@@ -1,44 +1,34 @@
 # Local variables
 locals {
-  name                = "${var.vpc_prefix}${var.name}${var.namespace}"
-  public_subnet_name  = "${var.public_subnet_prefix}${var.name}${var.namespace}"
-  private_subnet_name = "${var.private_subnet_prefix}${var.name}${var.namespace}"
-  prefix              = "${var.prefix}${var.namespace}"
-
-  default_tags = {
-    managed_by    = "terraform"
-    date_created  = formatdate("MM-DD-YYYY", timestamp())
-    created_by    = var.created_by
-    team          = var.team
-    environment   = var.environment
-    namespace     = var.namespace
-    contact_email = var.contact_email
-  }
+  ifconfig_co_json = jsondecode(data.http.my_public_ip.body)
+  vpc_id           = try(aws_vpc_ipv4_cidr_block_association.this[0].vpc_id, aws_vpc.this[0], "")
+  create_vpc       = var.create_vpc
 }
 
 ### Network resources ###
 # VPC
 resource "aws_vpc" "this" {
+  count                = local.create_vpc ? 1 : 0
   cidr_block           = var.cidr
   enable_dns_hostnames = var.enable_dns_hostnames
   enable_dns_support   = var.enable_dns_support
   tags = merge(
-    { Name = "${local.name}" },
-    { resource = "VPC" },
+    { Name = var.name },
+    var.vpc_tags,
     var.tags
   )
 }
 
 # Public subnet
 resource "aws_subnet" "public" {
+  count                   = local.vpc_id
   vpc_id                  = aws_vpc.this.id
   cidr_block              = var.public_subnet
   availability_zone       = data.aws_availability_zones.available.names[0]
   map_public_ip_on_launch = true
   tags = merge(
-    { Name = "${local.public_subnet_name}" },
-    { resource = "public subnet" },
-    local.default_tags,
+    { Name = "${var.name}-${var.public_subnet_suffix}" },
+    var.public_subnet_tags,
     var.tags
   )
 }
@@ -47,9 +37,8 @@ resource "aws_subnet" "public" {
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.this.id
   tags = merge(
-    { Name = "${local.public_subnet_name}" },
-    { resource = "Route table for public subnet" },
-    local.default_tags,
+    { Name = "${var.name}-${var.public_subnet_suffix}" },
+    var.private_route_table_tags,
     var.tags
   )
 }
@@ -99,7 +88,7 @@ resource "aws_security_group" "trusted" {
     from_port   = 0
     to_port     = 65535
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = var.trusted_cidr
   }
 
   egress {
@@ -336,12 +325,6 @@ resource "aws_secretsmanager_secret_version" "centralpass" {
   secret_id     = aws_secretsmanager_secret.centralpass.id
   secret_string = var.central_password
 }
-
-
-
-
-
-
 resource "aws_key_pair" "this" {
   count = var.create_key_pair ? 1 : 0
 
