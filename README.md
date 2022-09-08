@@ -107,7 +107,7 @@ No modules.
 | <a name="input_suffix"></a> [suffix](#input\_suffix) | Suffix to attach to created resources | `string` | `null` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | A map of tags to add to all resources | `map(string)` | `{}` | no |
 | <a name="input_team"></a> [team](#input\_team) | The name of the team provisioning the resource | `string` | `null` | no |
-| <a name="input_trusted_cidr"></a> [trusted\_cidr](#input\_trusted\_cidr) | Trusted IP address | `list(string)` | <pre>[<br>  "0.0.0.0/0"<br>]</pre> | no |
+| <a name="input_trusted_cidr"></a> [trusted\_cidr](#input\_trusted\_cidr) | Trusted IP address | `list(string)` | <pre>[<br>  null<br>]</pre> | no |
 | <a name="input_vpc_prefix"></a> [vpc\_prefix](#input\_vpc\_prefix) | Pre-fix to attach to created VPC resources | `string` | `"vpc-"` | no |
 | <a name="input_vpc_tags"></a> [vpc\_tags](#input\_vpc\_tags) | Additional tags for the VPC | `map(string)` | `{}` | no |
 

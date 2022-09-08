@@ -1,8 +1,20 @@
 # Local variables
 locals {
-  ifconfig_co_json = jsondecode(data.http.my_public_ip.body)
-  vpc_id           = try(aws_vpc_ipv4_cidr_block_association.this.vpc_id, aws_vpc.this, "")
-  create_vpc       = var.create_vpc
+  name                = "${var.vpc_prefix}${var.name}${var.namespace}"
+  public_subnet_name  = "${var.public_subnet_prefix}${var.name}${var.namespace}"
+  private_subnet_name = "${var.private_subnet_prefix}${var.name}${var.namespace}"
+  prefix              = "${var.prefix}${var.namespace}"
+  ifconfig_co_json    = [join("/", jsondecode(data.http.my_public_ip.body), ["32"])]
+  trusted_cidr        = var.trusted_cidr != null ? var.trusted_cidr : "${local.ifconfig_co_json}"
+  default_tags = {
+    managed_by    = "terraform"
+    date_created  = formatdate("MM-DD-YYYY", timestamp())
+    created_by    = var.created_by
+    team          = var.team
+    environment   = var.environment
+    namespace     = var.namespace
+    contact_email = var.contact_email
+  }
 }
 
 ### Network resources ###
@@ -136,10 +148,12 @@ resource "aws_security_group" "lan" {
   description = "Security Group for private subnet. Allow everything by default"
   vpc_id      = aws_vpc.this.id
   ingress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    from_port = 0
+    to_port   = 0
+    protocol  = "-1"
+    cidr_blocks = concat(
+      var.trusted_cidr
+    )
   }
   egress {
     from_port   = 0
