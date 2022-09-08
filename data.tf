@@ -68,6 +68,13 @@ data "aws_iam_policy_document" "trust_relationship" {
   }
 }
 
+data "http" "my_public_ip" {
+  url = "https://ifconfig.co/json"
+  request_headers = {
+    Accept = "application/json"
+  }
+}
+
 data "template_file" "user_data" {
   template = file("${path.module}/templates/user_data.tpl")
   vars = {

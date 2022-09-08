@@ -233,7 +233,7 @@ variable "team" {
 variable "trusted_cidr" {
   description = "Trusted IP address"
   type        = list(string)
-  default     = ["0.0.0.0/0"]
+  default     = [null]
 }
 
 variable "vpc_prefix" {

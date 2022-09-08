@@ -13,6 +13,7 @@
 | Name | Version |
 |------|---------|
 | <a name="provider_aws"></a> [aws](#provider\_aws) | 4.29.0 |
+| <a name="provider_http"></a> [http](#provider\_http) | 3.1.0 |
 | <a name="provider_template"></a> [template](#provider\_template) | 2.2.0 |
 | <a name="provider_tls"></a> [tls](#provider\_tls) | 4.0.2 |
 
@@ -59,6 +60,7 @@ No modules.
 | [aws_iam_policy_document.ec2_iam_policy_ssmk](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.trust_relationship](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_region.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/region) | data source |
+| [http_http.my_public_ip](https://registry.terraform.io/providers/hashicorp/http/latest/docs/data-sources/http) | data source |
 | [template_file.user_data](https://registry.terraform.io/providers/hashicorp/template/latest/docs/data-sources/file) | data source |
 
 ## Inputs
@@ -102,7 +104,7 @@ No modules.
 | <a name="input_suffix"></a> [suffix](#input\_suffix) | Suffix to attach to created resources | `string` | `null` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | A map of tags to add to all resources | `map(string)` | `{}` | no |
 | <a name="input_team"></a> [team](#input\_team) | The name of the team provisioning the resource | `string` | `null` | no |
-| <a name="input_trusted_cidr"></a> [trusted\_cidr](#input\_trusted\_cidr) | Trusted IP address | `list(string)` | <pre>[<br>  "0.0.0.0/0"<br>]</pre> | no |
+| <a name="input_trusted_cidr"></a> [trusted\_cidr](#input\_trusted\_cidr) | Trusted IP address | `list(string)` | <pre>[<br>  null<br>]</pre> | no |
 | <a name="input_vpc_prefix"></a> [vpc\_prefix](#input\_vpc\_prefix) | Pre-fix to attach to created VPC resources | `string` | `"vpc-"` | no |
 
 ## Outputs
