@@ -1,30 +1,20 @@
 # Local variables
 locals {
-  name                = "${var.vpc_prefix}${var.name}${var.namespace}"
-  public_subnet_name  = "${var.public_subnet_prefix}${var.name}${var.namespace}"
-  private_subnet_name = "${var.private_subnet_prefix}${var.name}${var.namespace}"
-  prefix              = "${var.prefix}${var.namespace}"
-
-  default_tags = {
-    managed_by    = "terraform"
-    date_created  = formatdate("MM-DD-YYYY", timestamp())
-    created_by    = var.created_by
-    team          = var.team
-    environment   = var.environment
-    namespace     = var.namespace
-    contact_email = var.contact_email
-  }
+  ifconfig_co_json = jsondecode(data.http.my_public_ip.body)
+  vpc_id           = try(aws_vpc_ipv4_cidr_block_association.this.vpc_id, aws_vpc.this, "")
+  create_vpc       = var.create_vpc
 }
 
 ### Network resources ###
 # VPC
 resource "aws_vpc" "this" {
+  count                = local.create_vpc ? 1 : 0
   cidr_block           = var.cidr
   enable_dns_hostnames = var.enable_dns_hostnames
   enable_dns_support   = var.enable_dns_support
   tags = merge(
-    { Name = "${local.name}" },
-    { resource = "VPC" },
+    { Name = var.name },
+    var.vpc_tags,
     var.tags
   )
 }
@@ -37,9 +27,8 @@ resource "aws_subnet" "public" {
   availability_zone       = data.aws_availability_zones.available.names[0]
   map_public_ip_on_launch = true
   tags = merge(
-    { Name = "${local.public_subnet_name}" },
-    { resource = "public subnet" },
-    local.default_tags,
+    { Name = "${var.name}-${var.public_subnet_suffix}" },
+    var.public_subnet_tags,
     var.tags
   )
 }
@@ -48,9 +37,8 @@ resource "aws_subnet" "public" {
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.this.id
   tags = merge(
-    { Name = "${local.public_subnet_name}" },
-    { resource = "Route table for public subnet" },
-    local.default_tags,
+    { Name = "${var.name}-${var.public_subnet_suffix}" },
+    var.private_route_table_tags,
     var.tags
   )
 }
@@ -90,7 +78,7 @@ resource "aws_security_group" "public" {
   tags = merge(
     { Name = "Public Subnet" },
     { resource = "Untrusted network security group" },
-    local.default_tags,
+
     var.tags
   )
 }
@@ -116,7 +104,7 @@ resource "aws_security_group" "trusted" {
   tags = merge(
     { Name = "Trusted Network" },
     { resource = "Trusted network security group" },
-    local.default_tags,
+
     var.tags
   )
 }
@@ -128,7 +116,6 @@ resource "aws_subnet" "private" {
   tags = merge(
     { Name = "${local.private_subnet_name}" },
     { resource = "private subnet" },
-    local.default_tags,
     var.tags
   )
 }
@@ -139,7 +126,6 @@ resource "aws_route_table" "private" {
   tags = merge(
     { Name = "${local.private_subnet_name}" },
     { resource = "Route table for private subnet" },
-    local.default_tags,
     var.tags
   )
 }
@@ -164,7 +150,7 @@ resource "aws_security_group" "lan" {
   tags = merge(
     { Name = "Private Subnet" },
     { resource = "Private subnet security groups" },
-    local.default_tags,
+
     var.tags
   )
 }
@@ -175,7 +161,7 @@ resource "aws_internet_gateway" "this" {
   tags = merge(
     { Name = "${var.name}" },
     { resource = "Internet Gateway" },
-    local.default_tags,
+
     var.tags
   )
 }
@@ -204,7 +190,6 @@ resource "aws_network_interface" "public" {
   tags = merge(
     { Name = "WAN" },
     { resource = "Public ENI" },
-    local.default_tags,
     var.tags
   )
 }
@@ -220,7 +205,7 @@ resource "aws_network_interface" "private" {
   tags = merge(
     { Name = "LAN" },
     { resource = "Private ENI" },
-    local.default_tags,
+
     var.tags
   )
 }
@@ -235,7 +220,7 @@ resource "aws_instance" "this" {
   tags = merge(
     { Name = "${var.firewall_hostname}" },
     { resource = "Sophos XG Firewall" },
-    local.default_tags,
+
     var.tags
   )
 }
@@ -247,7 +232,6 @@ resource "aws_iam_instance_profile" "this" {
   role = aws_iam_role.this.name
   tags = merge(
     { resource = "EC2 IAM Instance Profile" },
-    local.default_tags,
     var.tags
   )
 }
@@ -270,7 +254,7 @@ resource "aws_iam_role" "this" {
   }
   tags = merge(
     { resource = "EC2 IAM Role" },
-    local.default_tags,
+
     var.tags
   )
 }
@@ -341,20 +325,13 @@ resource "aws_secretsmanager_secret_version" "centralpass" {
   secret_id     = aws_secretsmanager_secret.centralpass.id
   secret_string = var.central_password
 }
-
-
-
-
-
-
 resource "aws_key_pair" "this" {
   count = var.create_key_pair ? 1 : 0
 
   key_name        = var.key_name
   key_name_prefix = var.key_name_prefix
   public_key      = var.create_private_key ? trimspace(tls_private_key.this[0].public_key_openssh) : var.public_key
-
-  tags = var.tags
+  tags            = var.tags
 }
 
 resource "tls_private_key" "this" {

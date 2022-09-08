@@ -8,7 +8,7 @@ variable "central_password" {
   description = "Sophos Central password"
   type        = string
   sensitive   = true
-  default     = null
+  default     = ""
 }
 
 variable "central_username" {
@@ -51,6 +51,12 @@ variable "create_key_pair" {
   description = "Determines whether resources will be created (affects all resources)"
   type        = bool
   default     = false
+}
+
+variable "create_vpc" {
+  description = "Controls if VPC should be created (it affects almost all resources)"
+  type        = bool
+  default     = true
 }
 
 variable "default_security_group_egress" {
@@ -145,16 +151,21 @@ variable "private_key_rsa_bits" {
   default     = 4096
 }
 
+variable "private_route_table_tags" {
+  description = "Additional tags for the private route table"
+  type        = map(string)
+  default     = {}
+}
 variable "private_subnet" {
   description = "CIDR block for private subnet"
   type        = string
   default     = "172.16.16.0/24"
 }
 
-variable "private_subnet_prefix" {
+variable "private_subnet_suffix" {
   description = "Prefix to attach to private subnets"
   type        = string
-  default     = "private-subnet-"
+  default     = "private"
 }
 
 variable "public_key" {
@@ -169,10 +180,16 @@ variable "public_subnet" {
   default     = "172.16.17.0/24"
 }
 
-variable "public_subnet_prefix" {
+variable "public_subnet_suffix" {
   description = "Prefix to attach to public subnets"
   type        = string
-  default     = "public-subnet-"
+  default     = "public"
+}
+
+variable "public_subnet_tags" {
+  description = "Additional tags for the public subnets"
+  type        = map(string)
+  default     = {}
 }
 
 variable "region" {
@@ -236,6 +253,11 @@ variable "trusted_cidr" {
   default     = ["0.0.0.0/0"]
 }
 
+variable "vpc_tags" {
+  description = "Additional tags for the VPC"
+  type        = map(string)
+  default     = {}
+}
 variable "vpc_prefix" {
   description = "Pre-fix to attach to created VPC resources"
   type        = string

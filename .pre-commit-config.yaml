@@ -13,9 +13,10 @@ repos:
 
     - id: terraform_tflint
       args:
-        - --args=--loglevel=trace
         - --args=--enable-rule=terraform_documented_variables
         - --args=--module
+        - --args=--force
+        - --args=--config=__GIT_WORKING_DIR__/.tflint.hcl
 
     - id: terraform_docs
       args:
