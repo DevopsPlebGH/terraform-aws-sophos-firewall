@@ -31,6 +31,7 @@ resource "aws_vpc" "this" {
 
 # Public subnet
 resource "aws_subnet" "public" {
+	# checkov:skip=BC_AWS_NETWORKING_53: Need to allow public IP address to access firewall
   vpc_id                  = aws_vpc.this.id
   cidr_block              = var.public_subnet
   availability_zone       = data.aws_availability_zones.available.names[0]
@@ -60,18 +61,21 @@ resource "aws_security_group" "public" {
   description = "Untrusted network restricted from access port 22 and 4444"
   vpc_id      = aws_vpc.this.id
   ingress {
+    description = "Allow public access 0 - 21"
     from_port   = 0
     to_port     = 21
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
   ingress {
+    description = "Allow public access 23 - 4443"
     from_port   = 23
     to_port     = 4443
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
   ingress {
+    description = "Allow public access 4445 - 65535"
     from_port   = 4445
     to_port     = 65535
     protocol    = "tcp"
@@ -96,6 +100,7 @@ resource "aws_security_group" "trusted" {
   description = "Enable TCP access from trusted network"
   vpc_id      = aws_vpc.this.id
   ingress {
+    description = "Allow all from trusted IP"
     from_port   = 0
     to_port     = 65535
     protocol    = "tcp"
