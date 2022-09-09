@@ -22,6 +22,12 @@ jobs:
         include:
           - environment: 'esg_se_xdr_demo_dev'
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
       - id: tfbackend
         uses: dawidd6/action-download-artifact@v2
         continue-on-error: true
@@ -43,14 +49,10 @@ jobs:
           organization = "${{ secrets.ORGANIZATION_NAME }}"
           workspaces { name = "${{ env.GITHUB_REF }}"}
           EOF
+          
+          ls -lah
         env:
-          GITHUB_REF: ${{ github.ref_name }}
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v1
-        with:
-          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+          GITHUB_REF: ${{ github.ref_name }}          
       - name: Use branch workspace
         uses: dflook/terraform-new-workspace@v1
         with:
