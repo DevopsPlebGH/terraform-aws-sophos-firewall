@@ -12,22 +12,23 @@ env:
   TERRAFORM_CLOUD_TOKENS: app.terraform.io=${{ secrets.TF_API_TOKEN }}
 
 jobs:
-  name: Module testing
-  runs-on: ubuntu-latest
-  strategy:
-    fail-fast: false
-    matrix:
-      include:
-        - environment: 'esg_se_xdr_demo_dev'
-  steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-    - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v1
-      with:
-        cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
-    - name: Use branch workspace
-      uses: dflook/terraform-new-workspace@v1
-      with:
-        workspace: ${{ github.head_ref }}
+  test:
+    name: Module testing
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - environment: 'esg_se_xdr_demo_dev'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+      - name: Use branch workspace
+        uses: dflook/terraform-new-workspace@v1
+        with:
+          workspace: ${{ github.head_ref }}
 
