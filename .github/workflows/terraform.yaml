@@ -21,6 +21,8 @@ jobs:
       matrix:
         include:
           - environment: 'esg_se_xdr_demo_dev'
+        path:
+          - ./examples/simple
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -49,19 +51,9 @@ jobs:
           organization = "${{ secrets.ORGANIZATION_NAME }}"
           workspaces { name = "${{ env.GITHUB_REF }}"}
           EOF
-
-          cat >> ./backend.tf<<EOF
-          terraform {
-            backend "remote" {}
-          }
-          EOF
-          
-          ls -lah
         env:
           GITHUB_REF: ${{ github.ref_name }}          
-      - name: Use branch workspace
-        uses: dflook/terraform-new-workspace@v1
-        with:
-          backend_config_file: ${{ env.TFBACKEND }}
-          path: .
+      - id: init
+        run: |
+          terraform init -backend-config=./config.remote.tfbackend
 
