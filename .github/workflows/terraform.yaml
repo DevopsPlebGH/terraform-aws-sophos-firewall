@@ -54,6 +54,7 @@ jobs:
           terraform {
             backend "remote" {}
           }
+          EOF
           
           ls -lah
         env:
