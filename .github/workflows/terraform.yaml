@@ -10,7 +10,7 @@ on:
       - main
 env:
   TERRAFORM_CLOUD_TOKENS: app.terraform.io=${{ secrets.TF_API_TOKEN }}
-  TFBACKEND: ./config.remote.tfbackend
+  TFBACKEND: config.remote.tfbackend
 
 jobs:
   test:
@@ -63,4 +63,5 @@ jobs:
         uses: dflook/terraform-new-workspace@v1
         with:
           backend_config_file: ${{ env.TFBACKEND }}
+          path: .
 
