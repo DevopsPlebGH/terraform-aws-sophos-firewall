@@ -35,13 +35,14 @@ data "aws_iam_policy_document" "ec2_iam_policy" {
 }
 
 data "aws_iam_policy_document" "ec2_iam_policy_central" {
+  count = var.register_in_central ? 1 : 0
   statement {
     actions = [
       "secretsmanager:GetSecretValue",
       "secretsmanager:DescribeSecret"
     ]
     resources = [
-      aws_secretsmanager_secret.centralpass.arn
+      element(aws_secretsmanager_secret.centralpass[*].arn, count.index)
     ]
   }
 }
