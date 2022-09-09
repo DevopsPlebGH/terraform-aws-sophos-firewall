@@ -8,7 +8,7 @@ variable "central_password" {
   description = "Sophos Central password"
   type        = string
   sensitive   = true
-  default     = null
+  default     = ""
 }
 
 variable "central_username" {
@@ -41,16 +41,10 @@ variable "created_by" {
   default     = "terraform"
 }
 
-variable "create_private_key" {
-  description = "Determines whether a private key will be created"
+variable "create_vpc" {
+  description = "Controls if VPC should be created (it affects almost all resources)"
   type        = bool
-  default     = false
-}
-
-variable "create_key_pair" {
-  description = "Determines whether resources will be created (affects all resources)"
-  type        = bool
-  default     = false
+  default     = true
 }
 
 variable "default_security_group_egress" {
@@ -93,6 +87,12 @@ variable "firewall_hostname" {
   default     = "sophos-xg-firewall"
 }
 
+variable "iam_role_tags" {
+  description = "Additional tags to attach to the EC2 IAM role"
+  type = map(string)
+  default = {}
+}
+
 variable "instance_type" {
   description = "EC2 instance type to use for the firewall"
   type        = map(any)
@@ -103,22 +103,40 @@ variable "instance_type" {
   }
 }
 
+variable "instance_profile_tags" {
+  description = "Additional tags to attach to the Instance Profile"
+  type = map(string)
+  default = {}
+}
+
+variable "instance_tags" {
+  description = "Additional tags to attach to the EC2 instance"
+  type = map(string)
+  default = {}
+}
+
+variable "internet_gateway_tags" {
+  description = "Additional tags to attach to the internet gateway"
+  type = map(string)
+  default = {}
+}
+
 variable "key_name" {
   description = "The name for the key pair. Conflicts with `key_name_prefix`"
   type        = string
   default     = null
 }
 
-variable "key_name_prefix" {
-  description = "Creates a unique name beginning with the specified prefix. Conflicts with `key_name`"
-  type        = string
-  default     = null
+variable "launch_template_tags" {
+  description = "Additional tags to attach to the launch template"
+  type = map(string)
+  default = {}
 }
 
 variable "name" {
   description = "The name of the VPC"
   type        = string
-  default     = "sophos.aws.demo_env"
+  default     = "xg_firewall"
 }
 
 variable "namespace" {
@@ -133,34 +151,39 @@ variable "prefix" {
   default     = "fw"
 }
 
-variable "private_key_algorithm" {
-  description = "Name of the algorithm to use when generating the private key. Currently-supported values are `RSA` and `ED25519`"
-  type        = string
-  default     = "RSA"
+variable "private_eni_tags" {
+  description = "Additional tags to attach to the private ENI"
+  type = map(string)
+  default = {}
 }
 
-variable "private_key_rsa_bits" {
-  description = "When algorithm is `RSA`, the size of the generated RSA key, in bits (default: `4096`)"
-  type        = number
-  default     = 4096
+variable "private_route_table_tags" {
+  description = "Additional tags for the private route table"
+  type        = map(string)
+  default     = {}
 }
-
 variable "private_subnet" {
   description = "CIDR block for private subnet"
   type        = string
   default     = "172.16.16.0/24"
 }
 
-variable "private_subnet_prefix" {
+variable "private_subnet_suffix" {
   description = "Prefix to attach to private subnets"
   type        = string
-  default     = "private-subnet-"
+  default     = "private"
 }
 
-variable "public_key" {
-  description = "The public key material"
-  type        = string
-  default     = ""
+variable "private_subnet_tags" {
+  description = "Additional tags for the private subnets"
+  type        = map(string)
+  default     = {}
+}
+
+variable "public_eni_tags" {
+  description = "Additional tags to attach to the public ENI"
+  type = map(string)
+  default = {}
 }
 
 variable "public_subnet" {
@@ -169,10 +192,16 @@ variable "public_subnet" {
   default     = "172.16.17.0/24"
 }
 
-variable "public_subnet_prefix" {
+variable "public_subnet_suffix" {
   description = "Prefix to attach to public subnets"
   type        = string
-  default     = "public-subnet-"
+  default     = "public"
+}
+
+variable "public_subnet_tags" {
+  description = "Additional tags for the public subnets"
+  type        = map(string)
+  default     = {}
 }
 
 variable "region" {
@@ -191,6 +220,12 @@ variable "secure_storage_master_key" {
   description = "The Secure Storage Master Key"
   type        = string
   sensitive   = true
+}
+
+variable "security_group_tags" {
+  description = "Additional tags for Security Groups"
+  type        = map(string)
+  default     = {}
 }
 
 variable "send_stats" {
@@ -236,6 +271,11 @@ variable "trusted_cidr" {
   default     = [null]
 }
 
+variable "vpc_tags" {
+  description = "Additional tags for the VPC"
+  type        = map(string)
+  default     = {}
+}
 variable "vpc_prefix" {
   description = "Pre-fix to attach to created VPC resources"
   type        = string
