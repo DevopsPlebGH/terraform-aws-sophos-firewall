@@ -53,6 +53,8 @@ jobs:
           organization = "${{ secrets.ORGANIZATION_NAME }}"
           workspaces { name = "${{ env.GITHUB_REF }}"}
           EOF
+
+          ls -lah
         env:
           GITHUB_REF: ${{ github.ref_name }}          
       - id: init
