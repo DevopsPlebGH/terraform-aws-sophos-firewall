@@ -49,6 +49,11 @@ jobs:
           organization = "${{ secrets.ORGANIZATION_NAME }}"
           workspaces { name = "${{ env.GITHUB_REF }}"}
           EOF
+
+          cat >> ./backend.tf<<EOF
+          terraform {
+            backend "remote" {}
+          }
           
           ls -lah
         env:
