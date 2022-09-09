@@ -10,6 +10,7 @@ on:
       - main
 env:
   TERRAFORM_CLOUD_TOKENS: app.terraform.io=${{ secrets.TF_API_TOKEN }}
+  TFBACKEND: ./config.remote.tfbackend
 
 jobs:
   test:
@@ -21,6 +22,29 @@ jobs:
         include:
           - environment: 'esg_se_xdr_demo_dev'
     steps:
+      - id: tfbackend
+        uses: dawidd6/action-download-artifact@v2
+        continue-on-error: true
+        with:
+          github_token: ${{ github.token }}
+          name: ${{ matrix.environment }}
+          path: ./config.remote.tfbackend.enc
+      - name: Check if tfbackend already exists
+        if: steps.tfbackend.outcome == 'success'
+        run: |
+          if [ -f ./config.remote.tfbackend.enc ]; then
+            openssl enc -d -in ${{ env.tfbackend }} -aes-256-cbc -pbkdf2 -pass pass:"${{ secrets.ENCRYPTION_KEY }}" -out ./config.remote.tfbackend
+          fi
+      - name: Create tfbackend
+        if: steps.tfbackend.outcome != 'success'
+        run: |
+          cat >> ./config.remote.tfbackend<<EOF
+          hostname = "app.terraform.io"
+          organization = "${{ secrets.ORGANIZATION_NAME }}"
+          workspaces { name = "${{ env.GITHUB_REF }}"}
+          EOF
+        env:
+          GITHUB_REF: ${{ github.head_ref }}
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Setup Terraform
@@ -30,5 +54,5 @@ jobs:
       - name: Use branch workspace
         uses: dflook/terraform-new-workspace@v1
         with:
-          workspace: ${{ github.head_ref }}
+          backend_config_file: ${{ env.TFBACKEND }}
 
