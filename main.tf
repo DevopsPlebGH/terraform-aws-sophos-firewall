@@ -45,11 +45,17 @@ resource "aws_route_table" "public" {
   )
 }
 
+resource "aws_route_table_association" "public" {
+  count  = var.create_vpc ? 1 : 0
+  subnet_id = aws_subnet.public[0].id
+  route_table_id = aws_route_table.public[0].id
+}
+
 # Public subnet security groups
 resource "aws_security_group" "public" {
   # checkov:skip=BC_AWS_NETWORKING_2: Not applicable to firewall
   count       = var.create_vpc ? 1 : 0
-  name        = "Public Subnet"
+  name        = "${var.namespace}-SecurityGroupPublic-${var.public_subnet_suffix}"
   description = "Untrusted network restricted from access port 22 and 4444"
   vpc_id      = aws_vpc.this[0].id
   ingress {
@@ -81,7 +87,6 @@ resource "aws_security_group" "public" {
     cidr_blocks = ["0.0.0.0/0"]
   }
   tags = merge(
-    { Name = "Public Subnet" },
     var.security_group_tags,
     var.tags
   )
@@ -89,7 +94,7 @@ resource "aws_security_group" "public" {
 
 resource "aws_security_group" "trusted" {
   count = var.create_vpc ? 1 : 0
-  name        = "Trusted Network"
+  name        = "${var.namespace}-SecurityGroupTrusted-${var.public_subnet_suffix}"
   description = "Enable TCP access from trusted network"
   vpc_id      = aws_vpc.this[0].id
   ingress {
@@ -107,7 +112,6 @@ resource "aws_security_group" "trusted" {
     cidr_blocks = ["0.0.0.0/0"]
   }
   tags = merge(
-    { Name = "sg-${var.name}-trusted-${var.public_subnet_suffix}" },
     var.security_group_tags,
     var.tags
   )
@@ -136,10 +140,16 @@ resource "aws_route_table" "private" {
   )
 }
 
+resource "aws_route_table_association" "private" {
+  count  = var.create_vpc ? 1 : 0
+  subnet_id = aws_subnet.private[0].id
+  route_table_id = aws_route_table.private[0].id
+}
+
 # Private subnet security groups
 resource "aws_security_group" "lan" {
   count       = var.create_vpc ? 1 : 0
-  name        = "Private Subnet"
+  name        = "${var.namespace}-SecurityGroupLAN-${var.private_subnet_suffix}"
   description = "Security Group for private subnet. Allow everything by default"
   vpc_id      = aws_vpc.this[0].id
   ingress {
@@ -155,7 +165,6 @@ resource "aws_security_group" "lan" {
     cidr_blocks = ["0.0.0.0/0"]
   }
   tags = merge(
-    { Name = "sg-${var.namespace}-${var.name}-${var.private_subnet_suffix}" },
     var.security_group_tags,
     var.tags
   )
@@ -198,10 +207,10 @@ resource "aws_eip" "this" {
 resource "aws_network_interface" "public" {
   subnet_id   = aws_subnet.public[0].id
   description = "ENI for Public Subnet"
-  security_groups = [
-    aws_security_group.trusted[0].id,
-    aws_security_group.public[0].id
-  ]
+#  security_groups = [
+#    aws_security_group.trusted[0].id,
+#    aws_security_group.public[0].id
+#  ]
   tags = merge(
     { Name = "publicENI-${var.namespace}-${var.name}" },
     var.public_eni_tags,
@@ -209,18 +218,33 @@ resource "aws_network_interface" "public" {
   )
 }
 
+# Public ENI attachment
+resource "aws_network_interface_attachment" "public" {
+  instance_id = aws_instance.this.id
+  network_interface_id = aws_network_interface.public.id
+  device_index = 1
+}
+
 # Private ENI
 resource "aws_network_interface" "private" {
   subnet_id   = aws_subnet.private[0].id
   description = "ENI for Private Subnet"
-  security_groups = [
-    aws_security_group.lan[0].id
-  ]
+#  security_groups = [
+#    aws_security_group.lan[0].id
+#  ]
+  source_dest_check = false
   tags = merge(
     { Name = "privateENI-${var.namespace}-${var.name}" },
     var.private_eni_tags,
     var.tags
   )
+}
+
+# Private ENI attachment
+resource "aws_network_interface_attachment" "private" {
+  instance_id = aws_instance.this.id
+  network_interface_id = aws_network_interface.private.id
+  device_index = 0
 }
 
 # EC2 Instance
@@ -232,16 +256,16 @@ resource "aws_instance" "this" {
   }
   root_block_device {
     encrypted     = false
+    delete_on_termination = true
     volume_size   = 16
     volume_type = "gp2"
-    iops = 100
   }
   ebs_block_device {
     device_name = "/dev/xvdg"
+    delete_on_termination = true
     encrypted = false
     volume_size = 80
     volume_type = "gp2"
-    iops = 240
   }
   metadata_options {
     http_endpoint               = "enabled"
@@ -311,15 +335,7 @@ resource "aws_launch_template" "this" {
   iam_instance_profile {
     name = aws_iam_role.this.name
   }
-  network_interfaces {
-    network_interface_id = aws_network_interface.public.id
-    device_index         = 0
-  }
-  network_interfaces {
-    network_interface_id = aws_network_interface.private.id
-    device_index         = 1
-  }
-  user_data = base64encode(jsonencode("${data.template_file.user_data.rendered}"))
+  user_data = base64encode("${data.template_file.user_data.rendered}")
   tags = merge(
     var.launch_template_tags,
     var.tags
@@ -371,6 +387,7 @@ resource "aws_secretsmanager_secret" "centralpass" {
 }
 
 resource "aws_secretsmanager_secret_version" "centralpass" {
-  secret_id     = aws_secretsmanager_secret.centralpass.id
+  count = var.register_in_central ? 1 : 0
+  secret_id     = aws_secretsmanager_secret.centralpass[0].id
   secret_string = var.central_password
 }

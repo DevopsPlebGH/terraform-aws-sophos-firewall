@@ -122,9 +122,32 @@ variable "internet_gateway_tags" {
 }
 
 variable "key_name" {
-  description = "The name for the key pair. Conflicts with `key_name_prefix`"
+  description = <<EOT
+  (Optional) The name of the SSH key to attach to the instance.
+
+  Default: null
+  EOT
   type        = string
   default     = null
+}
+
+variable "sku_type" {
+  description = <<EOT
+  (Optional) The license SKU to use for this XG firewall deployment.
+
+  Options:
+  
+  - payg
+  - byol
+
+  Default: payg
+  EOT
+  type = string
+  default = "payg"
+  validation {
+    condition = contains(["byol", "payg"], var.sku_type)
+    error_message = "ERROR: SKU type must be either byol or payg"
+  }
 }
 
 variable "launch_template_tags" {
