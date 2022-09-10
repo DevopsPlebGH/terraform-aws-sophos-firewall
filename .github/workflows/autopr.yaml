@@ -4,8 +4,9 @@ on:
   push:
     branches:
     - feature/**
-    - !main
-    - !dev
+    branches-ignore:
+    - main
+    - dev
 
 jobs:
   autopr:
