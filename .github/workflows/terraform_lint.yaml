@@ -14,6 +14,7 @@ jobs:
     - name: Terraform Lint
       id: lint
       uses: Dev0psPleb/terraform-aws-sophos-firewall/.github/actions/terraform_lint@main
+      continue-on-error: true
     - id: diff
       run: |
         echo '${{ steps.lint.outputs.stdout || steps.lint.outputs.stderr }}'
