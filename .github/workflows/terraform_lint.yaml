@@ -12,4 +12,4 @@ jobs:
       with:
         ref: ${{ github.ref }}
     - name: Terraform Lint
-      uses: Dev0psPleb/terraform-aws-sophos-firewall/.github/actions/terraform_lint
+      uses: Dev0psPleb/terraform-aws-sophos-firewall/.github/actions/terraform_lint@main
