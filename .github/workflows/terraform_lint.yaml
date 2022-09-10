@@ -5,7 +5,7 @@ on:
     branches:
       - dev
       - main
-      
+
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -31,3 +31,14 @@ jobs:
         echo "DIFF<<EOF" >> $GITHUB_ENV
         echo "$DIFF" >> $GITHUB_ENV
         echo "EOF" >> $GITHUB_ENV
+    - name: Post Diff to GitHub PR
+      uses: mshick/add-pr-comment@v1
+      with:
+        allow-repeats: true
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        repo-token-user-login: 'github-actions[bot]'
+        message: |
+          ## terraform fmt diff
+          ```diff
+          ${{ env.DIFF }}
+          ```
