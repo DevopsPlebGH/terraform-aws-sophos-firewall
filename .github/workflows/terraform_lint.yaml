@@ -15,13 +15,13 @@ jobs:
       uses: hashicorp/setup-terraform@v1
     - name: Terraform Lint
       id: lint
+      continue-on-error: true
       run: |
         terraform fmt -check -recursive -diff
     - id: diff
       run: |
         echo '${{ steps.lint.outputs.stdout || steps.lint.outputs.stderr }}' \
         | sed -E 's/^([[:space:]]+)([-+])/\2\1/g' > diff.txt
-      continue-on-error: true
     - name: Put diff in Env Var
       run: |
         DIFF=$(cat diff.txt)
