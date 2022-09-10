@@ -1,6 +1,0 @@
-name: 'Terraform-Lint'
-author: 'Jason Field'
-description: 'Validates your terraform files are formatted correctly'
-runs:
-  using: 'docker'
-  image: 'Dockerfile'
