@@ -17,7 +17,7 @@ jobs:
       id: lint
       continue-on-error: true
       run: |
-        terraform fmt -check -recursive -diff
+        terraform fmt -check -diff -list=true
     - id: diff
       run: |
         echo '${{ steps.lint.outputs.stdout || steps.lint.outputs.stderr }}' \
