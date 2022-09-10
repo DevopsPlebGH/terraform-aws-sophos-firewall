@@ -1,0 +1,10 @@
+name: Terraform Lint
+description: Formats terraform files and validates code.
+author: Ralph Brynard
+branding:
+  icon: cloud
+  color: purple
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+
