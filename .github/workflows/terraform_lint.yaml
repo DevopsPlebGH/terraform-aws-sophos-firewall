@@ -29,9 +29,8 @@ jobs:
     - id: diff
       run: |
         echo '${{ steps.lint1.outputs.stdout || steps.lint1.outputs.stderr }}' \
-        | sed -E 's/^([[:space:]]+)([-+])/\2\1/g' > diff.txt
-
-        echo '{{ steps.lint2.outputs.stdout || steps.lint2.outputs.stderr }}' > list.txt
+        | sed -E 's/^([[:space:]]+)([-+])/\2\1/g' > diff.txt \
+        echo '${{ steps.lint2.outputs.stdout || steps.lint2.outputs.stderr }}' > list.txt
     - name: Put diff and list in Env Var
       run: |
         DIFF=$(cat diff.txt)
