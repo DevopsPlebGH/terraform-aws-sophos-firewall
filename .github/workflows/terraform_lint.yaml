@@ -19,4 +19,12 @@ jobs:
         terraform fmt -check -recursive -diff
     - id: diff
       run: |
-        echo '${{ steps.lint.outputs.stdout || steps.lint.outputs.stderr }}'
+        echo '${{ steps.lint.outputs.stdout || steps.lint.outputs.stderr }}' \
+        | sed -E 's/^([[:space:]]+)([-+])/\2\1/g' > diff.txt
+      continue-on-error: true
+    - name: Put diff in Env Var
+      run: |
+        DIFF=$(cat diff.txt)
+        echo "DIFF<<EOF" >> $GITHUB_ENV
+        echo "$DIFF" >> $GITHUB_ENV
+        echo "EOF" >> $GITHUB_ENV
