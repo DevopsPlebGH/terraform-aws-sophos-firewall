@@ -1,4 +1,11 @@
-if [[ -n "$(terraform fmt -check -recursive -diff)" ]]; then
-  echo "Some terraform files need to be formatted. Run 'terraform fmt -recursive' to fix them.";
-  exit 1;
-fi
+function check(){
+  local __resultvar=$1
+  local result=$(terraform fmt -check -recursive -diff)
+
+  if [[ -n "$(terraform fmt -check -recursive -diff)" ]]; then
+    echo "$result"
+  fi
+}
+
+check result
+echo $result
