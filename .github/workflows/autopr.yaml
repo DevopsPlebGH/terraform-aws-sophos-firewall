@@ -3,6 +3,7 @@ name: Auto Pull Request
 on:
   push:
     branches:
+    - feature/**
     - !main
     - !dev
 
