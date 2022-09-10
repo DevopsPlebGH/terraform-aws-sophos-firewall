@@ -17,12 +17,19 @@ jobs:
       uses: actions/checkout@v2
     - name: autopr
       id: autopr
-      uses: peter-evans/create-pull-request@v4
+      uses: devops-infra/action-pull-request@v0.5.0
       with:
-        token: ${{ secrets.GH_PAT_TOKEN }}
-        delete-branch: false
-        labels: |
+        github_token: ${{ github.token }}
+        target_branch: dev
+        title: '[create-pull-request] automated change'
+        body: '[create-pull-request] automated change'
+        reviewer: Dev0psPleb
+        label: |
           autopr
-          feature
-        reviewers: Dev0psPleb
-        base: dev
+        milestone: My milestone
+        draft: true
+        old_string: "<!-- Add your description here -->"
+        new_string: "** Automatic pull request**"
+        get_diff: true
+        ignore_users: "dependabot"
+        allow_no_diff: false
