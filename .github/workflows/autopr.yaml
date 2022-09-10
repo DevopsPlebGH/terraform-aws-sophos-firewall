@@ -2,11 +2,12 @@ name: Auto Pull Request
 
 on:
   push:
-    branches:
-    - feature/**
     branches-ignore:
     - main
     - dev
+    - hotfix/**
+    - bugfix/**
+    - release/**
 
 jobs:
   autopr:
