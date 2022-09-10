@@ -11,10 +11,12 @@ jobs:
       uses: actions/checkout@v2
       with:
         ref: ${{ github.ref }}
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v1
     - name: Terraform Lint
       id: lint
-      uses: Dev0psPleb/terraform-aws-sophos-firewall/.github/actions/terraform_lint@main
-      continue-on-error: true
+      run: |
+        terraform fmt -check -recursive -diff
     - id: diff
       run: |
         echo '${{ steps.lint.outputs.stdout || steps.lint.outputs.stderr }}'
