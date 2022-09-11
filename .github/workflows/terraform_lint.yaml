@@ -20,17 +20,18 @@ jobs:
       id: lint1
       run: |
         terraform fmt -check -diff
-    - id: diff
+    - name: Terraform fmt list
+      continue-on-error: true
       if: ${{ failure() }}
+      id: lint2
+      run: |
+        terraform fmt -check -list=true
+    - id: diff
+      if: ${{ steps.lint1.outcome != 'success' }}
       run: |
         echo '${{ steps.lint1.outputs.stdout || steps.lint1.outputs.stderr }}' \
         | sed -E 's/^([[:space:]]+)([-+])/\2\1/g' > diff.txt && \
         echo '${{ steps.lint2.outputs.stdout || steps.lint2.outputs.stderr }}' > list.txt
-    - name: Terraform fmt list
-      continue-on-error: true
-      id: lint2
-      run: |
-        terraform fmt -check -list=true
     - name: Put diff and list in Env Var
       run: |
         DIFF=$(cat diff.txt)
