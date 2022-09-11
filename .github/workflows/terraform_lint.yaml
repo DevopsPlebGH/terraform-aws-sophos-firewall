@@ -17,26 +17,30 @@ jobs:
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v1
     - name: Terraform Lint
-      id: lint
-      continue-on-error: true
+      id: lint1
       run: |
-        terraform fmt -check -diff && \
-        terraform fmt -check -list=true
+        terraform fmt -check -diff
+    - id: diff
+      if: ${{ failure() }}
+      run: |
+        echo '${{ steps.lint1.outputs.stdout || steps.lint1.outputs.stderr }}' \
+        | sed -E 's/^([[:space:]]+)([-+])/\2\1/g' > diff.txt && \
+        echo '${{ steps.lint2.outputs.stdout || steps.lint2.outputs.stderr }}' > list.txt
     - name: Terraform fmt list
       continue-on-error: true
-      id: fmtlist
+      id: lint2
       run: |
         terraform fmt -check -list=true
-    - id: diff
-      run: |
-        echo '${{ steps.lint.outputs.stdout || steps.lint.outputs.stderr }}' \
-        | sed -E 's/^([[:space:]]+)([-+])/\2\1/g' > lint.txt && \
-        cat lint.txt
     - name: Put diff and list in Env Var
       run: |
-        LINT=$(cat lint.txt)
-        echo "LINT<<EOF" >> $GITHUB_ENV
-        echo "$LINT" >> $GITHUB_ENV
+        DIFF=$(cat diff.txt)
+        echo "DIFF<<EOF" >> $GITHUB_ENV
+        echo "$DIFF" >> $GITHUB_ENV
+        echo "EOF" >> $GITHUB_ENV
+
+        LIST=$(cat list.txt)
+        echo "LIST<<EOF" >> $GITHUB_ENV
+        echo "$LIST" >> $GITHUB_ENV
         echo "EOF" >> $GITHUB_ENV
     - name: Post Diff to GitHub PR
       uses: mshick/add-pr-comment@v1
@@ -47,6 +51,8 @@ jobs:
         message: |
           ## Terraform Format Diff:
           ```diff
-          ${{ env.LINT }}
+          ${{ env.DIFF }}
           ```
 
+          ## List of files:
+          ${{ env.LIST }}
