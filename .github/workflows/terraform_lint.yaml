@@ -17,12 +17,22 @@ jobs:
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v1
     - name: Terraform Lint
-      id: fmt
+      id: lint
       continue-on-error: true
       run: |
-        terraform fmt -check -diff  > diff.txt \
+        terraform fmt -check -diff && \
+        echo '${{ steps.lint.outputs.stdout }}' | sed -E 's/^([[:space:]]+)([-+])/\2\1/g' > diff.txt
+
+    - name: Terraform fmt list
+      continue-on-error: true
+      id: fmtlist
+      run: |
+        terraform fmt -check -list=true
+    - id: diff
+      run: |
+        echo '${{ steps.fmtdiff.outputs.stdout || steps.fmtdiff.outputs.stderr }}' \
         | sed -E 's/^([[:space:]]+)([-+])/\2\1/g' > diff.txt && \
-        terraform fmt -check -list=true  > list.txt \
+        echo '${{ steps.fmtlist.outputs.stdout || steps.fmtlist.outputs.stderr }}' > list.txt
     - name: Put diff and list in Env Var
       run: |
         DIFF=$(cat diff.txt)
@@ -48,4 +58,8 @@ jobs:
 
           ## List of files:
           ${{ env.LIST }}
+    - id: fmt
+      if: steps.fmtcheck.outputs.stderr == 'true'
+      run: |
+        echo ${{ steps.fmtcheck.outputs.stderr }}
 
