@@ -21,7 +21,6 @@ jobs:
       run: |
         terraform fmt -check -diff
     - name: Terraform fmt list
-      continue-on-error: true
       if: ${{ failure() }}
       id: lint2
       run: |
@@ -46,7 +45,7 @@ jobs:
         echo "EOF" >> $GITHUB_ENV
     - name: Post Diff to GitHub PR
       uses: mshick/add-pr-comment@v1
-      if: ${{ failure() }}
+      if: ${{ always() }}
       with:
         allow-repeats: true
         repo-token: ${{ secrets.GITHUB_TOKEN }}
