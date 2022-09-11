@@ -18,20 +18,22 @@ jobs:
       uses: hashicorp/setup-terraform@v1
     - name: Terraform Lint
       id: lint1
-      continue-on-error: true
       run: |
         terraform fmt -check -diff
     - name: Terraform fmt list
       continue-on-error: true
+      if: ${{ failure() }}
       id: lint2
       run: |
         terraform fmt -check -list=true
     - id: diff
+      if: ${{ failure() }}
       run: |
         echo '${{ steps.lint1.outputs.stdout || steps.lint1.outputs.stderr }}' \
         | sed -E 's/^([[:space:]]+)([-+])/\2\1/g' > diff.txt && \
         echo '${{ steps.lint2.outputs.stdout || steps.lint2.outputs.stderr }}' > list.txt
     - name: Put diff and list in Env Var
+      if: ${{ failure() }}
       run: |
         DIFF=$(cat diff.txt)
         echo "DIFF<<EOF" >> $GITHUB_ENV
@@ -44,6 +46,7 @@ jobs:
         echo "EOF" >> $GITHUB_ENV
     - name: Post Diff to GitHub PR
       uses: mshick/add-pr-comment@v1
+      if: ${{ failure() }}
       with:
         allow-repeats: true
         repo-token: ${{ secrets.GITHUB_TOKEN }}

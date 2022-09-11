@@ -1,8 +1,8 @@
 # Local variables
 locals {
-  ifconfig_co_json    = jsondecode(data.http.my_public_ip.body)
-  trusted_ip = [join("/", ["${local.ifconfig_co_json.ip}"], ["32"])]
-  cidr_block = var.trusted_cidr == null ? var.trusted_cidr : local.trusted_ip
+  ifconfig_co_json = jsondecode(data.http.my_public_ip.body)
+  trusted_ip       = [join("/", ["${local.ifconfig_co_json.ip}"], ["32"])]
+  cidr_block       = var.trusted_cidr == null ? var.trusted_cidr : local.trusted_ip
 }
 
 ### Network resources ###
@@ -88,7 +88,7 @@ resource "aws_security_group" "public" {
 }
 
 resource "aws_security_group" "trusted" {
-  count = var.create_vpc ? 1 : 0
+  count       = var.create_vpc ? 1 : 0
   name        = "Trusted Network"
   description = "Enable TCP access from trusted network"
   vpc_id      = aws_vpc.this[0].id
@@ -114,7 +114,7 @@ resource "aws_security_group" "trusted" {
 }
 # Private subnet
 resource "aws_subnet" "private" {
-  count       = var.create_vpc ? 1 : 0
+  count             = var.create_vpc ? 1 : 0
   vpc_id            = aws_vpc.this[0].id
   cidr_block        = var.private_subnet
   availability_zone = data.aws_availability_zones.available.names[0]
@@ -127,7 +127,7 @@ resource "aws_subnet" "private" {
 
 # Private subnet route table
 resource "aws_route_table" "private" {
-  count       = var.create_vpc ? 1 : 0
+  count  = var.create_vpc ? 1 : 0
   vpc_id = aws_vpc.this[0].id
   tags = merge(
     { Name = "rtb-${var.name}-${var.private_subnet_suffix}" },
@@ -163,7 +163,7 @@ resource "aws_security_group" "lan" {
 
 # Internet Gateway
 resource "aws_internet_gateway" "this" {
-  count       = var.create_vpc ? 1 : 0
+  count  = var.create_vpc ? 1 : 0
   vpc_id = aws_vpc.this[0].id
   tags = merge(
     { Name = "igw-${var.namespace}-${var.name}-${var.namespace}" },
@@ -186,10 +186,10 @@ resource "aws_route" "public_internet_gateway" {
 # Elastic IP Address
 # Public Elastic IP
 resource "aws_eip" "this" {
-  vpc                       = true
+  vpc               = true
   network_interface = aws_network_interface.public.id
   tags = merge(
-    { Name = "eip-${var.namespace}-${var.name}"},
+    { Name = "eip-${var.namespace}-${var.name}" },
     var.tags
   )
 }
@@ -231,17 +231,17 @@ resource "aws_instance" "this" {
     version = "$Latest"
   }
   root_block_device {
-    encrypted     = false
-    volume_size   = 16
+    encrypted   = false
+    volume_size = 16
     volume_type = "gp2"
-    iops = 100
+    iops        = 100
   }
   ebs_block_device {
     device_name = "/dev/xvdg"
-    encrypted = false
+    encrypted   = false
     volume_size = 80
     volume_type = "gp2"
-    iops = 240
+    iops        = 240
   }
   metadata_options {
     http_endpoint               = "enabled"
@@ -250,7 +250,7 @@ resource "aws_instance" "this" {
     instance_metadata_tags      = "enabled"
   }
   iam_instance_profile = aws_iam_instance_profile.this.name
-  monitoring = true
+  monitoring           = true
   tags = merge(
     { Name = "${var.firewall_hostname}" },
     { namespace = var.namespace },
@@ -291,9 +291,9 @@ resource "aws_iam_role" "this" {
 }
 
 resource "aws_iam_role_policy" "central_policy" {
-  count = var.register_in_central ? 1 : 0
-  name = "EC2IAMPolicyForCentral"
-  role = aws_iam_role.this.id
+  count  = var.register_in_central ? 1 : 0
+  name   = "EC2IAMPolicyForCentral"
+  role   = aws_iam_role.this.id
   policy = data.aws_iam_policy_document.ec2_iam_policy_central[0].json[count.index]
 }
 # EC2 Launch Template
@@ -329,7 +329,7 @@ resource "aws_launch_template" "this" {
 ### AWS Secrets Manager Resources ###
 # Secure Storage Master Key Secret
 resource "aws_secretsmanager_secret" "ssmk" {
-	# checkov:skip=BC_AWS_GENERAL_79: Customer Managed Key not needed
+  # checkov:skip=BC_AWS_GENERAL_79: Customer Managed Key not needed
   name                    = "${var.name}-ssmk"
   recovery_window_in_days = 0
 }
@@ -341,7 +341,7 @@ resource "aws_secretsmanager_secret_version" "ssmk" {
 
 # XG Backup Configuration Password
 resource "aws_secretsmanager_secret" "xgconfig" {
-	# checkov:skip=BC_AWS_GENERAL_79: Customer Managed Key not needed
+  # checkov:skip=BC_AWS_GENERAL_79: Customer Managed Key not needed
   name                    = "${var.name}-xgconfig"
   recovery_window_in_days = 0
 }
@@ -365,7 +365,7 @@ resource "aws_secretsmanager_secret_version" "sophospass" {
 
 # Sophos Central Password
 resource "aws_secretsmanager_secret" "centralpass" {
-  count = var.register_in_central ? 1 : 0
+  count                   = var.register_in_central ? 1 : 0
   name                    = "${var.name}-centralpass"
   recovery_window_in_days = 0
 }
