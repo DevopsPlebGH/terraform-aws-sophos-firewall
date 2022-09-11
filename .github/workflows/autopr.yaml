@@ -2,29 +2,22 @@ name: Auto Pull Request
 
 on:
   push:
-    branches-ignore:
-    - main
-    - dev
-    - hotfix/**
-    - bugfix/**
-    - release/**
+    branches:
+      - feature/**
 
 jobs:
   autopr:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: autopr
       id: autopr
       uses: repo-sync/pull-request@v2
       with:
         destination_branch: dev
-        pr_title: "Pulling ${{ github.ref }} into master"
-        pr_body: ":crown: *An automated PR*"
-#        pr_template: ".github/PULL_REQUEST_TEMPLATE.md"
-        pr_reviewer: "wei,worker"
-        pr_label: autopr
-        pr_draft: true
-        pr_allow_empty: true
         github_token: ${{ github.token }}
+        pr_label: |
+          autopr
+        pr_title: "Pulling ${{ github.ref }} into dev"
+        pr_assignee: Dev0psPleb
