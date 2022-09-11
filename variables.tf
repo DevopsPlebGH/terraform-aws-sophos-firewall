@@ -57,12 +57,12 @@ variable "tags" {
     
     Default: {}
     EOT
-    default = {}
+  default     = {}
 }
 
 variable "trusted_ip" {
-    type = list(string)
-    description =<<EOT
+  type        = list(string)
+  description = <<EOT
     (Optional) A trusted IP in CIDR format that will be added to the Trusted Network security group to allow access to the firewall console.
 
     The default behavior is to include the public IP address from which the Terraform plan is run.
@@ -71,7 +71,7 @@ variable "trusted_ip" {
     
     Default: [null]
     EOT
-    default = [null]
+  default     = [null]
 }
 variable "vpc_tags" {
   type        = map(string)

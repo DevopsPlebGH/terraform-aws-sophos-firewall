@@ -6,7 +6,7 @@
 #}
 
 module "example-basic" {
-  source                    = "../../"
-  create_vpc                = true
+  source     = "../../"
+  create_vpc = true
 }
 

@@ -19,7 +19,7 @@ jobs:
     - id: fmtcheck
       continue-on-error: true
       run: |
-        terraform fmt -check
+        terraform fmt
     - name: Terraform Lint
       id: fmtdiff
       continue-on-error: true

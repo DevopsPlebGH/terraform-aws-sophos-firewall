@@ -89,8 +89,8 @@ variable "firewall_hostname" {
 
 variable "iam_role_tags" {
   description = "Additional tags to attach to the EC2 IAM role"
-  type = map(string)
-  default = {}
+  type        = map(string)
+  default     = {}
 }
 
 variable "instance_type" {
@@ -105,20 +105,20 @@ variable "instance_type" {
 
 variable "instance_profile_tags" {
   description = "Additional tags to attach to the Instance Profile"
-  type = map(string)
-  default = {}
+  type        = map(string)
+  default     = {}
 }
 
 variable "instance_tags" {
   description = "Additional tags to attach to the EC2 instance"
-  type = map(string)
-  default = {}
+  type        = map(string)
+  default     = {}
 }
 
 variable "internet_gateway_tags" {
   description = "Additional tags to attach to the internet gateway"
-  type = map(string)
-  default = {}
+  type        = map(string)
+  default     = {}
 }
 
 variable "key_name" {
@@ -129,8 +129,8 @@ variable "key_name" {
 
 variable "launch_template_tags" {
   description = "Additional tags to attach to the launch template"
-  type = map(string)
-  default = {}
+  type        = map(string)
+  default     = {}
 }
 
 variable "name" {
@@ -153,8 +153,8 @@ variable "prefix" {
 
 variable "private_eni_tags" {
   description = "Additional tags to attach to the private ENI"
-  type = map(string)
-  default = {}
+  type        = map(string)
+  default     = {}
 }
 
 variable "private_route_table_tags" {
@@ -182,8 +182,8 @@ variable "private_subnet_tags" {
 
 variable "public_eni_tags" {
   description = "Additional tags to attach to the public ENI"
-  type = map(string)
-  default = {}
+  type        = map(string)
+  default     = {}
 }
 
 variable "public_subnet" {
