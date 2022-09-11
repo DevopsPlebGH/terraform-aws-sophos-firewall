@@ -18,11 +18,11 @@ jobs:
       uses: hashicorp/setup-terraform@v1
     - name: Terraform Lint
       id: lint1
-      if: success() || failure()
+      continue-on-error: true
       run: |
         terraform fmt -check -diff
     - name: Terraform fmt list
-      if: success() || failure()
+      continue-on-error: true
       id: lint2
       run: |
         terraform fmt -check -list=true
@@ -56,4 +56,8 @@ jobs:
 
           ## List of files:
           ${{ env.LIST }}
+    - id: fmt
+      if: steps.lint1.outputs.stderr
+      run: |
+        terraform fmt -recursive -check -write=true
 
