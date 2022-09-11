@@ -17,14 +17,8 @@ jobs:
       uses: actions/checkout@v2
     - name: autopr
       id: autopr
-      uses: repo-sync/pull-request@v2
+      uses: peter-evans/create-pull-request@v4
       with:
-        destination_branch: dev
-        pr_title: "Pulling ${{ github.ref }} into master"
-        pr_body: ":crown: *An automated PR*"
-#        pr_template: ".github/PULL_REQUEST_TEMPLATE.md"
-        pr_reviewer: "wei,worker"
-        pr_label: autopr
-        pr_draft: true
-        pr_allow_empty: true
-        github_token: ${{ github.token }}
+        base: dev
+        token: ${{ github.token }}
+
