@@ -27,7 +27,7 @@ jobs:
       run: |
         terraform fmt -check -list=true
     - id: diff
-      if: ${{ steps.lint1.outcome != 'success' }}
+      if: ${{ failure() }}
       run: |
         echo '${{ steps.lint1.outputs.stdout || steps.lint1.outputs.stderr }}' \
         | sed -E 's/^([[:space:]]+)([-+])/\2\1/g' > diff.txt && \
