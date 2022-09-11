@@ -2,6 +2,10 @@ locals {
   ifconfig_co_json = jsondecode(data.http.my_public_ip.body)
   my_ip            = [join("/", ["${local.ifconfig_co_json.ip}"], ["32"])]
   trusted_ip       = var.trusted_ip == null ? var.trusted_ip : local.my_ip
+  network_prefix   = parseint(regex("/(\\d+)$", "${var.cidr_block}")[0], 10)
+  new_bits         = var.subnet_prefix - local.network_prefix
+  public_subnet    = element(cidrsubnets("${var.cidr_block}", "${local.new_bits}", "${local.new_bits}"), 0)
+  private_subnet   = element(cidrsubnets("${var.cidr_block}", "${local.new_bits}", "${local.new_bits}"), 1)
 }
 
 ### VPC ###
@@ -23,7 +27,7 @@ resource "aws_vpc" "this" {
 resource "aws_subnet" "public" {
   count                   = var.create_vpc ? 1 : 0
   vpc_id                  = aws_vpc.this[0].id
-  cidr_block              = var.public_subnet
+  cidr_block              = var.public_subnet == null ? var.public_subnet : local.public_subnet
   availability_zone       = var.az == null ? var.az : element("${random_shuffle.az.result}", 0)
   map_public_ip_on_launch = true
   tags = merge(
@@ -45,3 +49,4 @@ resource "random_shuffle" "az" {
   input        = data.aws_availability_zones.available.names
   result_count = 1
 }
+

@@ -64,9 +64,11 @@ variable "namespace" {
 variable "public_subnet" {
   type        = string
   description = <<EOT
-  (Optional) The public subnet CIDR range
+  (Optional) The CIDR block of the public subnet. Conflicts with subnet_prefix.
+
+  default: "10.0.0.0/24"
   EOT
-  default     = null
+  default     = "10.0.0.0/24"
 }
 
 variable "public_subnet_tags" {
@@ -77,6 +79,14 @@ variable "public_subnet_tags" {
   default: {}
   EOT
   default     = {}
+}
+
+variable "subnet_prefix" {
+  type        = string
+  description = <<EOT
+  (Optional) The subnet prefix. Conflicts with public_subnet/private_subnet.
+  EOT
+  default     = ""
 }
 
 variable "tags" {
