@@ -18,7 +18,7 @@ jobs:
       uses: hashicorp/setup-terraform@v1
     - name: Terraform Lint
       id: lint1
-      continue-on-error: true
+      if: success() || failure()
       run: |
         terraform fmt -check -diff
     - name: Terraform fmt list
@@ -56,3 +56,6 @@ jobs:
 
           ## List of files:
           ${{ env.LIST }}
+    - name: Format
+      id: fmt
+
