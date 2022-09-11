@@ -22,7 +22,7 @@ jobs:
       run: |
         terraform fmt -check -diff
     - name: Terraform fmt list
-      continue-on-error: true
+      if: success() || failure()
       id: lint2
       run: |
         terraform fmt -check -list=true
