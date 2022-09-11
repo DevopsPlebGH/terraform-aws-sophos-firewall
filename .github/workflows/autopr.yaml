@@ -9,12 +9,11 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
-      with:
-        ref: dev
     - name: autopr
       id: autopr
       uses: peter-evans/create-pull-request@v4
       with:
+        base: dev
         token: ${{ github.token }}
         assignees: Dev0psPleb
 
