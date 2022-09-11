@@ -33,6 +33,7 @@ jobs:
         | sed -E 's/^([[:space:]]+)([-+])/\2\1/g' > diff.txt && \
         echo '${{ steps.lint2.outputs.stdout || steps.lint2.outputs.stderr }}' > list.txt
     - name: Put diff and list in Env Var
+      if: ${{ failure() }}
       run: |
         DIFF=$(cat diff.txt)
         echo "DIFF<<EOF" >> $GITHUB_ENV
@@ -45,6 +46,7 @@ jobs:
         echo "EOF" >> $GITHUB_ENV
     - name: Post Diff to GitHub PR
       uses: mshick/add-pr-comment@v1
+      if: ${{ failure() }}
       with:
         allow-repeats: true
         repo-token: ${{ secrets.GITHUB_TOKEN }}
