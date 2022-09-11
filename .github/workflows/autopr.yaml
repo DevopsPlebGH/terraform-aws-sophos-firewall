@@ -2,8 +2,7 @@ name: Auto Pull Request
 
 on:
   push:
-    branches:
-
+  
 jobs:
   autopr:
     runs-on: ubuntu-latest
