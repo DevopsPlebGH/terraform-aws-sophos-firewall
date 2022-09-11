@@ -56,8 +56,13 @@ jobs:
 
           ## List of files:
           ${{ env.LIST }}
-    - id: fmt
-      if: steps.lint1.outputs.stderr
+    - id: error
       run: |
-        terraform fmt -recursive -check -write=true
+        terraform fmt -check 2> errors.txt || true
+        echo ::set-output name=errors::`cat errors.txt`
+        terraform fmt -check
+    - id: fmt
+      if: ${{ failure() }}
+      run: |
+        terraform fmt -write=true
 
