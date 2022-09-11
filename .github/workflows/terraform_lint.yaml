@@ -64,5 +64,6 @@ jobs:
     - id: fmt
       if: ${{ failure() }}
       run: |
-        terraform fmt -write=true
+        terraform fmt -write=true \
+        && terraform fmt -check -diff
 
