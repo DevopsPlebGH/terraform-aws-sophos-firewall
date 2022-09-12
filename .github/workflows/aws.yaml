@@ -13,9 +13,13 @@ permissions:
 jobs:
   read-dev:
     runs-on: ubuntu-latest
-    matrix:
-      include:
-        - environment: Development
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - environment: Development
+    
+    environment: ${{ matrix.environment }}
 
     steps:
       - name: Checkout
