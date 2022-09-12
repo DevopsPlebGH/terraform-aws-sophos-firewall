@@ -32,7 +32,7 @@ jobs:
           role-to-assume: ${{ secrets.READER_ROLE }}
           role-session-name: OIDCSession
 
-      - run: aws s3 cp s3://YOUR_DEV_BUCKET/README.md README.md
+      - run: aws s3 cp s3://devopsplebgh-dev-us-east-1/README.md README.md
         shell: bash
 
   write-dev:
@@ -50,7 +50,7 @@ jobs:
           role-to-assume: ${{ secrets.DEV_DEPLOY_ROLE }}
           role-session-name: OIDCSession
 
-      - run: aws s3 cp README.md s3://YOUR_DEV_BUCKET/README.md
+      - run: aws s3 cp README.md s3://devopsplebgh-dev-us-east-1/README.md
         shell: bash
 
   read-prod:
@@ -66,5 +66,5 @@ jobs:
           role-to-assume: ${{ secrets.READER_ROLE }}
           role-session-name: OIDCSession
 
-      - run: aws s3 cp s3://YOUR_PROD_BUCKET/README.md README.md
+      - run: aws s3 cp s3://devopsplebgh-prod-us-west-2/README.md README.md
         shell: bash
