@@ -3,9 +3,6 @@ name: Deployments
 on:
   push:
     branches:
-      - feature/**
-  pull_request:
-    branches:
       - dev
 
 permissions:
@@ -47,7 +44,7 @@ jobs:
           cat >> config.remote.tfbackend<<EOF
           hostname = "app.terraform.io"
           organization = "${{ secrets.SOPHOS_TF_ORGANIZATION }}"
-          workspaces ( name = "${${{ github.repository }}#*/}")
+          workspaces { name = "${${{ github.repository }}#*/}"}
           EOF
       - id: init
         run: |
