@@ -31,7 +31,7 @@ resource "aws_subnet" "public" {
   availability_zone       = var.az == null ? var.az : element("${random_shuffle.az.result}", 0)
   map_public_ip_on_launch = true
   tags = merge(
-    { Name = "${random_id.this.hex}-${data.aws_caller_identity.current.account_id}" },
+    { Name = "public-${random_id.this.hex}-${data.aws_caller_identity.current.account_id}" },
     var.public_subnet_tags,
     var.tags
   )
