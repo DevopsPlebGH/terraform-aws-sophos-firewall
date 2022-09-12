@@ -1,3 +1,14 @@
+variable "az" {
+  type        = string
+  description = <<EOT
+  (Optional) The availability zone in which to deploy the firewall.
+
+  If not defined, this value will be derived from a randomly selected AZ via the aws_availability_zones data source.
+
+  Default: ""
+  EOT
+  default     = null
+}
 variable "cidr_block" {
   type        = string
   description = <<EOT
@@ -23,7 +34,7 @@ variable "enable_dns_hostnames" {
   description = <<EOT
     (Optional) Controls whether or not DNS hostname support should be enabled in the VPC
 
-    Default: true 
+    Default: true
     EOT
   default     = true
 }
@@ -32,7 +43,7 @@ variable "enable_dns_support" {
   type        = bool
   description = <<EOT
   (Optional) Controls whether DNS support should be enabled in the VPC
-  
+
   Default: true
   EOT
   default     = true
@@ -42,7 +53,7 @@ variable "namespace" {
   type        = string
   description = <<EOT
     (Optional) Namespace refers to the application or deployment type.
-    
+
     EG: sophos-xg, sophos-optix, sophos-cwp, etc...
 
     default: sophos-xg
@@ -50,11 +61,51 @@ variable "namespace" {
   default     = "sophos-xg"
 }
 
+variable "private_subnet" {
+  type        = string
+  description = <<EOT
+  (Optional) The CIDR block of the private subnet. Conflicts with subnet_prefix
+
+  default: "10.0.1.0/24"
+  EOT
+  default     = "10.0.1.0/24"
+}
+
+variable "public_subnet" {
+  type        = string
+  description = <<EOT
+  (Optional) The CIDR block of the public subnet. Conflicts with subnet_prefix.
+
+  default: "10.0.0.0/24"
+  EOT
+  default     = "10.0.0.0/24"
+}
+
+variable "public_subnet_tags" {
+  type        = map(string)
+  description = <<EOT
+  (Optional) Additional tags for the public subnets.
+
+  default: {}
+  EOT
+  default     = {}
+}
+
+variable "subnet_prefix" {
+  type        = string
+  description = <<EOT
+  (Optional) The subnet prefix. Conflicts with public_subnet/private_subnet.
+
+  default: null
+  EOT
+  default     = null
+}
+
 variable "tags" {
   type        = map(string)
   description = <<EOT
     (Optional) A map of tags to add to all resources
-    
+
     Default: {}
     EOT
   default     = {}
@@ -68,7 +119,7 @@ variable "trusted_ip" {
     The default behavior is to include the public IP address from which the Terraform plan is run.
 
     EG: 192.168.10.24/32
-    
+
     Default: [null]
     EOT
   default     = [null]
