@@ -61,6 +61,16 @@ variable "namespace" {
   default     = "sophos-xg"
 }
 
+variable "private_subnet" {
+  type        = string
+  description = <<EOT
+  (Optional) The CIDR block of the private subnet. Conflicts with subnet_prefix
+
+  default: "10.0.1.0/24"
+  EOT
+  default     = "10.0.1.0/24"
+}
+
 variable "public_subnet" {
   type        = string
   description = <<EOT
@@ -85,8 +95,10 @@ variable "subnet_prefix" {
   type        = string
   description = <<EOT
   (Optional) The subnet prefix. Conflicts with public_subnet/private_subnet.
+
+  default: null
   EOT
-  default     = ""
+  default     = null
 }
 
 variable "tags" {

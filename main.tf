@@ -37,6 +37,17 @@ resource "aws_subnet" "public" {
   )
 }
 
+# Private subnet
+resource "aws_subnet" "private" {
+  count             = var.create_vpc ? 1 : 0
+  vpc_id            = aws_vpc.this[0].id
+  cidr_block        = var.private_subnet == null ? var.private_subnet : local.private_subnet
+  availability_zone = var.az == null ? var.az : element("${random_shuffle.az.result}", 0)
+  tags = merge(
+    { Name = "${random_id.this.hex}-${data.aws_caller_identity.current.account_id}" }
+  )
+}
+
 ### Supporting resources ###
 # Random ID
 resource "random_id" "this" {
