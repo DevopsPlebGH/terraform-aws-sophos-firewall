@@ -33,10 +33,12 @@ jobs:
         uses: hashicorp/setup-terraform@v1
         with:
           cli_config_credentials_token: ${{ secrets.SOPHOS_TF_API_TOKEN }}
-      - id: init
+      - name: Terraform init
+        id: init
         run: |
           terraform plan -input=false
-      - id: plan
+      - name: Terraform plan
+        id: plan
         continue-on-error: true
         run: | 
           terraform plan -input=false -no-color -out=tfplan \
