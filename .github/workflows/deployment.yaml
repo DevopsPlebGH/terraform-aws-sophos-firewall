@@ -8,6 +8,10 @@ on:
     branches:
       - dev
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   integration_testing:
     runs-on: ubuntu-latest
