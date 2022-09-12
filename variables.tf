@@ -66,9 +66,9 @@ variable "private_subnet" {
   description = <<EOT
   (Optional) The CIDR block of the private subnet. Conflicts with subnet_prefix
 
-  default: "10.0.1.0/24"
+  default: null
   EOT
-  default     = "10.0.1.0/24"
+  default     = null
 }
 
 variable "public_subnet" {
@@ -76,9 +76,9 @@ variable "public_subnet" {
   description = <<EOT
   (Optional) The CIDR block of the public subnet. Conflicts with subnet_prefix.
 
-  default: "10.0.0.0/24"
+  default: null
   EOT
-  default     = "10.0.0.0/24"
+  default     = null
 }
 
 variable "public_subnet_tags" {
@@ -96,9 +96,9 @@ variable "subnet_prefix" {
   description = <<EOT
   (Optional) The subnet prefix. Conflicts with public_subnet/private_subnet.
 
-  default: null
+  default: "24"
   EOT
-  default     = null
+  default     = "24"
 }
 
 variable "tags" {

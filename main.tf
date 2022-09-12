@@ -27,7 +27,7 @@ resource "aws_vpc" "this" {
 resource "aws_subnet" "public" {
   count                   = var.create_vpc ? 1 : 0
   vpc_id                  = aws_vpc.this[0].id
-  cidr_block              = var.public_subnet == null ? var.public_subnet : local.public_subnet
+  cidr_block              = var.public_subnet != null ? var.public_subnet : local.public_subnet
   availability_zone       = var.az == null ? var.az : element("${random_shuffle.az.result}", 0)
   map_public_ip_on_launch = true
   tags = merge(
@@ -41,7 +41,7 @@ resource "aws_subnet" "public" {
 resource "aws_subnet" "private" {
   count             = var.create_vpc ? 1 : 0
   vpc_id            = aws_vpc.this[0].id
-  cidr_block        = var.private_subnet == null ? var.private_subnet : local.private_subnet
+  cidr_block        = var.private_subnet != null ? var.private_subnet : local.private_subnet
   availability_zone = var.az == null ? var.az : element("${random_shuffle.az.result}", 0)
   tags = merge(
     { Name = "${random_id.this.hex}-${data.aws_caller_identity.current.account_id}" }
