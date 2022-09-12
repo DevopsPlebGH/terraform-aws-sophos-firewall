@@ -35,6 +35,9 @@ jobs:
           cli_config_credentials_token: ${{ secrets.SOPHOS_TF_API_TOKEN }}
       - id: override
         run: |
+          REPO = ${{ github.repository }}
+          WORKSPACE = "${REPO#*/}"
+
           cat >> override.tf<<EOF
           terraform {
             backend "remote" {}
@@ -44,7 +47,7 @@ jobs:
           cat >> config.remote.tfbackend<<EOF
           hostname = "app.terraform.io"
           organization = "${{ secrets.SOPHOS_TF_ORGANIZATION }}"
-          workspaces { name = "${${{ github.repository }}#*/}"}
+          workspaces { name = "$WORKSPACE"}
           EOF
       - id: init
         run: |
