@@ -21,7 +21,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-region: us-east-1
-          role-to-assume: ${{ secrets.READ_ROLE }}
+          role-to-assume: ${{ secrets.READER_ROLE }}
           role-session-name: OIDCSession
 
       - run: aws s3 cp s3://YOUR_DEV_BUCKET/README.md README.md
@@ -55,7 +55,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-region: us-east-1
-          role-to-assume: ${{ secrets.READ_ROLE }}
+          role-to-assume: ${{ secrets.READER_ROLE }}
           role-session-name: OIDCSession
 
       - run: aws s3 cp s3://YOUR_PROD_BUCKET/README.md README.md
