@@ -35,8 +35,8 @@ jobs:
           cli_config_credentials_token: ${{ secrets.SOPHOS_TF_API_TOKEN }}
       - id: override
         run: |
-          REPO = ${{ github.repository }}
-          WORKSPACE = "${REPO#*/}"
+          REPO="${{ github.repository }}"
+          WORKSPACE="${REPO#*/}"
 
           cat >> override.tf<<EOF
           terraform {
