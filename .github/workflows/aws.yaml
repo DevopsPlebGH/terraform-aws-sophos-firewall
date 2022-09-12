@@ -13,6 +13,10 @@ permissions:
 jobs:
   read-dev:
     runs-on: ubuntu-latest
+    matrix:
+      include:
+        - environment: Development
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
