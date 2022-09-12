@@ -57,13 +57,17 @@ jobs:
         uses: mshick/add-pr-comment@v1
         with:
           allow-repeats: true
-          repo-token: ${{ github.token }}
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
           repo-token-user-login: 'github-actions[bot]'
           message: |
-            ## ${{ matrix.path }} plan
+            ## plan
             ```diff
-            ${{ env.PLAN }}
-            ```            
+            + Green
+            - Red
+            ! Orange
+            @@ Pink @@
+            #Gray
+            ${{ env.PLAN }}     
                   
 
 
