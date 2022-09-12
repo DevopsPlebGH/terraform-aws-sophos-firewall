@@ -27,9 +27,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Configure AWS Credentials
-        uses: aws-actions/configutre-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v1
         with: 
           role-to-assume: ${{ secrets.DEV_DEPLOY_ROLE }}
+          aws-region: us-west-2
+          role-session-name: OIDCSession
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
         with:
