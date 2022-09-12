@@ -13,7 +13,7 @@ No providers.
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_xg"></a> [xg](#module\_xg) | ../../ | n/a |
+| <a name="module_example-basic"></a> [example-basic](#module\_example-basic) | ../../ | n/a |
 
 ## Resources
 

@@ -1,0 +1,23 @@
+name: Auto Pull Request
+
+on:
+  push:
+    branches:
+      - feature/**
+
+jobs:
+  autopr:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    - name: autopr
+      id: autopr
+      uses: repo-sync/pull-request@v2
+      with:
+        destination_branch: dev
+        github_token: ${{ github.token }}
+        pr_label: |
+          autopr
+        pr_title: "Pulling ${{ github.ref }} into dev"
+        pr_assignee: Dev0psPleb
