@@ -1,5 +1,5 @@
 locals {
-  ifconfig_co_json = jsondecode(data.http.my_public_ip.body)
+  ifconfig_co_json = jsondecode(data.http.my_public_ip.response_body)
   my_ip            = [join("/", ["${local.ifconfig_co_json.ip}"], ["32"])]
   trusted_ip       = var.trusted_ip == null ? var.trusted_ip : local.my_ip
   network_prefix   = parseint(regex("/(\\d+)$", "${var.cidr_block}")[0], 10)
