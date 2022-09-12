@@ -1,0 +1,59 @@
+name: Deployments
+
+on:
+  push:
+    branches:
+      - dev
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  integration_testing:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - environment: Development
+
+    environment: ${{ matrix.environment }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with: 
+          role-to-assume: ${{ secrets.DEV_DEPLOY_ROLE }}
+          aws-region: us-west-2
+          role-session-name: OIDCSession
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          cli_config_credentials_token: ${{ secrets.SOPHOS_TF_API_TOKEN }}
+      - id: override
+        run: |
+          cat >> override.tf<<EOF
+          terraform {
+            backend "remote" {}
+          }
+          EOF
+
+          cat >> config.remote.tfbackend<<EOF
+          hostname = "app.terraform.io"
+          organization = "${{ secrets.SOPHOS_TF_ORGANIZATION }}"
+          workspaces { name = "${${{ github.repository }}#*/}"}
+          EOF
+      - id: init
+        run: |
+          terraform init -backend-config=config.remote.tfbackend
+
+
+          
+
+
+
+        
+  
