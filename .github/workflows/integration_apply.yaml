@@ -80,6 +80,14 @@ jobs:
           workspaces { name = "$WORKSPACE" }
           EOF
 
+          cat >> _override.tf<<EOF
+          provider "aws" {
+            assume_role_with_web_identity {
+              role_arn = "${{ secrets.SOPHOS_DEV_DEPLOY_ROLE }}"
+              session_name = "OIDCSession"
+            }
+          }
+
           terraform init -backend-config=config.remote.tfbackend
       - name: Terraform Plan
         id: plan
