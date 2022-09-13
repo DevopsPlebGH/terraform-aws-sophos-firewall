@@ -1,9 +1,11 @@
 name: Terraform Lint
 
 on:
-  pull_request:
+  push:
     branches:
-      - dev
+      - feature/**
+      - bugfix/**
+      - hotfix/**
 
 jobs:
   lint:
@@ -45,7 +47,7 @@ jobs:
       if: ${{ failure() }}
       with:
         allow-repeats: true
-        repo-token: ${{ secrets.GH_ACTIONS_BOT }}
+        repo-token: ${{ github.token }}
         repo-token-user-login: 'github-actions[bot]'
         message: |
           ## Terraform Format Diff:
@@ -60,7 +62,7 @@ jobs:
       if: ${{ success() }}
       with:
         allow-repeats: true
-        repo-token: ${{ secrets.GH_ACTIONS_BOT }}
+        repo-token: ${{ github.token }}
         repo-token-user-login: 'github-actions[bot]'
         message: |
           :smiley: Linting successful!
