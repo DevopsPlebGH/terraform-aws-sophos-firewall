@@ -19,7 +19,7 @@ jobs:
       - name: Inform on Pull Request that Apply is running
         uses: mshick/add-pr-comment@v1
         with:
-          repo-token: ${{ secrets.GH_ACTIONS_BOT }}
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
           repo-token-user-login: 'github-actions[bot]'
           message: |
             ***Running terraform apply***
@@ -74,6 +74,8 @@ jobs:
         continue-on-error: true
         run: |
           terraform plan -input=false -no-color
+        env:
+          AWS_ROLE_ARN: ${{ secrets.SOPHOS_DEV_DEPLOY_ROLE }}
       - name: Reformat Plan
         if: steps.plan.outcome == 'success'
         run: |
@@ -95,6 +97,8 @@ jobs:
             -input=false \
             -no-color
             -auto-approve
+        env:
+          AWS_ROLE_ARN: ${{ secrets.SOPHOS_DEV_DEPLOY_ROLE }}                
       - name: Post Plan and Apply to GitHub PR
         if: steps.plan.outcome == 'success' && steps.apply.outcome == 'success'
         uses: mshick/add-pr-comment@v1
