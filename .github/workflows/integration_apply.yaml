@@ -1,7 +1,6 @@
 name: Integration Testing - Apply
 
 on:
-  workflow_dispatch:
   push:
     branches:
       - dev
@@ -60,11 +59,13 @@ jobs:
           terraform {
             backend "remote" {}
           }
+          EOF
 
           cat >> config.remote.tfbackend<<EOF
           hostname = "app.terraform.io"
           organization = "${{ secrets.SOPHOS_TF_ORGANIZATION }}"
           workspaces { name = "$WORKSPACE" }
+          EOF
 
           terraform init -backend-config=config.remote.tfbackend
       - name: Terraform Plan
