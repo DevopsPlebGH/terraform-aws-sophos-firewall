@@ -16,7 +16,7 @@ jobs:
       uses: repo-sync/pull-request@v2
       with:
         destination_branch: dev
-        github_token: ${{ github.token }}
+        github_token: ${{ secrets.GITHUB_TOKEN }}
         pr_label: |
           autopr
         pr_title: "Pulling ${{ github.ref }} into dev"
