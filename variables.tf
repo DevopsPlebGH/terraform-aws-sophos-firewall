@@ -92,12 +92,13 @@ variable "public_subnet_tags" {
 }
 
 variable "security_group_tags" {
-  type = map(string)
+  type        = map(string)
   description = <<EOT
   (Optional) Additional tags to attach to security groups
 
   Default: {}
   EOT
+  default     = {}
 }
 
 variable "subnet_prefix" {

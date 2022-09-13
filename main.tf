@@ -51,10 +51,10 @@ resource "aws_subnet" "private" {
 ### Security Groups ###
 # Resource creates the security group to apply to the public subnet which blocks access to the firewall console ports and SSH ports.
 resource "aws_security_group" "public" {
-  count = var.create_vpc ? 1 : 0
-  name = "Public"
+  count       = var.create_vpc ? 1 : 0
+  name        = "Public"
   description = "Untrusted network restricted from access port 22 and 4444"
-  vpc_id = aws_vpc.this[0].id
+  vpc_id      = aws_vpc.this[0].id
   ingress {
     description = "Allow public access 0 - 21"
     from_port   = 0
@@ -91,7 +91,7 @@ resource "aws_security_group" "public" {
 }
 
 resource "aws_security_group" "trusted" {
-    count       = var.create_vpc ? 1 : 0
+  count       = var.create_vpc ? 1 : 0
   name        = "Trusted Network"
   description = "Enable TCP access from trusted network"
   vpc_id      = aws_vpc.this[0].id
