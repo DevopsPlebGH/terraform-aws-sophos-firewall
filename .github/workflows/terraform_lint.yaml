@@ -5,9 +5,6 @@ on:
     workflows: ["autopr.yaml"]
     types:
       - completed
-  push:
-    ignored_branches:
-      - feature/**
 
 jobs:
   lint:
