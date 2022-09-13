@@ -53,8 +53,8 @@ jobs:
          cli_config_credentials_token: ${{ secrets.SOPHOS_TF_API_TOKEN }}
       - name: Terraform init
         run: |
-          $REPO="${{ github.repository }}"
-          $WORKSPACE="${REPO#*/}"
+          REPO="${{ github.repository }}"
+          WORKSPACE="${REPO#*/}"
 
           cat >> remote.tf<<EOF
           terraform {
