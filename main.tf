@@ -154,6 +154,11 @@ resource "aws_internet_gateway" "this" {
   )
 }
 
+# Resource creates an internet gateway attachment
+resource "aws_internet_gateway_attachment" "this" {
+  internet_gateway_id = aws_internet_gateway.this[0].id
+  vpc_id              = aws_vpc.this[0].id
+}
 ### Route Tables ###
 # Resource creates the route table for the public subnet
 resource "aws_route_table" "public" {
