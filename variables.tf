@@ -56,7 +56,7 @@ variable "namespace" {
 
     EG: sophos-xg, sophos-optix, sophos-cwp, etc...
 
-    default: sophos-xg
+    Default: sophos-xg
     EOT
   default     = "sophos-xg"
 }
@@ -66,9 +66,9 @@ variable "private_subnet" {
   description = <<EOT
   (Optional) The CIDR block of the private subnet. Conflicts with subnet_prefix
 
-  default: "10.0.1.0/24"
+  Default: null
   EOT
-  default     = "10.0.1.0/24"
+  default     = null
 }
 
 variable "public_subnet" {
@@ -76,9 +76,9 @@ variable "public_subnet" {
   description = <<EOT
   (Optional) The CIDR block of the public subnet. Conflicts with subnet_prefix.
 
-  default: "10.0.0.0/24"
+  Default: null
   EOT
-  default     = "10.0.0.0/24"
+  default     = null
 }
 
 variable "public_subnet_tags" {
@@ -86,7 +86,17 @@ variable "public_subnet_tags" {
   description = <<EOT
   (Optional) Additional tags for the public subnets.
 
-  default: {}
+  Default: {}
+  EOT
+  default     = {}
+}
+
+variable "security_group_tags" {
+  type        = map(string)
+  description = <<EOT
+  (Optional) Additional tags to attach to security groups
+
+  Default: {}
   EOT
   default     = {}
 }
@@ -96,9 +106,9 @@ variable "subnet_prefix" {
   description = <<EOT
   (Optional) The subnet prefix. Conflicts with public_subnet/private_subnet.
 
-  default: null
+  Default: "24"
   EOT
-  default     = null
+  default     = "24"
 }
 
 variable "tags" {

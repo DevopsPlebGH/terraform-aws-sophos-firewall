@@ -1,9 +1,7 @@
 name: Auto Pull Request
 
 on:
-  push:
-    branches:
-      - feature/**
+  workflow_dispatch:
 
 jobs:
   autopr:
@@ -20,4 +18,5 @@ jobs:
         pr_label: |
           autopr
         pr_title: "Pulling ${{ github.ref }} into dev"
+        pr_body: ":crown: Automated Pull Request"
         pr_assignee: Dev0psPleb

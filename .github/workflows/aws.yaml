@@ -1,0 +1,71 @@
+name: 'Pull Request'
+
+# The workflow should only trigger on pull requests to the main branch
+on:
+  pull_request:
+    branches:
+      - main
+
+# Required to get the ID Token that will be used for OIDC
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  read-dev:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - environment: Development
+    
+    environment: ${{ matrix.environment }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: us-east-1
+          role-to-assume: ${{ secrets.READER_ROLE }}
+          role-session-name: OIDCSession
+
+      - run: aws s3 cp s3://devopsplebgh-dev-us-east-1/README.md README.md
+        shell: bash
+
+  write-dev:
+    runs-on: ubuntu-latest
+    needs: read-dev
+    environment: Development
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: us-east-1
+          role-to-assume: ${{ secrets.DEV_DEPLOY_ROLE }}
+          role-session-name: OIDCSession
+
+      - run: aws s3 cp README.md s3://devopsplebgh-dev-us-east-1/README.md
+        shell: bash
+
+  read-prod:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: us-east-1
+          role-to-assume: ${{ secrets.READER_ROLE }}
+          role-session-name: OIDCSession
+
+      - run: aws s3 cp s3://devopsplebgh-prod-us-west-2/README.md README.md
+        shell: bash

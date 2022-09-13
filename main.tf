@@ -1,5 +1,5 @@
 locals {
-  ifconfig_co_json = jsondecode(data.http.my_public_ip.body)
+  ifconfig_co_json = jsondecode(data.http.my_public_ip.response_body)
   my_ip            = [join("/", ["${local.ifconfig_co_json.ip}"], ["32"])]
   trusted_ip       = var.trusted_ip == null ? var.trusted_ip : local.my_ip
   network_prefix   = parseint(regex("/(\\d+)$", "${var.cidr_block}")[0], 10)
@@ -23,28 +23,96 @@ resource "aws_vpc" "this" {
 }
 
 ### Subnets ###
-# Public subnet
+# Resource creates the public subnet
 resource "aws_subnet" "public" {
   count                   = var.create_vpc ? 1 : 0
   vpc_id                  = aws_vpc.this[0].id
-  cidr_block              = var.public_subnet == null ? var.public_subnet : local.public_subnet
+  cidr_block              = var.public_subnet != null ? var.public_subnet : local.public_subnet
   availability_zone       = var.az == null ? var.az : element("${random_shuffle.az.result}", 0)
   map_public_ip_on_launch = true
   tags = merge(
-    { Name = "${random_id.this.hex}-${data.aws_caller_identity.current.account_id}" },
+    { Name = "public-${random_id.this.hex}-${data.aws_caller_identity.current.account_id}" },
     var.public_subnet_tags,
     var.tags
   )
 }
 
-# Private subnet
+# Resource creates the private subnet
 resource "aws_subnet" "private" {
   count             = var.create_vpc ? 1 : 0
   vpc_id            = aws_vpc.this[0].id
-  cidr_block        = var.private_subnet == null ? var.private_subnet : local.private_subnet
+  cidr_block        = var.private_subnet != null ? var.private_subnet : local.private_subnet
   availability_zone = var.az == null ? var.az : element("${random_shuffle.az.result}", 0)
   tags = merge(
     { Name = "${random_id.this.hex}-${data.aws_caller_identity.current.account_id}" }
+  )
+}
+
+### Security Groups ###
+# Resource creates the security group to apply to the public subnet which blocks access to the firewall console ports and SSH ports.
+resource "aws_security_group" "public" {
+  count       = var.create_vpc ? 1 : 0
+  name        = "Public"
+  description = "Untrusted network restricted from access port 22 and 4444"
+  vpc_id      = aws_vpc.this[0].id
+  ingress {
+    description = "Allow public access 0 - 21"
+    from_port   = 0
+    to_port     = 21
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
+    description = "Allow public access 23 - 4443"
+    from_port   = 23
+    to_port     = 4443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
+    description = "Allow public access 4445 - 65535"
+    from_port   = 4445
+    to_port     = 65535
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  egress {
+    description = "Allow all traffic outbound"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  tags = merge(
+    { Name = "Public" },
+    var.security_group_tags,
+    var.tags
+  )
+}
+
+resource "aws_security_group" "trusted" {
+  count       = var.create_vpc ? 1 : 0
+  name        = "Trusted Network"
+  description = "Enable TCP access from trusted network"
+  vpc_id      = aws_vpc.this[0].id
+  ingress {
+    description = "Allow all from trusted IP"
+    from_port   = 0
+    to_port     = 65535
+    protocol    = "tcp"
+    cidr_blocks = local.trusted_ip
+  }
+  egress {
+    description = "Allow all traffic outbound"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  tags = merge(
+    { Name = "Trusted Network" },
+    var.security_group_tags,
+    var.tags
   )
 }
 
