@@ -108,7 +108,6 @@ jobs:
         run: |
           terraform apply \
             -input=false \
-            -no-color
             -auto-approve
         env:
           AWS_ROLE_ARN: ${{ secrets.SOPHOS_DEV_DEPLOY_ROLE }}
