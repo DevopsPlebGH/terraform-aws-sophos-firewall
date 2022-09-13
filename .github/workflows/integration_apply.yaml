@@ -93,7 +93,7 @@ jobs:
         run: |
           terraform apply \
             -input=false \
-            -no-color
+            -no-color \
             -auto-approve
       - name: Post Plan and Apply to GitHub PR
         if: steps.plan.outcome == 'success' && steps.apply.outcome == 'success'
