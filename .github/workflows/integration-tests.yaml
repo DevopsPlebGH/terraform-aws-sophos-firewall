@@ -32,7 +32,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
         with:
-          cli_config_credentials_token: ${{ github.token }}
+          cli_config_credentials_token: ${{ secrets.SOPHOS_TF_API_TOKEN }}
       - name: Terraform init
         id: init
         run: |
@@ -57,7 +57,7 @@ jobs:
         uses: mshick/add-pr-comment@v1
         with:
           allow-repeats: true
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          repo-token: ${{ github.token }}
           repo-token-user-login: 'github-actions[bot]'
           message: |
             ## plan
