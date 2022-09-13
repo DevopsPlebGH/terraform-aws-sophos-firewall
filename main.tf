@@ -166,6 +166,13 @@ resource "aws_route_table" "public" {
   )
 }
 
+## Route Table Associations ###
+# Resources creates the public route table association
+resource "aws_route_table_association" "public" {
+  subnet_id      = aws_subnet.public[0].id
+  route_table_id = aws_route_table.public[0].id
+}
+
 ### Routes ###
 # Resource creates the public route
 resource "aws_route" "public_internet_gateway" {
