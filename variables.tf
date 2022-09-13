@@ -49,6 +49,16 @@ variable "enable_dns_support" {
   default     = true
 }
 
+variable "internet_gateway_tags" {
+  type        = map(string)
+  description = <<EOT
+  (Optional) Additional tags to attach to created internet gateways
+
+  Default: {}
+  EOT
+  default     = {}
+}
+
 variable "namespace" {
   type        = string
   description = <<EOT

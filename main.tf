@@ -141,6 +141,18 @@ resource "aws_security_group" "lan" {
     var.tags
   )
 }
+
+### Internet Gateway ###
+# Resource creates an internet gateway in the VPC
+resource "aws_internet_gateway" "this" {
+  count  = var.create_vpc ? 1 : 0
+  vpc_id = aws_vpc.this[0].id
+  tags = merge(
+    { Name = "igw-${random_id.this.hex}-${data.aws_caller_identity.current.account_id}" },
+    var.internet_gateway_tags,
+    var.tags
+  )
+}
 ### Supporting resources ###
 # Random ID
 resource "random_id" "this" {

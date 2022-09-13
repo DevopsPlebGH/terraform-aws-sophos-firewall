@@ -24,6 +24,7 @@ No modules.
 
 | Name | Type |
 |------|------|
+| [aws_internet_gateway.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/internet_gateway) | resource |
 | [aws_security_group.lan](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
 | [aws_security_group.public](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
 | [aws_security_group.trusted](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
@@ -45,6 +46,7 @@ No modules.
 | <a name="input_create_vpc"></a> [create\_vpc](#input\_create\_vpc) | (Optional) Controls whether or not a new VPC should be created or if an existing VPC should be used.<br><br>    Default: true | `bool` | `"true"` | no |
 | <a name="input_enable_dns_hostnames"></a> [enable\_dns\_hostnames](#input\_enable\_dns\_hostnames) | (Optional) Controls whether or not DNS hostname support should be enabled in the VPC<br><br>    Default: true | `bool` | `true` | no |
 | <a name="input_enable_dns_support"></a> [enable\_dns\_support](#input\_enable\_dns\_support) | (Optional) Controls whether DNS support should be enabled in the VPC<br><br>  Default: true | `bool` | `true` | no |
+| <a name="input_internet_gateway_tags"></a> [internet\_gateway\_tags](#input\_internet\_gateway\_tags) | (Optional) Additional tags to attach to created internet gateways<br><br>  Default: {} | `map(string)` | `{}` | no |
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | (Optional) Namespace refers to the application or deployment type.<br><br>    EG: sophos-xg, sophos-optix, sophos-cwp, etc...<br><br>    Default: sophos-xg | `string` | `"sophos-xg"` | no |
 | <a name="input_private_subnet"></a> [private\_subnet](#input\_private\_subnet) | (Optional) The CIDR block of the private subnet. Conflicts with subnet\_prefix<br><br>  Default: null | `string` | `null` | no |
 | <a name="input_public_subnet"></a> [public\_subnet](#input\_public\_subnet) | (Optional) The CIDR block of the public subnet. Conflicts with subnet\_prefix.<br><br>  Default: null | `string` | `null` | no |
