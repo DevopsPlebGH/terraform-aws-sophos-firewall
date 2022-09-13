@@ -81,6 +81,16 @@ variable "private_subnet" {
   default     = null
 }
 
+variable "public_route_table_tags" {
+  type        = map(string)
+  description = <<EOT
+  (Optional) Additional tags to attach to the Public Route Table
+
+  Default: {}
+  EOT
+  default     = {}
+}
+
 variable "public_subnet" {
   type        = string
   description = <<EOT

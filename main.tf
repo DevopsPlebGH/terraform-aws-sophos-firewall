@@ -153,6 +153,19 @@ resource "aws_internet_gateway" "this" {
     var.tags
   )
 }
+
+### Route Tables ###
+# Resource creates the route table for the public subnet
+resource "aws_route_table" "public" {
+  count  = var.create_vpc ? 1 : 0
+  vpc_id = aws_vpc.this[0].id
+  tags = merge(
+    { Name = "pub-rtb-${random_id.this.hex}-${data.aws_caller_identity.current.account_id}" },
+    var.public_route_table_tags,
+    var.tags
+  )
+}
+
 ### Supporting resources ###
 # Random ID
 resource "random_id" "this" {
