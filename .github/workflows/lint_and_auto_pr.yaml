@@ -47,7 +47,7 @@ jobs:
       if: ${{ failure() }}
       with:
         allow-repeats: true
-        repo-token: ${{ github.token }}
+        repo-token: ${{ secrets.GH_ACTIONS_BOT }}
         repo-token-user-login: 'github-actions[bot]'
         message: |
           ## Terraform Format Diff:
@@ -62,7 +62,7 @@ jobs:
       if: ${{ success() }}
       with:
         allow-repeats: true
-        repo-token: ${{ github.token }}
+        repo-token: ${{ secrets.GH_ACTIONS_BOT }}
         repo-token-user-login: 'github-actions[bot]'
         message: |
           :smiley: Linting successful!
@@ -80,7 +80,7 @@ jobs:
       uses: repo-sync/pull-request@v2
       with:
         destination_branch: dev
-        github_token: ${{ github.token }}
+        github_token: ${{ secrets.GH_ACTIONS_BOT }}
         pr_label: |
           autopr
         pr_title: "Pulling ${{ github.ref }} into dev"
