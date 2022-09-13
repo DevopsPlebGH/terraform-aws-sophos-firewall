@@ -1,14 +1,11 @@
 name: Auto Pull Request
 
 on:
-  workflow_run:
-    workflows: ["Terraform Lint"]
-    types:
-      - completed
+  workflow_dispatch:
+
 jobs:
   autopr:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
