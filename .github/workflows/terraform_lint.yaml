@@ -66,4 +66,4 @@ jobs:
         allow-repeats: true
         repo-token: ${{ steps.generate-token.outputs.token }}
         message: |
-          :smiley: Linting successful!
+          ## :smiley: Linting successful!
