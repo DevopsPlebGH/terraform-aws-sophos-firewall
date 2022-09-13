@@ -57,7 +57,7 @@ jobs:
         uses: mshick/add-pr-comment@v1
         with:
           allow-repeats: true
-          repo-token: ${{ github.token }}
+          repo-token: ${{ secrets.GH_ACTIONS_BOT }}
           repo-token-user-login: 'github-actions[bot]'
           message: |
             ## plan
