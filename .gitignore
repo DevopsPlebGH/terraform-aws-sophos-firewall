@@ -43,3 +43,4 @@ terraform.rc
 *.retry
 
 artifacts.sh
+.terraform.lock.hcl
