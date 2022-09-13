@@ -94,6 +94,7 @@ jobs:
           terraform apply \
             -input=false \
             -no-color
+            -auto-approve
       - name: Post Plan and Apply to GitHub PR
         if: steps.plan.outcome == 'success' && steps.apply.outcome == 'success'
         uses: mshick/add-pr-comment@v1
