@@ -3,7 +3,7 @@ name: Integration Testing - Plan
 on:
   pull_request:
     branches:
-      - dev
+      - dev         
 
 permissions:
   id-token: write
@@ -23,6 +23,11 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+      - id: generate-token
+        uses: tibdex/github-app-token@v1
+        with:
+          app_id: ${{ secrets.APP_ID }}
+          private_key: ${{ secrets.APP_PRIVATE_KEY }}        
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with: 
@@ -56,7 +61,10 @@ jobs:
         id: plan
         continue-on-error: true
         run: | 
-          terraform plan -input=false -no-color -out=tfplan 
+          terraform plan -input=false -no-color -out=tfplan
+        env:
+          AWS_ROLE_ARN: ${{ secrets.SOPHOS_DEV_DEPLOY_ROLE }}
+          AWS_ROLE_SESSION_NAME: OIDCSession           
       - name: Reformat Plan
         run: |
           echo '${{ steps.plan.outputs.stdout || steps.plan.outputs.stderr }}' \
@@ -71,8 +79,7 @@ jobs:
         uses: mshick/add-pr-comment@v1
         with:
           allow-repeats: true
-          repo-token: ${{ secrets.GH_ACTIONS_BOT }}
-          repo-token-user-login: ${{ github.actor }}
+          repo-token: ${{ steps.generate-token.outputs.token }}
           message: |
             ## plan
             ```diff
@@ -82,7 +89,7 @@ jobs:
             @@ Pink @@
             #Gray
             ${{ env.PLAN }}     
-            ```      
+            ```
 
 
 

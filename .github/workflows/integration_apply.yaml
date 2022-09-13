@@ -6,6 +6,9 @@ on:
     branches:
       - dev
 
+env:
+  GITHUB_TOKEN: ${{ secrets.GH_ACTIONS_BOT }}   
+
 permissions:
   id-token: write
   contents: read
@@ -16,11 +19,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - id: generate-token
+        uses: tibdex/github-app-token@v1
+        with:
+          app_id: ${{ secrets.APP_ID }}
+          private_key: ${{ secrets.APP_PRIVATE_KEY }}    
       - name: Inform on Pull Request that Apply is running
         uses: mshick/add-pr-comment@v1
         with:
-          repo-token: ${{ secrets.GH_ACTIONS_BOT }}
-          repo-token-user-login: 'github-actions[bot]'
+          repo-token: ${{ steps.generate-token.outputs.token }}
           message: |
             ***Running terraform apply***
             Results will display here momentarily...  
@@ -41,6 +48,11 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v2
+      - id: generate-token
+        uses: tibdex/github-app-token@v1
+        with:
+          app_id: ${{ secrets.APP_ID }}
+          private_key: ${{ secrets.APP_PRIVATE_KEY }}        
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -74,6 +86,9 @@ jobs:
         continue-on-error: true
         run: |
           terraform plan -input=false -no-color
+        env:
+          AWS_ROLE_ARN: ${{ secrets.SOPHOS_DEV_DEPLOY_ROLE }}
+          AWS_ROLE_SESSION_NAME: OIDCSession  
       - name: Reformat Plan
         if: steps.plan.outcome == 'success'
         run: |
@@ -95,12 +110,14 @@ jobs:
             -input=false \
             -no-color
             -auto-approve
+        env:
+          AWS_ROLE_ARN: ${{ secrets.SOPHOS_DEV_DEPLOY_ROLE }}
+          AWS_ROLE_SESSION_NAME: OIDCSession                 
       - name: Post Plan and Apply to GitHub PR
         if: steps.plan.outcome == 'success' && steps.apply.outcome == 'success'
         uses: mshick/add-pr-comment@v1
         with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          repo-token-user-login: 'github-actions[bot]'
+          repo-token: ${{ steps.generate-token.outputs.token }}
           message: |
             Applying **${{ matrix.environment }}**:
 
@@ -115,8 +132,7 @@ jobs:
         if: steps.plan.outcome == 'failure'
         uses: mshick/add-pr-comment@v1
         with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          repo-token-user-login: 'github-actions[bot]'
+          repo-token: ${{ steps.generate-token.outputs.token }}
           message: |
             Plan failed for **${{ matrix.environment }}**:
 
@@ -128,8 +144,7 @@ jobs:
         if: steps.apply.outcome == 'failure'
         uses: mshick/add-pr-comment@v1
         with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          repo-token-user-login: 'github-actions[bot]'
+          repo-token: ${{ steps.generate-token.outputs.token }}
           message: |
             Apply failed for **${{ matrix.environment }}**:
 
