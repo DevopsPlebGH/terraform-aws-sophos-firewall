@@ -15,7 +15,7 @@ jobs:
       id: autopr
       uses: repo-sync/pull-request@v2
       env:
-        GITHUB_TOKEN: ${{ secrets.GH_ACTIONS_BOT }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         destination_branch: dev
         github_token: ${{ secrets.GITHUB_TOKEN }}
