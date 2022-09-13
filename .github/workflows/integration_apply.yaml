@@ -64,7 +64,7 @@ jobs:
           cat >> config.remote.tfbackend<<EOF
           hostname = "app.terraform.io"
           organization = "${{ secrets.SOPHOS_TF_ORGANIZATION }}"
-          workspace { name = "$WORKSPACE" }
+          workspaces { name = "$WORKSPACE" }
 
           terraform init -backend-config=config.remote.tfbackend
       - name: Terraform Plan
