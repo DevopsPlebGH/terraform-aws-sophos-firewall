@@ -67,7 +67,7 @@ jobs:
           workspace { name = "$WORKSPACE" }
 
           terraform init -backend-config=config.remote.tfbackend
-      - name: Terraform plan
+      - name: Terraform Plan
         id: plan
         continue-on-error: true
         run: |
