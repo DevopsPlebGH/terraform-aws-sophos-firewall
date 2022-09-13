@@ -1,4 +1,4 @@
-name: Integration Testing
+name: Integration Testing - Plan
 
 on:
   pull_request:
@@ -12,6 +12,14 @@ permissions:
 jobs:
   plan:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - environment: Development
+
+    environment: ${{ matrix.environment }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
