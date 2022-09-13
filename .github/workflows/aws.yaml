@@ -1,18 +1,15 @@
-name: 'Pull Request'
+name: AWS Web Identity
 
-# The workflow should only trigger on pull requests to the main branch
 on:
-  pull_request:
-    branches:
-      - main
+  workflow_dispatch:
 
-# Required to get the ID Token that will be used for OIDC
 permissions:
   id-token: write
   contents: read
 
 jobs:
-  read-dev:
+  test:
+    name: Test
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -20,52 +17,32 @@ jobs:
         include:
           - environment: Development
     
-    environment: ${{ matrix.environment }}
+    environment: 
+      name: ${{ matrix.environment }}
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+    steps:  
+      - id: auth
+    run:
+      - name: Auth with AWS
+        run:|
+          export AWS_ROLE_ARN=arn:aws:iam::012345678910:role/YourIAMRole
+          export AWS_WEB_IDENTITY_TOKEN_FILE=/tmp/awscreds
+          export AWS_DEFAULT_REGION=us-east-1
 
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-region: us-east-1
-          role-to-assume: ${{ secrets.READER_ROLE }}
-          role-session-name: OIDCSession
+          echo AWS_WEB_IDENTITY_TOKEN_FILE=$AWS_WEB_IDENTITY_TOKEN_FILE >> $GITHUB_ENV
+          echo AWS_ROLE_ARN=$AWS_ROLE_ARN >> $GITHUB_ENV
+          echo AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION >> $GITHUB_ENV
 
-      - run: aws s3 cp s3://devopsplebgh-dev-us-east-1/README.md README.md
-        shell: bash
+          curl -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL" | jq -r '.value' > $AWS_WEB_IDENTITY_TOKEN_FILE
+          apt-get install awscli
+          temp_role=$(aws sts assume-role-with-web-identity \
+          --web-identity-token file://$AWS_WEB_IDENTITY_TOKEN_FILE \                              --role-arn "arn:aws:iam::<aws_account_number>:role/<role_name>" \                    --role-session-name "<some_session_name>")
+          
+          export AWS_ACCESS_KEY_ID=$(echo $temp_role | jq -r .Credentials.AccessKeyId) >> GITHUB_ENV
+          echo "::add-mask::$AWS_ACCESS_KEY_ID"
+          export AWS_SECRET_ACCESS_KEY=$(echo $temp_role | jq -r .Credentials.SecretAccessKey) >> $GITHUB_ENV
+          echo "::add-mask::$AWS_SECRET_ACCESS_KEY"
+          export AWS_SESSION_TOKEN=$(echo $temp_role | jq -r .Credentials.SessionToken) >> $GITHUB_ENV
+          echo "::add-mask::$AWS_SESSION_TOKEN"
 
-  write-dev:
-    runs-on: ubuntu-latest
-    needs: read-dev
-    environment: Development
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
 
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-region: us-east-1
-          role-to-assume: ${{ secrets.DEV_DEPLOY_ROLE }}
-          role-session-name: OIDCSession
-
-      - run: aws s3 cp README.md s3://devopsplebgh-dev-us-east-1/README.md
-        shell: bash
-
-  read-prod:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-region: us-east-1
-          role-to-assume: ${{ secrets.READER_ROLE }}
-          role-session-name: OIDCSession
-
-      - run: aws s3 cp s3://devopsplebgh-prod-us-west-2/README.md README.md
-        shell: bash
