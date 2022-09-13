@@ -115,6 +115,7 @@ resource "aws_security_group" "trusted" {
     var.tags
   )
 }
+
 ### Supporting resources ###
 # Random ID
 resource "random_id" "this" {

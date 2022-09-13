@@ -55,3 +55,12 @@ jobs:
 
           ## List of files:
           ${{ env.LIST }}
+    - name: Post Success to GitHub PR
+      uses: mshick/add-pr-comment@v1
+      if: ${{ success() }}
+      with:
+        allow-repeats: true
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        repo-token-user-login: 'github-actions[bot]'
+        message: |
+          :smiley: Linting successful!
