@@ -85,7 +85,7 @@ jobs:
         id: plan
         continue-on-error: true
         run: |
-          terraform plan -input=false
+          terraform plan -input=false -no-color
         env:
           AWS_ROLE_ARN: ${{ secrets.SOPHOS_DEV_DEPLOY_ROLE }}
           AWS_ROLE_SESSION_NAME: OIDCSession  
