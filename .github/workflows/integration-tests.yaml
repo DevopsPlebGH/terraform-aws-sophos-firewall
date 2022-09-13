@@ -12,21 +12,13 @@ permissions:
 jobs:
   plan:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - environment: Development
-
-    environment: ${{ matrix.environment }}
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with: 
-          role-to-assume: ${{ secrets.DEV_DEPLOY_ROLE }}
+          role-to-assume: ${{ secrets.SOPHOS_DEV_DEPLOY_ROLE }}
           aws-region: us-west-2
           role-session-name: OIDCSession
       - name: Setup Terraform
