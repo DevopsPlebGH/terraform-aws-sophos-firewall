@@ -90,6 +90,7 @@ resource "aws_security_group" "public" {
   )
 }
 
+# Resource creates the security group to allow access to the firewall management console
 resource "aws_security_group" "trusted" {
   count       = var.create_vpc ? 1 : 0
   name        = "Trusted Network"
@@ -116,6 +117,30 @@ resource "aws_security_group" "trusted" {
   )
 }
 
+# Resource creates the sucurity group for the LAN subnet
+resource "aws_security_group" "lan" {
+  count       = var.create_vpc ? 1 : 0
+  name        = "Private Subnet"
+  description = "Security Group for private subnet. Allow everything by default"
+  vpc_id      = aws_vpc.this[0].id
+  ingress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  tags = merge(
+    { Name = "LAN" },
+    var.security_group_tags,
+    var.tags
+  )
+}
 ### Supporting resources ###
 # Random ID
 resource "random_id" "this" {
