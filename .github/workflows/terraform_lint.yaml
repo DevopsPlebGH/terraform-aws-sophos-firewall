@@ -1,4 +1,4 @@
-name: Terraform lint and auto pull requests
+name: Terraform lint
 
 on:
   push:
@@ -63,23 +63,3 @@ jobs:
         repo-token-user-login: 'github-actions[bot]'
         message: |
           :smiley: Linting successful!
-
-
-  autopr:
-    runs-on: ubuntu-latest
-    needs: lint
-    if: contains('refs/heads/feature', github.ref)
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-    - name: autopr
-      id: autopr
-      uses: repo-sync/pull-request@v2
-      with:
-        destination_branch: dev
-        github_token: ${{ secrets.GH_ACTIONS_BOT }}
-        pr_label: |
-          autopr
-        pr_title: "Pulling ${{ github.ref }} into dev"
-        pr_body: ":crown: Automated Pull Request"
-        pr_assignee: Dev0psPleb
