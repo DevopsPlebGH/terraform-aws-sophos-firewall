@@ -36,13 +36,27 @@ jobs:
       - name: Terraform init
         id: init
         run: |
-          terraform init -input=false
+          REPO="${{ github.repository }}"
+          WORKSPACE="${REPO#*/}"
+
+          cat >> remote.tf<<EOF
+          terraform {
+            backend "remote" {}
+          }
+          EOF
+
+          cat >> config.remote.tfbackend<<EOF
+          hostname = "app.terraform.io"
+          organization = "${{ secrets.SOPHOS_TF_ORGANIZATION }}"
+          workspaces { name = "$WORKSPACE" }
+          EOF
+
+          terraform init -backend-config=config.remote.tfbackend
       - name: Terraform plan
         id: plan
         continue-on-error: true
         run: | 
-          terraform plan -input=false -no-color -out=tfplan \
-          && terraform show -no-color tfplan
+          terraform plan -input=false -no-color -out=tfplan 
       - name: Reformat Plan
         run: |
           echo '${{ steps.plan.outputs.stdout || steps.plan.outputs.stderr }}' \

@@ -44,7 +44,7 @@ resource "aws_subnet" "private" {
   cidr_block        = var.private_subnet != null ? var.private_subnet : local.private_subnet
   availability_zone = var.az == null ? var.az : element("${random_shuffle.az.result}", 0)
   tags = merge(
-    { Name = "${random_id.this.hex}-${data.aws_caller_identity.current.account_id}" }
+    { Name = "private-${random_id.this.hex}-${data.aws_caller_identity.current.account_id}" }
   )
 }
 
