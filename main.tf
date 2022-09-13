@@ -1,5 +1,5 @@
 locals {
-  ifconfig_co_json = jsondecode(data.http.my_public_ip.body)
+  ifconfig_co_json = jsondecode(data.http.my_public_ip.response_body)
   my_ip            = [join("/", ["${local.ifconfig_co_json.ip}"], ["32"])]
   trusted_ip       = var.trusted_ip == null ? var.trusted_ip : local.my_ip
   network_prefix   = parseint(regex("/(\\d+)$", "${var.cidr_block}")[0], 10)
@@ -23,7 +23,7 @@ resource "aws_vpc" "this" {
 }
 
 ### Subnets ###
-# Public subnet
+# Resource creates the public subnet
 resource "aws_subnet" "public" {
   count                   = var.create_vpc ? 1 : 0
   vpc_id                  = aws_vpc.this[0].id
@@ -37,7 +37,7 @@ resource "aws_subnet" "public" {
   )
 }
 
-# Private subnet
+# Resource creates the private subnet
 resource "aws_subnet" "private" {
   count             = var.create_vpc ? 1 : 0
   vpc_id            = aws_vpc.this[0].id
@@ -47,6 +47,9 @@ resource "aws_subnet" "private" {
     { Name = "${random_id.this.hex}-${data.aws_caller_identity.current.account_id}" }
   )
 }
+
+### Security Groups ###
+# Resource creates the security group to apply to the public subnet which blocks access to the firewall console ports and SSH ports.
 
 ### Supporting resources ###
 # Random ID
