@@ -71,6 +71,26 @@ variable "namespace" {
   default     = "sophos-xg"
 }
 
+variable "private_eni_tags" {
+  type        = map(string)
+  description = <<EOT
+  (Optional) Additional tags to attach to the private ENI
+
+  Default: {}
+  EOT
+  default     = {}
+}
+
+variable "private_route_table_tags" {
+  type        = map(string)
+  description = <<EOT
+  (Optional) Additional tags to attach to the public route table
+
+  Default: {}
+  EOT
+  default     = {}
+}
+
 variable "private_subnet" {
   type        = string
   description = <<EOT
@@ -79,6 +99,16 @@ variable "private_subnet" {
   Default: null
   EOT
   default     = null
+}
+
+variable "public_eni_tags" {
+  type        = map(string)
+  description = <<EOT
+  (Optional) Additional tags to attach to the public ENI
+
+  Default: {}
+  EOT
+  default     = {}
 }
 
 variable "public_route_table_tags" {

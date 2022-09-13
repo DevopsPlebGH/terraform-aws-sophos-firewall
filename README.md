@@ -26,7 +26,11 @@ No modules.
 |------|------|
 | [aws_internet_gateway.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/internet_gateway) | resource |
 | [aws_internet_gateway_attachment.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/internet_gateway_attachment) | resource |
-| [aws_route.public_internet_gateway](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
+| [aws_network_interface.private](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/network_interface) | resource |
+| [aws_network_interface.public](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/network_interface) | resource |
+| [aws_route.private](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
+| [aws_route.public](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
+| [aws_route_table.private](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table) | resource |
 | [aws_route_table.public](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table) | resource |
 | [aws_route_table_association.public](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table_association) | resource |
 | [aws_security_group.lan](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
@@ -52,7 +56,10 @@ No modules.
 | <a name="input_enable_dns_support"></a> [enable\_dns\_support](#input\_enable\_dns\_support) | (Optional) Controls whether DNS support should be enabled in the VPC<br><br>  Default: true | `bool` | `true` | no |
 | <a name="input_internet_gateway_tags"></a> [internet\_gateway\_tags](#input\_internet\_gateway\_tags) | (Optional) Additional tags to attach to created internet gateways<br><br>  Default: {} | `map(string)` | `{}` | no |
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | (Optional) Namespace refers to the application or deployment type.<br><br>    EG: sophos-xg, sophos-optix, sophos-cwp, etc...<br><br>    Default: sophos-xg | `string` | `"sophos-xg"` | no |
+| <a name="input_private_eni_tags"></a> [private\_eni\_tags](#input\_private\_eni\_tags) | (Optional) Additional tags to attach to the private ENI<br><br>  Default: {} | `map(string)` | `{}` | no |
+| <a name="input_private_route_table_tags"></a> [private\_route\_table\_tags](#input\_private\_route\_table\_tags) | (Optional) Additional tags to attach to the public route table<br><br>  Default: {} | `map(string)` | `{}` | no |
 | <a name="input_private_subnet"></a> [private\_subnet](#input\_private\_subnet) | (Optional) The CIDR block of the private subnet. Conflicts with subnet\_prefix<br><br>  Default: null | `string` | `null` | no |
+| <a name="input_public_eni_tags"></a> [public\_eni\_tags](#input\_public\_eni\_tags) | (Optional) Additional tags to attach to the public ENI<br><br>  Default: {} | `map(string)` | `{}` | no |
 | <a name="input_public_route_table_tags"></a> [public\_route\_table\_tags](#input\_public\_route\_table\_tags) | (Optional) Additional tags to attach to the Public Route Table<br><br>  Default: {} | `map(string)` | `{}` | no |
 | <a name="input_public_subnet"></a> [public\_subnet](#input\_public\_subnet) | (Optional) The CIDR block of the public subnet. Conflicts with subnet\_prefix.<br><br>  Default: null | `string` | `null` | no |
 | <a name="input_public_subnet_tags"></a> [public\_subnet\_tags](#input\_public\_subnet\_tags) | (Optional) Additional tags for the public subnets.<br><br>  Default: {} | `map(string)` | `{}` | no |

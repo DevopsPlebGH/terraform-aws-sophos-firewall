@@ -159,6 +159,7 @@ resource "aws_internet_gateway_attachment" "this" {
   internet_gateway_id = aws_internet_gateway.this[0].id
   vpc_id              = aws_vpc.this[0].id
 }
+
 ### Route Tables ###
 # Resource creates the route table for the public subnet
 resource "aws_route_table" "public" {
@@ -167,6 +168,17 @@ resource "aws_route_table" "public" {
   tags = merge(
     { Name = "pub-rtb-${random_id.this.hex}-${data.aws_caller_identity.current.account_id}" },
     var.public_route_table_tags,
+    var.tags
+  )
+}
+
+# Resource creates the route table for the private subnet
+resource "aws_route_table" "private" {
+  count  = var.create_vpc ? 1 : 0
+  vpc_id = aws_vpc.this[0].id
+  tags = merge(
+    { Name = "priv-rtb-${random_id.this.hex}-${data.aws_caller_identity.current.account_id}" },
+    var.private_route_table_tags,
     var.tags
   )
 }
@@ -180,7 +192,7 @@ resource "aws_route_table_association" "public" {
 
 ### Routes ###
 # Resource creates the public route
-resource "aws_route" "public_internet_gateway" {
+resource "aws_route" "public" {
   route_table_id         = aws_route_table.public[0].id
   destination_cidr_block = "0.0.0.0/0"
   gateway_id             = aws_internet_gateway.this[0].id
@@ -189,6 +201,43 @@ resource "aws_route" "public_internet_gateway" {
   }
 }
 
+# Resource creates the private route
+resource "aws_route" "private" {
+  route_table_id         = aws_route_table.private[0].id
+  destination_cidr_block = "0.0.0.0/0"
+  network_interface_id   = aws_network_interface.private.id
+  timeouts {
+    create = "5m"
+  }
+}
+
+### Elastic Network Interfaces ###
+# Resource creates a private ENI
+resource "aws_network_interface" "private" {
+  subnet_id       = aws_subnet.private[0].id
+  description     = "ENI for private subnet"
+  security_groups = [aws_security_group.lan[0].id]
+  tags = merge(
+    { Name = "priv-eni-${random_id.this.hex}-${data.aws_caller_identity.current.account_id}" },
+    var.private_eni_tags,
+    var.tags
+  )
+}
+
+# Resource creates a public ENI
+resource "aws_network_interface" "public" {
+  subnet_id   = aws_subnet.public[0].id
+  description = "ENI for Public Subnet"
+  security_groups = [
+    aws_security_group.trusted[0].id,
+    aws_security_group.public[0].id
+  ]
+  tags = merge(
+    { Name = "pub-eni-${random_id.this.hex}-${data.aws_caller_identity.current.account_id}" },
+    var.public_eni_tags,
+    var.tags
+  )
+}
 ### Supporting resources ###
 # Random ID
 resource "random_id" "this" {
