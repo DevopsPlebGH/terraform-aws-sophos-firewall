@@ -6,6 +6,9 @@ on:
     branches:
       - dev
 
+env:
+  GITHUB_TOKEN: ${{ secrets.GH_ACTIONS_BOT }}   
+
 permissions:
   id-token: write
   contents: read
