@@ -22,9 +22,7 @@ jobs:
 
     steps:  
       - id: auth
-    run:
-      - name: Auth with AWS
-        run:|
+        run: |
           export AWS_ROLE_ARN=arn:aws:iam::012345678910:role/YourIAMRole
           export AWS_WEB_IDENTITY_TOKEN_FILE=/tmp/awscreds
           export AWS_DEFAULT_REGION=us-east-1
