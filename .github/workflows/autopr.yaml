@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - feature/**
-
-env:
-  GITHUB_TOKEN: ${{ secrets.GH_ACTIONS_BOT }}
       
 jobs:
   autopr:
