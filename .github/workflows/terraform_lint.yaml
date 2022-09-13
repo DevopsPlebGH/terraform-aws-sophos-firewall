@@ -11,8 +11,6 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-      with:
-        ref: ${{ github.ref }}
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v1
     - name: Terraform Lint

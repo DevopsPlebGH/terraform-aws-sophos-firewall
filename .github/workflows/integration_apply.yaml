@@ -1,0 +1,80 @@
+name: Integration Testing - Apply
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - dev
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  inform_about_apply:
+    name: Inform About Apply
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Inform on Pull Request that Apply is running
+        uses: mshick/add-pr-comment@v1
+        with:
+          repo-token: ${{ secrets.GH_ACTIONS_BOT }}
+          repo-token-user-login: 'github-actions[bot]'
+          message: |
+            ***Running terraform apply***
+            Results will display here momentarily...  
+  plan_and_apply:
+    name: Plan and Apply
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - environment: Development
+            url: https://app.terraform.io/app/esg_se_xdr_demo_dev/workspaces/terraform-aws-sophos-firewall/runs
+
+    environment: 
+      name: ${{ matrix.environment }}
+      url: ${{ matrix.url }}
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ secrets.SOPHOS_DEV_DEPLOY_ROLE }}
+          aws-region: us-west-2
+          role-session-name: OIDCSession    
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+         cli_config_credentials_token: ${{ secrets.SOPHOS_TF_API_TOKEN }}
+      - name: Terraform init
+        run: |
+          $REPO="${{ github.repository }}"
+          $WORKSPACE="${REPO#*/}"
+
+          cat >> remote.tf<<EOF
+          terraform {
+            backend "remote" {}
+          }
+
+          cat >> config.remote.tfbackend<<EOF
+          hostname = "app.terraform.io"
+          organization = "${{ secrets.SOPHOS_TF_ORGANIZATION }}"
+          workspace { name = "$WORKSPACE" }
+
+          terraform init -backend-config=config.remote.tfbackend
+      - name: Terraform Plan
+        id: plan
+        continue-on-error: true
+        run: |
+          terraform plan -input=false -no-color \
+          && terraform show -no-color
+
+
+
+
+
