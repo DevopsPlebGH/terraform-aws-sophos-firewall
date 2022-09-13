@@ -3,10 +3,7 @@ name: Integration Testing - Plan
 on:
   pull_request:
     branches:
-      - dev
-      
-env:
-  GITHUB_TOKEN: ${{ secrets.GH_ACTIONS_BOT }}            
+      - dev         
 
 permissions:
   id-token: write
