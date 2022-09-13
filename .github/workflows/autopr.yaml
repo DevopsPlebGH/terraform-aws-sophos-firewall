@@ -19,4 +19,5 @@ jobs:
         pr_label: |
           autopr
         pr_title: "Pulling ${{ github.ref }} into dev"
+        pr_body: ":crown: Automated Pull Request"
         pr_assignee: Dev0psPleb

@@ -2,7 +2,7 @@ name: Terraform Lint
 
 on:
   workflow_run:
-    workflows: ["autopr.yaml"]
+    workflows: ["Auto Pull Request"]
     types:
       - completed
 
