@@ -238,6 +238,19 @@ resource "aws_network_interface" "public" {
     var.tags
   )
 }
+
+### IAM Role ###
+# Resource will create the EC2 IAM role
+resource "aws_iam_role" "this" {
+  assume_role_policy = data.aws_iam_policy_document.trust_relationship.json
+
+  tags = merge(
+    { Name = "ec2-iam-role-${random_id.this.hex}-${data.aws_caller_identity.current.account_id}" },
+    var.iam_role_tags,
+    var.tags
+  )
+}
+
 ### Supporting resources ###
 # Random ID
 resource "random_id" "this" {
