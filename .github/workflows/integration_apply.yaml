@@ -82,7 +82,7 @@ jobs:
 
           cat >> _override.tf<<EOF
           provider "aws" {
-            assume_role_with_web_identity {
+            assume_role {
               role_arn = "${{ secrets.SOPHOS_DEV_DEPLOY_ROLE }}"
               session_name = "OIDCSession"
             }
