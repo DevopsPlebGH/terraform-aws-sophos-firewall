@@ -50,7 +50,71 @@ resource "aws_subnet" "private" {
 
 ### Security Groups ###
 # Resource creates the security group to apply to the public subnet which blocks access to the firewall console ports and SSH ports.
+resource "aws_security_group" "public" {
+  count = var.create_vpc ? 1 : 0
+  name = "Public"
+  description = "Untrusted network restricted from access port 22 and 4444"
+  vpc_id = aws_vpc.this[0].id
+  ingress {
+    description = "Allow public access 0 - 21"
+    from_port   = 0
+    to_port     = 21
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
+    description = "Allow public access 23 - 4443"
+    from_port   = 23
+    to_port     = 4443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
+    description = "Allow public access 4445 - 65535"
+    from_port   = 4445
+    to_port     = 65535
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  egress {
+    description = "Allow all traffic outbound"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  tags = merge(
+    { Name = "Public" },
+    var.security_group_tags,
+    var.tags
+  )
+}
 
+resource "aws_security_group" "trusted" {
+    count       = var.create_vpc ? 1 : 0
+  name        = "Trusted Network"
+  description = "Enable TCP access from trusted network"
+  vpc_id      = aws_vpc.this[0].id
+  ingress {
+    description = "Allow all from trusted IP"
+    from_port   = 0
+    to_port     = 65535
+    protocol    = "tcp"
+    cidr_blocks = local.trusted_ip
+  }
+  egress {
+    description = "Allow all traffic outbound"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  tags = merge(
+    { Name = "Trusted Network" },
+    var.security_group_tags,
+    var.tags
+  )
+}
 ### Supporting resources ###
 # Random ID
 resource "random_id" "this" {
