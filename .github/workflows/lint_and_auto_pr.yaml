@@ -3,9 +3,6 @@ name: Terraform lint and auto pull requests
 on:
   push:
     branches:
-      - '*'
-      - '!main'
-      - '!dev'
 
 jobs:
   lint:
