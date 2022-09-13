@@ -139,7 +139,6 @@ jobs:
             ```
             ${{ steps.plan.outputs.stderr }}
             ```            
-
       - name: Post Apply Failure
         if: steps.apply.outcome == 'failure'
         uses: mshick/add-pr-comment@v1
