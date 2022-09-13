@@ -1,6 +1,7 @@
 name: Integration Testing - Apply
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - dev
