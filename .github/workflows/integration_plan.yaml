@@ -3,7 +3,7 @@ name: Integration Testing - Plan
 on:
   pull_request:
     branches:
-      - dev         
+      - dev
 
 permissions:
   id-token: write
@@ -29,6 +29,8 @@ jobs:
           webhook-uri: ${{ secrets.MSTEAMS_WEBHOOK }}
       - name: Checkout code
         uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.workflow_run.head_branch }}
       - id: generate-token
         uses: tibdex/github-app-token@v1
         with:
