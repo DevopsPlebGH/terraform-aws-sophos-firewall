@@ -260,10 +260,10 @@ resource "aws_iam_role" "this" {
 
 # Resource will create the IAM role policy for the EC2 role
 resource "aws_iam_role_policy" "register_in_central" {
-  count  = var.central_password != null ? var.central_password : null
+  count  = var.central_password != "" ? 1 : 0
   name   = "ec2-central-policy-${random_id.this.hex}"
   role   = aws_iam_role.this.id
-  policy = data.aws_iam_policy_document.central[0].json[count.index]
+  policy = data.aws_iam_policy_document.central[0].json
 }
 
 ### AWS Secrets Manager Resources ###
@@ -305,15 +305,16 @@ resource "aws_secretsmanager_secret_version" "secure_storage_master_key" {
 
 # Resource creates the Sophos Central password secret
 resource "aws_secretsmanager_secret" "central_password" {
-  count                   = var.central_password != null ? var.central_password : null
+  count                   = var.central_password != "" ? 1 : 0
   name                    = "sophos-central-password"
   recovery_window_in_days = 0
 }
 
 # Resource creates the Sophos Central secret
 resource "aws_secretsmanager_secret_version" "central_password" {
+  count         = var.central_password != "" ? 1 : 0
   secret_id     = aws_secretsmanager_secret.central_password[0].id
-  secret_string = var.central_password
+  secret_string = var.central_password != "" ? var.central_password : null
 }
 
 ### Supporting resources ###

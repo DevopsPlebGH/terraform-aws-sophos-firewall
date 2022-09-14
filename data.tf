@@ -12,7 +12,7 @@ data "http" "my_public_ip" {
 }
 
 data "aws_iam_policy_document" "central" {
-  count = var.central_password != null ? var.central_password : null
+  count = var.central_password != "" ? 1 : 0
   statement {
     actions = [
       "secretsmanager:GetSecretValue",
