@@ -18,7 +18,6 @@ variable "central_password" {
   Default: null
   EOT
   default     = null
-  sensitive   = true
 }
 
 variable "cidr_block" {
@@ -37,7 +36,6 @@ variable "config_backup_password" {
   (Required) The password to secure the configuration backup.
 
   EOT
-  sensitive   = true
 }
 
 variable "console_password" {
@@ -46,7 +44,6 @@ variable "console_password" {
   (Required) The password for the firewall management console.
 
   EOT
-  sensitive   = true
 }
 
 variable "create_vpc" {
@@ -196,7 +193,6 @@ variable "secure_storage_master_key" {
   description = <<EOT
   (Required) The Secure Storage Master Key password.
   EOT
-  sensitive   = true
 }
 
 variable "subnet_prefix" {
