@@ -87,8 +87,9 @@ jobs:
         run: |
           terraform plan -input=false -no-color
         env:
-          AWS_ROLE_ARN: ${{ secrets.SOPHOS_DEV_DEPLOY_ROLE }}
-          AWS_ROLE_SESSION_NAME: OIDCSession  
+        env:
+          TF_VAR_console_password: ${{ secrets.CONSOLE_PASSWORD }}
+          TF_VAR_config_backup_password: ${{ secrets.CONFIG_BACKUP_PASSWORD }}  
       - name: Reformat Plan
         if: steps.plan.outcome == 'success'
         run: |
@@ -111,8 +112,8 @@ jobs:
             -no-color \
             -auto-approve
         env:
-          AWS_ROLE_ARN: ${{ secrets.SOPHOS_DEV_DEPLOY_ROLE }}
-          AWS_ROLE_SESSION_NAME: OIDCSession                 
+          TF_VAR_console_password: ${{ secrets.CONSOLE_PASSWORD }}
+          TF_VAR_config_backup_password: ${{ secrets.CONFIG_BACKUP_PASSWORD }}                  
       - name: Post Plan and Apply to GitHub PR
         if: steps.plan.outcome == 'success' && steps.apply.outcome == 'success'
         uses: mshick/add-pr-comment@v1
