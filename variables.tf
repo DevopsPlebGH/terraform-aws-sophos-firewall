@@ -179,6 +179,14 @@ variable "security_group_tags" {
   default     = {}
 }
 
+variable "secure_storage_master_key" {
+  type        = string
+  description = <<EOT
+  (Required) The Secure Storage Master Key password.
+  EOT
+  sensitive   = true
+}
+
 variable "subnet_prefix" {
   type        = string
   description = <<EOT
