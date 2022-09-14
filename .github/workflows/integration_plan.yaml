@@ -3,8 +3,6 @@ name: Integration Testing - Plan
 on:
   workflow_run:
     workflows: ['Terraform lint']
-    types:
-      - completed
 
 permissions:
   id-token: write
