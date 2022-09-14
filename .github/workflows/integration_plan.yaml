@@ -21,6 +21,12 @@ jobs:
     environment: ${{ matrix.environment }}
 
     steps:
+      - name: Microsoft Teams Notifications
+        uses: toko-bifrost/ms-teams-deploy-card@master
+        if: always()
+        with:
+          github-token: ${{ steps.generate-token.outputs.token }}
+          webhook-uri: ${{ secrets.MSTEAMS_WEBHOOK }}
       - name: Checkout code
         uses: actions/checkout@v2
       - id: generate-token
