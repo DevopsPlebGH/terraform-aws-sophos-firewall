@@ -11,6 +11,19 @@ data "http" "my_public_ip" {
   }
 }
 
+data "aws_iam_policy_document" "central" {
+  count = var.central_password != null ? var.central_password : null
+  statement {
+    actions = [
+      "secretsmanager:GetSecretValue",
+      "secretsmanager:DescribeSecret"
+    ]
+    resources = [
+      element(aws_secretsmanager_secret.central_password[*].arn, count.index)
+    ]
+  }
+}
+
 data "aws_iam_policy_document" "ec2_iam_policy" {
   statement {
     actions = [
