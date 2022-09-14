@@ -15,8 +15,9 @@ variable "central_password" {
   description = <<EOT
   (Optional) The password for your Sophos Central account if you would like to register the firewall with Sophos Central
 
-  Default: {}
+  Default: null
   EOT
+  default     = null
   sensitive   = true
 }
 

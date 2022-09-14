@@ -64,7 +64,7 @@ No modules.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_az"></a> [az](#input\_az) | (Optional) The availability zone in which to deploy the firewall.<br><br>  If not defined, this value will be derived from a randomly selected AZ via the aws\_availability\_zones data source.<br><br>  Default: "" | `string` | `null` | no |
-| <a name="input_central_password"></a> [central\_password](#input\_central\_password) | (Optional) The password for your Sophos Central account if you would like to register the firewall with Sophos Central<br><br>  Default: {} | `string` | n/a | yes |
+| <a name="input_central_password"></a> [central\_password](#input\_central\_password) | (Optional) The password for your Sophos Central account if you would like to register the firewall with Sophos Central<br><br>  Default: null | `string` | `null` | no |
 | <a name="input_cidr_block"></a> [cidr\_block](#input\_cidr\_block) | (Optional) The CIDR range for the VPC CIDR block.<br><br>    Default: "10.0.0.0/16" | `string` | `"10.0.0.0/16"` | no |
 | <a name="input_config_backup_password"></a> [config\_backup\_password](#input\_config\_backup\_password) | (Required) The password to secure the configuration backup. | `string` | n/a | yes |
 | <a name="input_console_password"></a> [console\_password](#input\_console\_password) | (Required) The password for the firewall management console. | `string` | n/a | yes |
