@@ -91,6 +91,26 @@ jobs:
             #Gray
             ${{ env.PLAN }}     
             ```
+      - name: Microsoft Teams Notifications
+        uses: skitionek/notify-microsoft-teams@master
+        if: always()
+        with:
+          webhook_url: ${{ secrets.MSTEAMS_WEBHOOK }}
+          raw: >-
+            {
+              "@type": "MessageCard",
+              "@context": "http://schema.org/extensions",
+              "title": "Terraform Plan: "
+              ## plan
+              ```diff
+              + Green
+              - Red
+              ! Orange
+              @@ Pink @@
+              #Gray
+              ${{ env.PLAN }}     
+              ```
+            }
 
 
 
