@@ -45,3 +45,5 @@ terraform.rc
 artifacts.sh
 .terraform.lock.hcl
 test.pem
+remote.tf
+config.remote.tfbackend
