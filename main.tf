@@ -184,6 +184,12 @@ resource "aws_route_table_association" "public" {
   route_table_id = aws_route_table.public[0].id
 }
 
+# Resource creates the private route table association
+resource "aws_route_table_association" "private" {
+  subnet_id      = aws_subnet.private[0].id
+  route_table_id = aws_route_table.private[0].id
+}
+
 ### Routes ###
 # Resource creates the public route
 resource "aws_route" "public" {
@@ -236,13 +242,41 @@ resource "aws_network_interface" "public" {
 ### IAM Role ###
 # Resource will create the EC2 IAM role
 resource "aws_iam_role" "this" {
+  name               = "ec2-iam-role-${random_id.this.hex}-${data.aws_caller_identity.current.account_id}"
   assume_role_policy = data.aws_iam_policy_document.trust_relationship.json
-
+  inline_policy {
+    name   = "ec2-policy-${random_id.this.hex}"
+    policy = data.aws_iam_policy_document.ec2_iam_policy.json
+  }
   tags = merge(
-    { Name = "ec2-iam-role-${random_id.this.hex}-${data.aws_caller_identity.current.account_id}" },
     var.iam_role_tags,
     var.tags
   )
+}
+
+### AWS Secrets Manager Resources ###
+# Resource creates the XG Firewall Password secret
+resource "aws_secretsmanager_secret" "console_password" {
+  name                    = "sophos-fw-console-password"
+  recovery_window_in_days = 0
+}
+
+# Resource creates the XG Firewall Secret
+resource "aws_secretsmanager_secret_version" "console_password" {
+  secret_id     = aws_secretsmanager_secret.console_password.id
+  secret_string = var.console_password
+}
+
+# Resource creates the XG Firewall backup configuration password secret
+resource "aws_secretsmanager_secret" "config_backup_password" {
+  name                    = "sophos-fw-backup-configuration-password"
+  recovery_window_in_days = 0
+}
+
+# Resource creates the XG Firewall backup configuration secret
+resource "aws_secretsmanager_secret_version" "config_backup_password" {
+  secret_id     = aws_secretsmanager_secret.config_backup_password.id
+  secret_string = var.config_backup_password
 }
 
 ### Supporting resources ###

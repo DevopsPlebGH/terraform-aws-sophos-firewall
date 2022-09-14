@@ -19,6 +19,24 @@ variable "cidr_block" {
   default     = "10.0.0.0/16"
 }
 
+variable "config_backup_password" {
+  type        = string
+  description = <<EOT
+  (Required) The password to secure the configuration backup.
+
+  EOT
+  sensitive   = true
+}
+
+variable "console_password" {
+  type        = string
+  description = <<EOT
+  (Required) The password for the firewall management console.
+
+  EOT
+  sensitive   = true
+}
+
 variable "create_vpc" {
   type        = bool
   description = <<EOT
