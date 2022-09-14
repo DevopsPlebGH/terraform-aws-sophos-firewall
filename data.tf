@@ -24,6 +24,18 @@ data "aws_iam_policy_document" "ec2_iam_policy" {
   }
 }
 
+data "aws_iam_policy_document" "secure_storage_master_key" {
+  statement {
+    actions = [
+      "secretsmanager:GetSecretValue",
+      "secretsmanager:DescribeSecret"
+    ]
+    resources = [
+      aws_secretsmanager_secret.secure_storage_master_key.arn
+    ]
+  }
+}
+
 data "aws_iam_policy_document" "trust_relationship" {
   statement {
     actions = ["sts:AssumeRole"]

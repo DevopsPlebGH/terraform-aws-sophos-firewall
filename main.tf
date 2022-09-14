@@ -248,6 +248,10 @@ resource "aws_iam_role" "this" {
     name   = "ec2-policy-${random_id.this.hex}"
     policy = data.aws_iam_policy_document.ec2_iam_policy.json
   }
+  inline_policy {
+    name   = "ssm-policy-${random_id.this.hex}"
+    policy = data.aws_iam_policy_document.secure_storage_master_key.json
+  }
   tags = merge(
     var.iam_role_tags,
     var.tags
@@ -277,6 +281,18 @@ resource "aws_secretsmanager_secret" "config_backup_password" {
 resource "aws_secretsmanager_secret_version" "config_backup_password" {
   secret_id     = aws_secretsmanager_secret.config_backup_password.id
   secret_string = var.config_backup_password
+}
+
+# Resource creates the Secure Storage Master Key password secret
+resource "aws_secretsmanager_secret" "secure_storage_master_key" {
+  name                    = "sophos-fw-secure-storage-master-key"
+  recovery_window_in_days = 0
+}
+
+# Resource creates the Secure Storage Master Key secret
+resource "aws_secretsmanager_secret_version" "secure_storage_master_key" {
+  secret_id     = aws_secretsmanager_secret.secure_storage_master_key.id
+  secret_string = var.secure_storage_master_key
 }
 
 ### Supporting resources ###

@@ -5,10 +5,7 @@ on:
   push:
     branches:
       - dev
-
-env:
-  GITHUB_TOKEN: ${{ secrets.GH_ACTIONS_BOT }}   
-
+  
 permissions:
   id-token: write
   contents: read
@@ -87,7 +84,6 @@ jobs:
         run: |
           terraform plan -input=false -no-color
         env:
-        env:
           TF_VAR_console_password: ${{ secrets.CONSOLE_PASSWORD }}
           TF_VAR_config_backup_password: ${{ secrets.CONFIG_BACKUP_PASSWORD }}  
       - name: Reformat Plan
@@ -113,7 +109,8 @@ jobs:
             -auto-approve
         env:
           TF_VAR_console_password: ${{ secrets.CONSOLE_PASSWORD }}
-          TF_VAR_config_backup_password: ${{ secrets.CONFIG_BACKUP_PASSWORD }}                  
+          TF_VAR_config_backup_password: ${{ secrets.CONFIG_BACKUP_PASSWORD }}  
+          TF_VAR_secure_storage_master_key: ${{ secrets.SECURE_STORAGE_MASTER_KEY }}                           
       - name: Post Plan and Apply to GitHub PR
         if: steps.plan.outcome == 'success' && steps.apply.outcome == 'success'
         uses: mshick/add-pr-comment@v1
