@@ -239,6 +239,17 @@ resource "aws_network_interface" "public" {
   )
 }
 
+### EC2 Resources ###
+# Resource will create the IAM instance profile
+resource "aws_iam_instance_profile" "this" {
+  name = "ec2-instance-profile-${random_id.this.hex}"
+  role = aws_iam_role.this.name
+  tags = merge(
+    var.instance_profile_tags,
+    var.tags
+  )
+}
+
 ### IAM Role ###
 # Resource will create the EC2 IAM role
 resource "aws_iam_role" "this" {

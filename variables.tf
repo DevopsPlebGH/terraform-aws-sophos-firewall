@@ -17,7 +17,7 @@ variable "central_password" {
 
   Default: null
   EOT
-  default     = null
+  default     = ""
 }
 
 variable "cidr_block" {
@@ -80,6 +80,16 @@ variable "iam_role_tags" {
   type        = map(string)
   description = <<EOT
   (Optional) Additional tags to attach to created IAM roles
+
+  Default: {}
+  EOT
+  default     = {}
+}
+
+variable "instance_profile_tags" {
+  type        = map(string)
+  description = <<EOT
+  (Optional) Additional tags to attach to instance profile
 
   Default: {}
   EOT
