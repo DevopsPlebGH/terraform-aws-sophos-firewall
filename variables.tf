@@ -9,6 +9,17 @@ variable "az" {
   EOT
   default     = null
 }
+
+variable "central_password" {
+  type        = string
+  description = <<EOT
+  (Optional) The password for your Sophos Central account if you would like to register the firewall with Sophos Central
+
+  Default: null
+  EOT
+  default     = ""
+}
+
 variable "cidr_block" {
   type        = string
   description = <<EOT
@@ -17,6 +28,22 @@ variable "cidr_block" {
     Default: "10.0.0.0/16"
     EOT
   default     = "10.0.0.0/16"
+}
+
+variable "config_backup_password" {
+  type        = string
+  description = <<EOT
+  (Required) The password to secure the configuration backup.
+
+  EOT
+}
+
+variable "console_password" {
+  type        = string
+  description = <<EOT
+  (Required) The password for the firewall management console.
+
+  EOT
 }
 
 variable "create_vpc" {
@@ -49,6 +76,36 @@ variable "enable_dns_support" {
   default     = true
 }
 
+variable "iam_role_tags" {
+  type        = map(string)
+  description = <<EOT
+  (Optional) Additional tags to attach to created IAM roles
+
+  Default: {}
+  EOT
+  default     = {}
+}
+
+variable "instance_profile_tags" {
+  type        = map(string)
+  description = <<EOT
+  (Optional) Additional tags to attach to instance profile
+
+  Default: {}
+  EOT
+  default     = {}
+}
+
+variable "internet_gateway_tags" {
+  type        = map(string)
+  description = <<EOT
+  (Optional) Additional tags to attach to created internet gateways
+
+  Default: {}
+  EOT
+  default     = {}
+}
+
 variable "namespace" {
   type        = string
   description = <<EOT
@@ -61,6 +118,26 @@ variable "namespace" {
   default     = "sophos-xg"
 }
 
+variable "private_eni_tags" {
+  type        = map(string)
+  description = <<EOT
+  (Optional) Additional tags to attach to the private ENI
+
+  Default: {}
+  EOT
+  default     = {}
+}
+
+variable "private_route_table_tags" {
+  type        = map(string)
+  description = <<EOT
+  (Optional) Additional tags to attach to the public route table
+
+  Default: {}
+  EOT
+  default     = {}
+}
+
 variable "private_subnet" {
   type        = string
   description = <<EOT
@@ -69,6 +146,26 @@ variable "private_subnet" {
   Default: null
   EOT
   default     = null
+}
+
+variable "public_eni_tags" {
+  type        = map(string)
+  description = <<EOT
+  (Optional) Additional tags to attach to the public ENI
+
+  Default: {}
+  EOT
+  default     = {}
+}
+
+variable "public_route_table_tags" {
+  type        = map(string)
+  description = <<EOT
+  (Optional) Additional tags to attach to the Public Route Table
+
+  Default: {}
+  EOT
+  default     = {}
 }
 
 variable "public_subnet" {
@@ -99,6 +196,13 @@ variable "security_group_tags" {
   Default: {}
   EOT
   default     = {}
+}
+
+variable "secure_storage_master_key" {
+  type        = string
+  description = <<EOT
+  (Required) The Secure Storage Master Key password.
+  EOT
 }
 
 variable "subnet_prefix" {

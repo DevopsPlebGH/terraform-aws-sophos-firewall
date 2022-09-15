@@ -11,14 +11,20 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
+    - id: generate-token
+      uses: tibdex/github-app-token@v1
+      with:
+        app_id: ${{ secrets.APP_ID }}
+        private_key: ${{ secrets.APP_PRIVATE_KEY }}
     - name: autopr
       id: autopr
       uses: repo-sync/pull-request@v2
       with:
         destination_branch: dev
-        github_token: ${{ github.token }}
+        github_token: ${{ steps.generate-token.outputs.token }}
         pr_label: |
           autopr
         pr_title: "Pulling ${{ github.ref }} into dev"
         pr_body: ":crown: Automated Pull Request"
         pr_assignee: Dev0psPleb
+

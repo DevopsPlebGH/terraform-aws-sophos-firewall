@@ -21,8 +21,21 @@ jobs:
     environment: ${{ matrix.environment }}
 
     steps:
+      - name: Microsoft Teams Notifications
+        uses: toko-bifrost/ms-teams-deploy-card@master
+        if: always()
+        with:
+          github-token: ${{ steps.generate-token.outputs.token }}
+          webhook-uri: ${{ secrets.MSTEAMS_WEBHOOK }}
       - name: Checkout code
         uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.workflow_run.head_branch }}
+      - id: generate-token
+        uses: tibdex/github-app-token@v1
+        with:
+          app_id: ${{ secrets.APP_ID }}
+          private_key: ${{ secrets.APP_PRIVATE_KEY }}        
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with: 
@@ -36,13 +49,31 @@ jobs:
       - name: Terraform init
         id: init
         run: |
-          terraform init -input=false
+          REPO="${{ github.repository }}"
+          WORKSPACE="${REPO#*/}"
+
+          cat >> remote.tf<<EOF
+          terraform {
+            backend "remote" {}
+          }
+          EOF
+
+          cat >> config.remote.tfbackend<<EOF
+          hostname = "app.terraform.io"
+          organization = "${{ secrets.SOPHOS_TF_ORGANIZATION }}"
+          workspaces { name = "$WORKSPACE" }
+          EOF
+
+          terraform init -backend-config=config.remote.tfbackend
       - name: Terraform plan
         id: plan
         continue-on-error: true
         run: | 
-          terraform plan -input=false -no-color -out=tfplan \
-          && terraform show -no-color tfplan
+          terraform plan -input=false -no-color -out=tfplan
+        env:
+          TF_VAR_console_password: ${{ secrets.CONSOLE_PASSWORD }}
+          TF_VAR_config_backup_password: ${{ secrets.CONFIG_BACKUP_PASSWORD }}
+          TF_VAR_secure_storage_master_key: ${{ secrets.SECURE_STORAGE_MASTER_KEY }}         
       - name: Reformat Plan
         run: |
           echo '${{ steps.plan.outputs.stdout || steps.plan.outputs.stderr }}' \
@@ -57,8 +88,7 @@ jobs:
         uses: mshick/add-pr-comment@v1
         with:
           allow-repeats: true
-          repo-token: ${{ secrets.GH_ACTIONS_BOT }}
-          repo-token-user-login: ${{ github.actor }}
+          repo-token: ${{ steps.generate-token.outputs.token }}
           message: |
             ## plan
             ```diff
@@ -68,7 +98,7 @@ jobs:
             @@ Pink @@
             #Gray
             ${{ env.PLAN }}     
-            ```      
+            ```
 
 
 

@@ -44,7 +44,7 @@ resource "aws_subnet" "private" {
   cidr_block        = var.private_subnet != null ? var.private_subnet : local.private_subnet
   availability_zone = var.az == null ? var.az : element("${random_shuffle.az.result}", 0)
   tags = merge(
-    { Name = "${random_id.this.hex}-${data.aws_caller_identity.current.account_id}" }
+    { Name = "private-${random_id.this.hex}-${data.aws_caller_identity.current.account_id}" }
   )
 }
 
@@ -90,6 +90,7 @@ resource "aws_security_group" "public" {
   )
 }
 
+# Resource creates the security group to allow access to the firewall management console
 resource "aws_security_group" "trusted" {
   count       = var.create_vpc ? 1 : 0
   name        = "Trusted Network"
@@ -114,6 +115,217 @@ resource "aws_security_group" "trusted" {
     var.security_group_tags,
     var.tags
   )
+}
+
+# Resource creates the sucurity group for the LAN subnet
+resource "aws_security_group" "lan" {
+  count       = var.create_vpc ? 1 : 0
+  name        = "Private Subnet"
+  description = "Security Group for private subnet. Allow everything by default"
+  vpc_id      = aws_vpc.this[0].id
+  ingress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  tags = merge(
+    { Name = "LAN" },
+    var.security_group_tags,
+    var.tags
+  )
+}
+
+### Internet Gateway ###
+# Resource creates an internet gateway in the VPC
+resource "aws_internet_gateway" "this" {
+  count  = var.create_vpc ? 1 : 0
+  vpc_id = aws_vpc.this[0].id
+  tags = merge(
+    { Name = "igw-${random_id.this.hex}-${data.aws_caller_identity.current.account_id}" },
+    var.internet_gateway_tags,
+    var.tags
+  )
+}
+
+### Route Tables ###
+# Resource creates the route table for the public subnet
+resource "aws_route_table" "public" {
+  count  = var.create_vpc ? 1 : 0
+  vpc_id = aws_vpc.this[0].id
+  tags = merge(
+    { Name = "pub-rtb-${random_id.this.hex}-${data.aws_caller_identity.current.account_id}" },
+    var.public_route_table_tags,
+    var.tags
+  )
+}
+
+# Resource creates the route table for the private subnet
+resource "aws_route_table" "private" {
+  count  = var.create_vpc ? 1 : 0
+  vpc_id = aws_vpc.this[0].id
+  tags = merge(
+    { Name = "priv-rtb-${random_id.this.hex}-${data.aws_caller_identity.current.account_id}" },
+    var.private_route_table_tags,
+    var.tags
+  )
+}
+
+## Route Table Associations ###
+# Resources creates the public route table association
+resource "aws_route_table_association" "public" {
+  subnet_id      = aws_subnet.public[0].id
+  route_table_id = aws_route_table.public[0].id
+}
+
+# Resource creates the private route table association
+resource "aws_route_table_association" "private" {
+  subnet_id      = aws_subnet.private[0].id
+  route_table_id = aws_route_table.private[0].id
+}
+
+### Routes ###
+# Resource creates the public route
+resource "aws_route" "public" {
+  route_table_id         = aws_route_table.public[0].id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = aws_internet_gateway.this[0].id
+  timeouts {
+    create = "5m"
+  }
+}
+
+# Resource creates the private route
+resource "aws_route" "private" {
+  route_table_id         = aws_route_table.private[0].id
+  destination_cidr_block = "0.0.0.0/0"
+  network_interface_id   = aws_network_interface.private.id
+  timeouts {
+    create = "5m"
+  }
+}
+
+### Elastic Network Interfaces ###
+# Resource creates a private ENI
+resource "aws_network_interface" "private" {
+  subnet_id       = aws_subnet.private[0].id
+  description     = "ENI for private subnet"
+  security_groups = [aws_security_group.lan[0].id]
+  tags = merge(
+    { Name = "priv-eni-${random_id.this.hex}-${data.aws_caller_identity.current.account_id}" },
+    var.private_eni_tags,
+    var.tags
+  )
+}
+
+# Resource creates a public ENI
+resource "aws_network_interface" "public" {
+  subnet_id   = aws_subnet.public[0].id
+  description = "ENI for Public Subnet"
+  security_groups = [
+    aws_security_group.trusted[0].id,
+    aws_security_group.public[0].id
+  ]
+  tags = merge(
+    { Name = "pub-eni-${random_id.this.hex}-${data.aws_caller_identity.current.account_id}" },
+    var.public_eni_tags,
+    var.tags
+  )
+}
+
+### EC2 Resources ###
+# Resource will create the IAM instance profile
+resource "aws_iam_instance_profile" "this" {
+  name = "ec2-instance-profile-${random_id.this.hex}"
+  role = aws_iam_role.this.name
+  tags = merge(
+    var.instance_profile_tags,
+    var.tags
+  )
+}
+
+### IAM Role ###
+# Resource will create the EC2 IAM role
+resource "aws_iam_role" "this" {
+  name               = "ec2-iam-role-${random_id.this.hex}-${data.aws_caller_identity.current.account_id}"
+  assume_role_policy = data.aws_iam_policy_document.trust_relationship.json
+  inline_policy {
+    name   = "ec2-policy-${random_id.this.hex}"
+    policy = data.aws_iam_policy_document.ec2_iam_policy.json
+  }
+  inline_policy {
+    name   = "ssm-policy-${random_id.this.hex}"
+    policy = data.aws_iam_policy_document.secure_storage_master_key.json
+  }
+  tags = merge(
+    var.iam_role_tags,
+    var.tags
+  )
+}
+
+# Resource will create the IAM role policy for the EC2 role
+resource "aws_iam_role_policy" "register_in_central" {
+  count  = var.central_password != "" ? 1 : 0
+  name   = "ec2-central-policy-${random_id.this.hex}"
+  role   = aws_iam_role.this.id
+  policy = data.aws_iam_policy_document.central[0].json
+}
+
+### AWS Secrets Manager Resources ###
+# Resource creates the XG Firewall Password secret
+resource "aws_secretsmanager_secret" "console_password" {
+  name                    = "sophos-fw-console-password"
+  recovery_window_in_days = 0
+}
+
+# Resource creates the XG Firewall Secret
+resource "aws_secretsmanager_secret_version" "console_password" {
+  secret_id     = aws_secretsmanager_secret.console_password.id
+  secret_string = var.console_password
+}
+
+# Resource creates the XG Firewall backup configuration password secret
+resource "aws_secretsmanager_secret" "config_backup_password" {
+  name                    = "sophos-fw-backup-configuration-password"
+  recovery_window_in_days = 0
+}
+
+# Resource creates the XG Firewall backup configuration secret
+resource "aws_secretsmanager_secret_version" "config_backup_password" {
+  secret_id     = aws_secretsmanager_secret.config_backup_password.id
+  secret_string = var.config_backup_password
+}
+
+# Resource creates the Secure Storage Master Key password secret
+resource "aws_secretsmanager_secret" "secure_storage_master_key" {
+  name                    = "sophos-fw-secure-storage-master-key"
+  recovery_window_in_days = 0
+}
+
+# Resource creates the Secure Storage Master Key secret
+resource "aws_secretsmanager_secret_version" "secure_storage_master_key" {
+  secret_id     = aws_secretsmanager_secret.secure_storage_master_key.id
+  secret_string = var.secure_storage_master_key
+}
+
+# Resource creates the Sophos Central password secret
+resource "aws_secretsmanager_secret" "central_password" {
+  count                   = var.central_password != "" ? 1 : 0
+  name                    = "sophos-central-password"
+  recovery_window_in_days = 0
+}
+
+# Resource creates the Sophos Central secret
+resource "aws_secretsmanager_secret_version" "central_password" {
+  count         = var.central_password != "" ? 1 : 0
+  secret_id     = aws_secretsmanager_secret.central_password[0].id
+  secret_string = var.central_password != "" ? var.central_password : null
 }
 
 ### Supporting resources ###
