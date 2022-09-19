@@ -264,9 +264,9 @@ variable "trusted_ip" {
 
     EG: 192.168.10.24/32
 
-    Default: [null]
+    Default: [""]
     EOT
-  default     = [null]
+  default     = [""]
 }
 
 variable "vpc_tags" {
