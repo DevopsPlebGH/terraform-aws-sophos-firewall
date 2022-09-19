@@ -27,7 +27,9 @@ No modules.
 | [aws_iam_instance_profile.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_instance_profile) | resource |
 | [aws_iam_role.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 | [aws_iam_role_policy.register_in_central](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy) | resource |
+| [aws_instance.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/instance) | resource |
 | [aws_internet_gateway.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/internet_gateway) | resource |
+| [aws_launch_template.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/launch_template) | resource |
 | [aws_network_interface.private](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/network_interface) | resource |
 | [aws_network_interface.public](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/network_interface) | resource |
 | [aws_route.private](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
@@ -76,8 +78,11 @@ No modules.
 | <a name="input_enable_dns_support"></a> [enable\_dns\_support](#input\_enable\_dns\_support) | (Optional) Controls whether DNS support should be enabled in the VPC<br><br>  Default: true | `bool` | `true` | no |
 | <a name="input_iam_role_tags"></a> [iam\_role\_tags](#input\_iam\_role\_tags) | (Optional) Additional tags to attach to created IAM roles<br><br>  Default: {} | `map(string)` | `{}` | no |
 | <a name="input_instance_profile_tags"></a> [instance\_profile\_tags](#input\_instance\_profile\_tags) | (Optional) Additional tags to attach to instance profile<br><br>  Default: {} | `map(string)` | `{}` | no |
+| <a name="input_instance_tags"></a> [instance\_tags](#input\_instance\_tags) | (Optional) Additional tags to attach to the EC2 instance<br><br>  Default: {} | `map(string)` | `{}` | no |
+| <a name="input_instance_type"></a> [instance\_type](#input\_instance\_type) | (Optional) The EC2 instance type to use for the firewall | `map(any)` | <pre>{<br>  "c3.2xlarge": "c3.2xlarge",<br>  "c3.4xlarge": "c3.4xlarge",<br>  "c3.8xlarge": "c3.8xlarge",<br>  "c3.xlarge": "c3.xlarge",<br>  "c4.2xlarge": "c4.2xlarge",<br>  "c4.4xlarge": "c4.4xlarge",<br>  "c4.8xlarge": "c4.8xlarge",<br>  "c4.large": "c4.large",<br>  "c4.xlarge": "c4.xlarge",<br>  "c5.2xlarge": "c5.2xlarge",<br>  "c5.large": "c5.large",<br>  "c5.xlarge": "c5.xlarge",<br>  "m3.2xlarge": "m3.2xlarge",<br>  "m3.xlarge": "m3.xlarge",<br>  "m4.large": "m4.large",<br>  "m4.xlarge": "m4.xlarge",<br>  "m5.2xlarge": "m5.2xlarge",<br>  "m5.large": "m5.large",<br>  "m5.xlarge": "m5.xlarge",<br>  "t3.medium": "t3.medium",<br>  "t3.small": "t3.small"<br>}</pre> | no |
 | <a name="input_internet_gateway_tags"></a> [internet\_gateway\_tags](#input\_internet\_gateway\_tags) | (Optional) Additional tags to attach to created internet gateways<br><br>  Default: {} | `map(string)` | `{}` | no |
 | <a name="input_latest"></a> [latest](#input\_latest) | (Optional) Whether or not to use the latest version of the AMI.<br><br>  Default: true | `bool` | `true` | no |
+| <a name="input_launch_template_tags"></a> [launch\_template\_tags](#input\_launch\_template\_tags) | (Optional) Additional tags to attach to the launch template<br><br>  Default: {} | `map(string)` | `{}` | no |
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | (Optional) Namespace refers to the application or deployment type.<br><br>    EG: sophos-xg, sophos-optix, sophos-cwp, etc...<br><br>    Default: sophos-xg | `string` | `"sophos-xg"` | no |
 | <a name="input_private_eni_tags"></a> [private\_eni\_tags](#input\_private\_eni\_tags) | (Optional) Additional tags to attach to the private ENI<br><br>  Default: {} | `map(string)` | `{}` | no |
 | <a name="input_private_route_table_tags"></a> [private\_route\_table\_tags](#input\_private\_route\_table\_tags) | (Optional) Additional tags to attach to the public route table<br><br>  Default: {} | `map(string)` | `{}` | no |
@@ -88,8 +93,11 @@ No modules.
 | <a name="input_public_subnet_tags"></a> [public\_subnet\_tags](#input\_public\_subnet\_tags) | (Optional) Additional tags for the public subnets.<br><br>  Default: {} | `map(string)` | `{}` | no |
 | <a name="input_secure_storage_master_key"></a> [secure\_storage\_master\_key](#input\_secure\_storage\_master\_key) | (Required) The Secure Storage Master Key password. | `string` | n/a | yes |
 | <a name="input_security_group_tags"></a> [security\_group\_tags](#input\_security\_group\_tags) | (Optional) Additional tags to attach to security groups<br><br>  Default: {} | `map(string)` | `{}` | no |
-| <a name="input_sfos_version"></a> [sfos\_version](#input\_sfos\_version) | (Optional) Version of SFOS firmware to use with the EC2 instance<br><br>    Default: "" | `string` | `""` | no |
+| <a name="input_sfos_version"></a> [sfos\_version](#input\_sfos\_version) | (Optional) The firmware version to use for the deployed firewall<br><br>  Default: "latest" | `string` | `"latest"` | no |
+| <a name="input_sfos_versions"></a> [sfos\_versions](#input\_sfos\_versions) | (Optional) Version of SFOS firmware to use with the EC2 instance<br><br>    Default: "" | `map(any)` | <pre>{<br>  "18.0 MR3": "18.0.3.457",<br>  "18.0 MR4": "18.0.4.506",<br>  "18.0 MR5": "18.0.5.585",<br>  "18.5 MR1": "18.5.1.326",<br>  "18.5 MR2": "18.5.2.380",<br>  "18.5 MR3": "18.5.3.408",<br>  "latest": "19.0.0.317"<br>}</pre> | no |
+| <a name="input_size"></a> [size](#input\_size) | (Optional) The size of the instance to deploy.<br><br>  Default: "m5.large" | `string` | `"m5.large"` | no |
 | <a name="input_sku"></a> [sku](#input\_sku) | (Optional) The SKU to use for the AMI. Can be either payg or byol<br><br>  Default: payg | `string` | `"payg"` | no |
+| <a name="input_ssh_key_name"></a> [ssh\_key\_name](#input\_ssh\_key\_name) | (Required) The name of the SSH key to use to authenticate to the firewall. | `string` | n/a | yes |
 | <a name="input_subnet_prefix"></a> [subnet\_prefix](#input\_subnet\_prefix) | (Optional) The subnet prefix. Conflicts with public\_subnet/private\_subnet.<br><br>  Default: "24" | `string` | `"24"` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | (Optional) A map of tags to add to all resources<br><br>    Default: {} | `map(string)` | `{}` | no |
 | <a name="input_trusted_ip"></a> [trusted\_ip](#input\_trusted\_ip) | (Optional) A trusted IP in CIDR format that will be added to the Trusted Network security group to allow access to the firewall console.<br><br>    The default behavior is to include the public IP address from which the Terraform plan is run.<br><br>    EG: 192.168.10.24/32<br><br>    Default: [] | `list(string)` | `[]` | no |
@@ -99,6 +107,7 @@ No modules.
 
 | Name | Description |
 |------|-------------|
+| <a name="output_ami_id"></a> [ami\_id](#output\_ami\_id) | n/a |
 | <a name="output_ami_map"></a> [ami\_map](#output\_ami\_map) | The map of AMI's available. |
 | <a name="output_azs"></a> [azs](#output\_azs) | The availability zone that the resources were deployed in if no availability zone was specified. |
 | <a name="output_trusted_ips"></a> [trusted\_ips](#output\_trusted\_ips) | The trusted IP CIDR's in the trusted IP security group. |
