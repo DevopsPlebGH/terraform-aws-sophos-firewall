@@ -25,8 +25,19 @@ jobs:
         uses: toko-bifrost/ms-teams-deploy-card@master
         if: always()
         with:
+          environment: ${{ matrix.environment }}
           github-token: ${{ steps.generate-token.outputs.token }}
           webhook-uri: ${{ secrets.MSTEAMS_WEBHOOK }}
+          card-layout-start: complete
+          card-layout-exit: complete
+          show-on-start: true
+          show-on-exist: true
+          show-on-failure: true
+          enable-view-status-action: true
+          enable-review-diffs-actions: true
+          view-status-action-text: View build/deploy status
+          review-diffs-action-text: Review commit diffs
+          include-files: true
       - name: Checkout code
         uses: actions/checkout@v2
         with:
