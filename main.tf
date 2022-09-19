@@ -2,6 +2,7 @@ locals {
   ifconfig_co_json = jsondecode(data.http.my_public_ip.response_body)
   my_ip            = [join("/", ["${local.ifconfig_co_json.ip}"], ["32"])]
   trusted_ip       = var.trusted_ip == null ? var.trusted_ip : local.my_ip
+  trusted_ips      = concat(local.my_ip, local.trusted_ip)
   network_prefix   = parseint(regex("/(\\d+)$", "${var.cidr_block}")[0], 10)
   new_bits         = var.subnet_prefix - local.network_prefix
   public_subnet    = element(cidrsubnets("${var.cidr_block}", "${local.new_bits}", "${local.new_bits}"), 0)
@@ -103,7 +104,7 @@ resource "aws_security_group" "trusted" {
     from_port   = 0
     to_port     = 65535
     protocol    = "tcp"
-    cidr_blocks = local.trusted_ip
+    cidr_blocks = local.trusted_ips
   }
   egress {
     description = "Allow all traffic outbound"
