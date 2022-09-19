@@ -1,13 +1,14 @@
 locals {
   ifconfig_co_json = jsondecode(data.http.my_public_ip.response_body)
   my_ip            = [join("/", ["${local.ifconfig_co_json.ip}"], ["32"])]
-  trusted_ip       = var.trusted_ip == null ? var.trusted_ip : local.my_ip
-  network_prefix   = parseint(regex("/(\\d+)$", "${var.cidr_block}")[0], 10)
-  new_bits         = var.subnet_prefix - local.network_prefix
-  public_subnet    = element(cidrsubnets("${var.cidr_block}", "${local.new_bits}", "${local.new_bits}"), 0)
-  private_subnet   = element(cidrsubnets("${var.cidr_block}", "${local.new_bits}", "${local.new_bits}"), 1)
-  amis             = { for k, v in data.aws_ami.sfos : k => v.description }
-  sfos_ami         = [for k, v in local.amis : k if v == "XG on AWS ${var.sfos_version}-${var.sku}"]
+  #  trusted_ip       = var.trusted_ip == null ? var.trusted_ip : local.my_ip
+  trusted_ip     = concat(local.my_ip, compact(var.trusted_ip))
+  network_prefix = parseint(regex("/(\\d+)$", "${var.cidr_block}")[0], 10)
+  new_bits       = var.subnet_prefix - local.network_prefix
+  public_subnet  = element(cidrsubnets("${var.cidr_block}", "${local.new_bits}", "${local.new_bits}"), 0)
+  private_subnet = element(cidrsubnets("${var.cidr_block}", "${local.new_bits}", "${local.new_bits}"), 1)
+  amis           = { for k, v in data.aws_ami.sfos : k => v.description }
+  sfos_ami       = [for k, v in local.amis : k if v == "XG on AWS ${var.sfos_version}-${var.sku}"]
 }
 
 ### VPC ###

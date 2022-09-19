@@ -106,6 +106,16 @@ variable "internet_gateway_tags" {
   default     = {}
 }
 
+variable "latest" {
+  type        = bool
+  description = <<EOT
+  (Optional) Whether or not to use the latest version of the AMI.
+
+  Default: true
+  EOT
+  default     = true
+}
+
 variable "namespace" {
   type        = string
   description = <<EOT
@@ -254,9 +264,9 @@ variable "trusted_ip" {
 
     EG: 192.168.10.24/32
 
-    Default: [null]
+    Default: []
     EOT
-  default     = [null]
+  default     = []
 }
 
 variable "vpc_tags" {
