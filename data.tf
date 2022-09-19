@@ -7,8 +7,9 @@ data "aws_ami_ids" "sfos" {
 }
 
 data "aws_ami" "sfos" {
-  for_each = toset(data.aws_ami_ids.sfos.ids)
-  owners   = ["aws-marketplace"]
+  for_each    = toset(data.aws_ami_ids.sfos.ids)
+  owners      = ["aws-marketplace"]
+  most_recent = var.latest == true ? var.latest : null
   filter {
     name   = "image-id"
     values = [each.key]
