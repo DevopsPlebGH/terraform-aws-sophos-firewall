@@ -99,6 +99,7 @@ No modules.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_ami_map"></a> [ami\_map](#output\_ami\_map) | n/a |
+| <a name="output_ami_map"></a> [ami\_map](#output\_ami\_map) | The map of AMI's available. |
 | <a name="output_azs"></a> [azs](#output\_azs) | The availability zone that the resources were deployed in if no availability zone was specified. |
+| <a name="output_trusted_ips"></a> [trusted\_ips](#output\_trusted\_ips) | The trusted IP CIDR's in the trusted IP security group. |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
