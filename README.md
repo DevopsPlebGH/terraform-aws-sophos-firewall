@@ -52,6 +52,8 @@ No modules.
 | [aws_vpc.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc) | resource |
 | [random_id.this](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
 | [random_shuffle.az](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/shuffle) | resource |
+| [aws_ami.sfos](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ami) | data source |
+| [aws_ami_ids.sfos](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ami_ids) | data source |
 | [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/availability_zones) | data source |
 | [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
 | [aws_iam_policy_document.central](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
@@ -94,5 +96,6 @@ No modules.
 
 | Name | Description |
 |------|-------------|
+| <a name="output_ami_map"></a> [ami\_map](#output\_ami\_map) | n/a |
 | <a name="output_azs"></a> [azs](#output\_azs) | The availability zone that the resources were deployed in if no availability zone was specified. |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
