@@ -4,3 +4,7 @@ output "azs" {
   EOT
   value       = var.az == null ? var.az : element("${random_shuffle.az.result}", 0)
 }
+
+output "ami_map" {
+  value = local.amis
+}

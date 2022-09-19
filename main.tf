@@ -6,6 +6,7 @@ locals {
   new_bits         = var.subnet_prefix - local.network_prefix
   public_subnet    = element(cidrsubnets("${var.cidr_block}", "${local.new_bits}", "${local.new_bits}"), 0)
   private_subnet   = element(cidrsubnets("${var.cidr_block}", "${local.new_bits}", "${local.new_bits}"), 1)
+  amis             = { for k, v in data.aws_ami.sfos : k => v.description }
 }
 
 ### VPC ###
@@ -249,6 +250,8 @@ resource "aws_iam_instance_profile" "this" {
     var.tags
   )
 }
+
+# Resource will create the EC2 instance
 
 ### IAM Role ###
 # Resource will create the EC2 IAM role
