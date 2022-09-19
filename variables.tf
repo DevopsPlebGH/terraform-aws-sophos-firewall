@@ -205,6 +205,26 @@ variable "secure_storage_master_key" {
   EOT
 }
 
+variable "sfos_version" {
+  type        = string
+  description = <<EOT
+    (Optional) Version of SFOS firmware to use with the EC2 instance
+
+    Default: ""
+  EOT
+  default     = ""
+}
+
+variable "sku" {
+  type        = string
+  description = <<EOT
+  (Optional) The SKU to use for the AMI. Can be either payg or byol
+
+  Default: payg
+  EOT
+  default     = "payg"
+}
+
 variable "subnet_prefix" {
   type        = string
   description = <<EOT
@@ -238,6 +258,7 @@ variable "trusted_ip" {
     EOT
   default     = [null]
 }
+
 variable "vpc_tags" {
   type        = map(string)
   description = <<EOT

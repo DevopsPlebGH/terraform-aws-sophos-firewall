@@ -7,6 +7,7 @@ locals {
   public_subnet    = element(cidrsubnets("${var.cidr_block}", "${local.new_bits}", "${local.new_bits}"), 0)
   private_subnet   = element(cidrsubnets("${var.cidr_block}", "${local.new_bits}", "${local.new_bits}"), 1)
   amis             = { for k, v in data.aws_ami.sfos : k => v.description }
+  sfos_ami         = [for k, v in local.amis : k if v == "XG on AWS ${var.sfos_version}-${var.sku}"]
 }
 
 ### VPC ###

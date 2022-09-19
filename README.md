@@ -87,6 +87,8 @@ No modules.
 | <a name="input_public_subnet_tags"></a> [public\_subnet\_tags](#input\_public\_subnet\_tags) | (Optional) Additional tags for the public subnets.<br><br>  Default: {} | `map(string)` | `{}` | no |
 | <a name="input_secure_storage_master_key"></a> [secure\_storage\_master\_key](#input\_secure\_storage\_master\_key) | (Required) The Secure Storage Master Key password. | `string` | n/a | yes |
 | <a name="input_security_group_tags"></a> [security\_group\_tags](#input\_security\_group\_tags) | (Optional) Additional tags to attach to security groups<br><br>  Default: {} | `map(string)` | `{}` | no |
+| <a name="input_sfos_version"></a> [sfos\_version](#input\_sfos\_version) | (Optional) Version of SFOS firmware to use with the EC2 instance<br><br>    Default: "" | `string` | `""` | no |
+| <a name="input_sku"></a> [sku](#input\_sku) | (Optional) The SKU to use for the AMI. Can be either payg or byol<br><br>  Default: payg | `string` | `"payg"` | no |
 | <a name="input_subnet_prefix"></a> [subnet\_prefix](#input\_subnet\_prefix) | (Optional) The subnet prefix. Conflicts with public\_subnet/private\_subnet.<br><br>  Default: "24" | `string` | `"24"` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | (Optional) A map of tags to add to all resources<br><br>    Default: {} | `map(string)` | `{}` | no |
 | <a name="input_trusted_ip"></a> [trusted\_ip](#input\_trusted\_ip) | (Optional) A trusted IP in CIDR format that will be added to the Trusted Network security group to allow access to the firewall console.<br><br>    The default behavior is to include the public IP address from which the Terraform plan is run.<br><br>    EG: 192.168.10.24/32<br><br>    Default: [null] | `list(string)` | <pre>[<br>  null<br>]</pre> | no |
