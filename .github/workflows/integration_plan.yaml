@@ -5,9 +5,10 @@ on:
     branches:
       - dev
 
-env:
-  working-directory:
-    - ./examples
+defaults:
+  run:
+    working-directory:
+      - ./examples
 permissions:
   id-token: write
   contents: read
