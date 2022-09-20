@@ -12,11 +12,14 @@ permissions:
 jobs:
   integration_plan:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: examples
     strategy:
       fail-fast: false
       matrix:
         path:
-          - examples/complete
+          - complete
         include:
           - environment: Development
 
