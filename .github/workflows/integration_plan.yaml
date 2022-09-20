@@ -61,7 +61,7 @@ jobs:
           cli_config_credentials_token: ${{ secrets.SOPHOS_TF_API_TOKEN }}
       - id: debug
         run: |
-          pwd \
+          pwd &&\
           ls -lah
       - name: Terraform init
         working-directory: ${{ matrix.path }}
