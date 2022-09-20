@@ -63,6 +63,10 @@ jobs:
         uses: hashicorp/setup-terraform@v1
         with:
           cli_config_credentials_token: ${{ secrets.SOPHOS_TF_API_TOKEN }}
+      - id: debug
+        run: |
+          pwd \
+          ls -lah
       - name: Terraform init
         working-directory: ${{ matrix.path }}
         id: init
