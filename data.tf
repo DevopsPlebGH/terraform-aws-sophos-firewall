@@ -1,3 +1,21 @@
+data "aws_ami_ids" "sfos" {
+  owners = ["aws-marketplace"]
+  filter {
+    name   = "name"
+    values = ["sophos_xg*"]
+  }
+}
+
+data "aws_ami" "sfos" {
+  for_each    = toset(data.aws_ami_ids.sfos.ids)
+  owners      = ["aws-marketplace"]
+  most_recent = var.latest == true ? var.latest : null
+  filter {
+    name   = "image-id"
+    values = [each.key]
+  }
+}
+
 data "aws_availability_zones" "available" {
   state = "available"
 }

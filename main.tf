@@ -1,11 +1,16 @@
 locals {
   ifconfig_co_json = jsondecode(data.http.my_public_ip.response_body)
   my_ip            = [join("/", ["${local.ifconfig_co_json.ip}"], ["32"])]
-  trusted_ip       = var.trusted_ip == null ? var.trusted_ip : local.my_ip
-  network_prefix   = parseint(regex("/(\\d+)$", "${var.cidr_block}")[0], 10)
-  new_bits         = var.subnet_prefix - local.network_prefix
-  public_subnet    = element(cidrsubnets("${var.cidr_block}", "${local.new_bits}", "${local.new_bits}"), 0)
-  private_subnet   = element(cidrsubnets("${var.cidr_block}", "${local.new_bits}", "${local.new_bits}"), 1)
+  #  trusted_ip       = var.trusted_ip == null ? var.trusted_ip : local.my_ip
+  trusted_ip     = concat(local.my_ip, compact(var.trusted_ip))
+  network_prefix = parseint(regex("/(\\d+)$", "${var.cidr_block}")[0], 10)
+  new_bits       = var.subnet_prefix - local.network_prefix
+  public_subnet  = element(cidrsubnets("${var.cidr_block}", "${local.new_bits}", "${local.new_bits}"), 0)
+  private_subnet = element(cidrsubnets("${var.cidr_block}", "${local.new_bits}", "${local.new_bits}"), 1)
+  #amis           = { for k, v in data.aws_ami.sfos : k => v.description }
+  sfos_version = lookup(var.sfos_versions, var.sfos_version, "latest")
+  amis         = { for k, v in data.aws_ami.sfos : k => v.description }
+  sfos_ami     = [for k, v in local.amis : k if v == "XG on AWS ${local.sfos_version}-${var.sku}"]
 }
 
 ### VPC ###
@@ -250,6 +255,73 @@ resource "aws_iam_instance_profile" "this" {
   )
 }
 
+# Resource will create the EC2 instance
+resource "aws_instance" "this" {
+  launch_template {
+    id      = aws_launch_template.this.id
+    version = "$Latest"
+  }
+  metadata_options {
+    http_endpoint               = "enabled"
+    http_tokens                 = "required"
+    http_put_response_hop_limit = 1
+    instance_metadata_tags      = "enabled"
+  }
+  iam_instance_profile = aws_iam_instance_profile.this.name
+  monitoring           = true
+  tags = merge(
+    var.instance_tags,
+    var.tags
+  )
+  ebs_optimized = false
+}
+
+# Resource creates the EC2 launch template
+resource "aws_launch_template" "this" {
+  name          = "launch-template-${random_id.this.hex}-${data.aws_caller_identity.current.account_id}"
+  instance_type = lookup(var.instance_type, var.size, "m5.large")
+  image_id      = element(local.sfos_ami, 0)
+  key_name      = var.ssh_key_name
+  block_device_mappings {
+    device_name = "/dev/xvda"
+    ebs {
+      delete_on_termination = true
+      volume_size           = "16"
+      volume_type           = "gp2"
+      encrypted             = false
+    }
+  }
+  block_device_mappings {
+    device_name = "/dev/xvdg"
+    ebs {
+      delete_on_termination = true
+      volume_size           = "80"
+      volume_type           = "gp2"
+      encrypted             = false
+    }
+  }
+  metadata_options {
+    http_endpoint               = "enabled"
+    http_tokens                 = "required"
+    http_put_response_hop_limit = 1
+    instance_metadata_tags      = "enabled"
+  }
+  iam_instance_profile {
+    name = aws_iam_role.this.name
+  }
+  network_interfaces {
+    network_interface_id = aws_network_interface.public.id
+    device_index         = 0
+  }
+  network_interfaces {
+    network_interface_id = aws_network_interface.private.id
+    device_index         = 1
+  }
+  tags = merge(
+    var.launch_template_tags,
+    var.tags
+  )
+}
 ### IAM Role ###
 # Resource will create the EC2 IAM role
 resource "aws_iam_role" "this" {

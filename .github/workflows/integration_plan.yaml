@@ -7,6 +7,9 @@ on:
       - completed
       - requested
 
+defaults:
+  working-directory:
+    - ./examples
 permissions:
   id-token: write
   contents: read
@@ -17,6 +20,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        path:
+          - complete
         include:
           - environment: Development
 
@@ -27,8 +32,19 @@ jobs:
         uses: toko-bifrost/ms-teams-deploy-card@master
         if: always()
         with:
+          environment: ${{ matrix.environment }}
           github-token: ${{ steps.generate-token.outputs.token }}
           webhook-uri: ${{ secrets.MSTEAMS_WEBHOOK }}
+          card-layout-start: complete
+          card-layout-exit: complete
+          show-on-start: true
+          show-on-exist: true
+          show-on-failure: true
+          enable-view-status-action: true
+          enable-review-diffs-actions: true
+          view-status-action-text: View build/deploy status
+          review-diffs-action-text: Review commit diffs
+          include-files: true
       - name: Checkout code
         uses: actions/checkout@v2
         with:
@@ -51,6 +67,7 @@ jobs:
       - name: Terraform init
         id: init
         run: |
+          cd ${{ matrix.path }}
           REPO="${{ github.repository }}"
           WORKSPACE="${REPO#*/}"
 
@@ -62,8 +79,8 @@ jobs:
 
           cat >> config.remote.tfbackend<<EOF
           hostname = "app.terraform.io"
-          organization = "${{ secrets.SOPHOS_TF_ORGANIZATION }}"
-          workspaces { name = "$WORKSPACE" }
+          organization = "terraform-aws-sophos-firewall"
+          workspaces { name = "example-firewall-complete" }
           EOF
 
           terraform init -backend-config=config.remote.tfbackend
@@ -71,11 +88,13 @@ jobs:
         id: plan
         continue-on-error: true
         run: | 
+          cd ${{ matrix.path }}
           terraform plan -input=false -no-color -out=tfplan
         env:
           TF_VAR_console_password: ${{ secrets.CONSOLE_PASSWORD }}
           TF_VAR_config_backup_password: ${{ secrets.CONFIG_BACKUP_PASSWORD }}
-          TF_VAR_secure_storage_master_key: ${{ secrets.SECURE_STORAGE_MASTER_KEY }}         
+          TF_VAR_secure_storage_master_key: ${{ secrets.SECURE_STORAGE_MASTER_KEY }}
+          TF_VAR_trusted_ip: '[ "${{ secrets.TRUSTED_IP }}" ]'  
       - name: Reformat Plan
         run: |
           echo '${{ steps.plan.outputs.stdout || steps.plan.outputs.stderr }}' \

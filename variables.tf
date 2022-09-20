@@ -96,10 +96,70 @@ variable "instance_profile_tags" {
   default     = {}
 }
 
+variable "instance_tags" {
+  type        = map(string)
+  description = <<EOT
+  (Optional) Additional tags to attach to the EC2 instance
+
+  Default: {}
+  EOT
+  default     = {}
+}
+
+variable "instance_type" {
+  type        = map(any)
+  description = <<EOT
+  (Optional) The EC2 instance type to use for the firewall
+  EOT
+  default = {
+    "t3.small"   = "t3.small"
+    "t3.medium"  = "t3.medium"
+    "m3.xlarge"  = "m3.xlarge"
+    "m3.2xlarge" = "m3.2xlarge"
+    "m4.large"   = "m4.large"
+    "m4.xlarge"  = "m4.xlarge"
+    "m5.large"   = "m5.large"
+    "m5.xlarge"  = "m5.xlarge"
+    "m5.2xlarge" = "m5.2xlarge"
+    "c3.xlarge"  = "c3.xlarge"
+    "c3.2xlarge" = "c3.2xlarge"
+    "c3.4xlarge" = "c3.4xlarge"
+    "c3.8xlarge" = "c3.8xlarge"
+    "c4.large"   = "c4.large"
+    "c4.xlarge"  = "c4.xlarge"
+    "c4.2xlarge" = "c4.2xlarge"
+    "c4.4xlarge" = "c4.4xlarge"
+    "c4.8xlarge" = "c4.8xlarge"
+    "c5.large"   = "c5.large"
+    "c5.xlarge"  = "c5.xlarge"
+    "c5.2xlarge" = "c5.2xlarge"
+  }
+}
+
 variable "internet_gateway_tags" {
   type        = map(string)
   description = <<EOT
   (Optional) Additional tags to attach to created internet gateways
+
+  Default: {}
+  EOT
+  default     = {}
+}
+
+variable "latest" {
+  type        = bool
+  description = <<EOT
+  (Optional) Whether or not to use the latest version of the AMI.
+
+  Default: true
+  EOT
+  default     = true
+}
+
+variable "launch_template_tags" {
+  type        = map(string)
+  description = <<EOT
+  (Optional) Additional tags to attach to the launch template
 
   Default: {}
   EOT
@@ -205,6 +265,62 @@ variable "secure_storage_master_key" {
   EOT
 }
 
+variable "ssh_key_name" {
+  type        = string
+  description = <<EOT
+  (Required) The name of the SSH key to use to authenticate to the firewall.
+
+  EOT
+}
+
+variable "size" {
+  type        = string
+  description = <<EOT
+  (Optional) The size of the instance to deploy.
+
+  Default: "m5.large"
+  EOT
+  default     = "m5.large"
+}
+
+variable "sfos_version" {
+  type        = string
+  description = <<EOT
+  (Optional) The firmware version to use for the deployed firewall
+
+  Default: "latest"
+  EOT
+  default     = "latest"
+}
+
+variable "sfos_versions" {
+  type        = map(any)
+  description = <<EOT
+    (Optional) Version of SFOS firmware to use with the EC2 instance
+
+    Default: ""
+  EOT
+  default = {
+    "latest"   = "19.0.0.317"
+    "18.0 MR3" = "18.0.3.457"
+    "18.0 MR4" = "18.0.4.506"
+    "18.0 MR5" = "18.0.5.585"
+    "18.5 MR1" = "18.5.1.326"
+    "18.5 MR2" = "18.5.2.380"
+    "18.5 MR3" = "18.5.3.408"
+  }
+}
+
+variable "sku" {
+  type        = string
+  description = <<EOT
+  (Optional) The SKU to use for the AMI. Can be either payg or byol
+
+  Default: payg
+  EOT
+  default     = "payg"
+}
+
 variable "subnet_prefix" {
   type        = string
   description = <<EOT
@@ -234,10 +350,11 @@ variable "trusted_ip" {
 
     EG: 192.168.10.24/32
 
-    Default: [null]
+    Default: []
     EOT
-  default     = [null]
+  default     = []
 }
+
 variable "vpc_tags" {
   type        = map(string)
   description = <<EOT

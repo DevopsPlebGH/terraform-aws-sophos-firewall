@@ -86,7 +86,8 @@ jobs:
         env:
           TF_VAR_console_password: ${{ secrets.CONSOLE_PASSWORD }}
           TF_VAR_config_backup_password: ${{ secrets.CONFIG_BACKUP_PASSWORD }}  
-          TF_VAR_secure_storage_master_key: ${{ secrets.SECURE_STORAGE_MASTER_KEY }}           
+          TF_VAR_secure_storage_master_key: ${{ secrets.SECURE_STORAGE_MASTER_KEY }}
+          TF_VAR_trusted_ip: '[ "${{ secrets.TRUSTED_IP }}" ]'              
       - name: Reformat Plan
         if: steps.plan.outcome == 'success'
         run: |
@@ -111,7 +112,8 @@ jobs:
         env:
           TF_VAR_console_password: ${{ secrets.CONSOLE_PASSWORD }}
           TF_VAR_config_backup_password: ${{ secrets.CONFIG_BACKUP_PASSWORD }}  
-          TF_VAR_secure_storage_master_key: ${{ secrets.SECURE_STORAGE_MASTER_KEY }}                           
+          TF_VAR_secure_storage_master_key: ${{ secrets.SECURE_STORAGE_MASTER_KEY }}
+          TF_VAR_trusted_ip: '[ "${{ secrets.TRUSTED_IP }}" ]'                             
       - name: Post Plan and Apply to GitHub PR
         if: steps.plan.outcome == 'success' && steps.apply.outcome == 'success'
         uses: mshick/add-pr-comment@v1
