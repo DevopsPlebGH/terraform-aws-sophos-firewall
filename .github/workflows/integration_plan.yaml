@@ -5,6 +5,9 @@ on:
     branches:
       - dev
 
+defaults:
+  run:
+    working-directory: examples
 permissions:
   id-token: write
   contents: read
@@ -16,7 +19,7 @@ jobs:
       fail-fast: false
       matrix:
         path:
-          - ./examples/complete
+          - complete
         include:
           - environment: Development
 
@@ -59,15 +62,6 @@ jobs:
         uses: hashicorp/setup-terraform@v1
         with:
           cli_config_credentials_token: ${{ secrets.SOPHOS_TF_API_TOKEN }}
-      - id: debugroot
-        run: |
-          pwd &&\
-          ls -lah
-      - id: debugworkdir
-        working-directory: ${{ matrix.path }}
-        run: |
-          pwd && \
-          ls -lah
       - name: Terraform init
         working-directory: ${{ matrix.path }}
         id: init
@@ -93,7 +87,6 @@ jobs:
         id: plan
         continue-on-error: true
         run: | 
-          cd ${{ matrix.path }} 
           terraform plan -input=false -no-color -out=tfplan
         env:
           TF_VAR_console_password: ${{ secrets.CONSOLE_PASSWORD }}
