@@ -5,7 +5,7 @@ on:
     branches:
       - dev
 
-defaults:
+env:
   working-directory:
     - ./examples
 permissions:
