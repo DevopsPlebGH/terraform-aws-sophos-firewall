@@ -5,6 +5,10 @@ on:
     branches:
       - dev
 
+defaults:
+  run:
+    working-directory: examples/
+
 permissions:
   id-token: write
   contents: read
@@ -12,9 +16,6 @@ permissions:
 jobs:
   integration_plan:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./examples    
     strategy:
       fail-fast: false
       matrix:
