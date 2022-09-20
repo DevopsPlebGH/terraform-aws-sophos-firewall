@@ -74,8 +74,8 @@ jobs:
 
           cat >> config.remote.tfbackend<<EOF
           hostname = "app.terraform.io"
-          organization = "terraform-aws-sophos-firewall"
-          workspaces { name = "example-firewall-complete" }
+          organization = "${{ secrets.SOPHOS_TF_ORGANIZATION }}"
+          workspaces { name = "$WORKSPACE" }
           EOF
 
           terraform init -backend-config=config.remote.tfbackend

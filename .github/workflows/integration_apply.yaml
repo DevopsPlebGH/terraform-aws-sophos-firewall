@@ -30,15 +30,12 @@ jobs:
             Results will display here momentarily...  
   plan_and_apply:
     name: Plan and Apply
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./examples        
+    runs-on: ubuntu-latest     
     strategy:
       fail-fast: false
       matrix:
         path:
-          - complete
+          - ./examples/complete
         include:
           - environment: Development
 
