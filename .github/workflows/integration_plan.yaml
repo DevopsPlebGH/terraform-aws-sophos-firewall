@@ -5,9 +5,6 @@ on:
     branches:
       - dev
 
-defaults:
-  run:
-    working-directory: examples
 permissions:
   id-token: write
   contents: read
@@ -19,7 +16,7 @@ jobs:
       fail-fast: false
       matrix:
         path:
-          - complete
+          - ./examples/complete
         include:
           - environment: Development
 
