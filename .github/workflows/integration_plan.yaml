@@ -16,7 +16,7 @@ jobs:
       fail-fast: false
       matrix:
         path:
-          - ./examples/complete
+          - examples/complete
         include:
           - environment: Development
 

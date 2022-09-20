@@ -5,10 +5,6 @@ on:
   push:
     branches:
       - dev
-
-defaults:
-  run:
-    working-directory: ./examples
   
 permissions:
   id-token: write
