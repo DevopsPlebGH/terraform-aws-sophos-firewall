@@ -35,6 +35,9 @@ jobs:
   plan_and_apply:
     name: Plan and Apply
     runs-on: ubuntu-latest
+    defaults:
+    run:
+      working-directory: ./examples        
     strategy:
       fail-fast: false
       matrix:
