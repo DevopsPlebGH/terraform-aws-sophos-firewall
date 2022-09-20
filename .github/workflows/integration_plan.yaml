@@ -8,6 +8,7 @@ on:
 defaults:
   run:
     working-directory: ./examples
+
 permissions:
   id-token: write
   contents: read
@@ -63,9 +64,9 @@ jobs:
         with:
           cli_config_credentials_token: ${{ secrets.SOPHOS_TF_API_TOKEN }}
       - name: Terraform init
+        working-directory: ${{ matrix.path }}
         id: init
         run: |
-          cd ${{ matrix.path }}
           REPO="${{ github.repository }}"
           WORKSPACE="${REPO#*/}"
 
@@ -83,6 +84,7 @@ jobs:
 
           terraform init -backend-config=config.remote.tfbackend
       - name: Terraform plan
+        working-directory: ${{ matrix.path }}
         id: plan
         continue-on-error: true
         run: | 

@@ -5,6 +5,10 @@ on:
   push:
     branches:
       - dev
+
+defaults:
+  run:
+    working-directory: ./examples
   
 permissions:
   id-token: write
@@ -34,15 +38,33 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        path:
+          - complete
         include:
           - environment: Development
-            url: https://app.terraform.io/app/esg_se_xdr_demo_dev/workspaces/terraform-aws-sophos-firewall/runs
 
     environment: 
       name: ${{ matrix.environment }}
       url: ${{ matrix.url }}
 
     steps:
+      - name: Microsoft Teams Notifications
+        uses: toko-bifrost/ms-teams-deploy-card@master
+        if: always()
+        with:
+          environment: ${{ matrix.environment }}
+          github-token: ${{ steps.generate-token.outputs.token }}
+          webhook-uri: ${{ secrets.MSTEAMS_WEBHOOK }}
+          card-layout-start: complete
+          card-layout-exit: complete
+          show-on-start: true
+          show-on-exist: true
+          show-on-failure: true
+          enable-view-status-action: true
+          enable-review-diffs-actions: true
+          view-status-action-text: View build/deploy status
+          review-diffs-action-text: Review commit diffs
+          include-files: true    
       - name: Check out code
         uses: actions/checkout@v2
       - id: generate-token
@@ -61,6 +83,7 @@ jobs:
         with:
          cli_config_credentials_token: ${{ secrets.SOPHOS_TF_API_TOKEN }}
       - name: Terraform init
+        working-directory: ${{ matrix.path }}
         run: |
           REPO="${{ github.repository }}"
           WORKSPACE="${REPO#*/}"
@@ -79,6 +102,7 @@ jobs:
 
           terraform init -backend-config=config.remote.tfbackend
       - name: Terraform Plan
+        working-directory: ${{ matrix.path }}
         id: plan
         continue-on-error: true
         run: |
@@ -101,6 +125,7 @@ jobs:
           echo "$PLAN" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV         
       - name: Apply Terraform
+        working-directory: ${{ matrix.path }}
         if: steps.plan.outcome == 'success'
         id: apply
         continue-on-error: true
