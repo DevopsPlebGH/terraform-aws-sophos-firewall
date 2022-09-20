@@ -16,7 +16,7 @@ jobs:
       fail-fast: false
       matrix:
         path:
-          - ./complete
+          - ./examples/complete
         include:
           - environment: Development
 
@@ -59,9 +59,14 @@ jobs:
         uses: hashicorp/setup-terraform@v1
         with:
           cli_config_credentials_token: ${{ secrets.SOPHOS_TF_API_TOKEN }}
-      - id: debug
+      - id: debugroot
         run: |
           pwd &&\
+          ls -lah
+      - id: debugworkdir
+        working-directory: ${{ matrix.path }}
+        run: |
+          pwd && \
           ls -lah
       - name: Terraform init
         working-directory: ${{ matrix.path }}
