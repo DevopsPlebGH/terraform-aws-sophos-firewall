@@ -13,8 +13,8 @@ jobs:
   integration_plan:
     runs-on: ubuntu-latest
     defaults:
-      run:
-        working-directory: examples
+      env:
+        working-directory: ./examples
     strategy:
       fail-fast: false
       matrix:
