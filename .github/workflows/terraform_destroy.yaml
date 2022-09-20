@@ -1,0 +1,77 @@
+name: Terraform Destroy
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  terraform_destroy:
+    name: Terraform Destroy - Root Module
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - environment: Development
+    
+    environment:
+      name: ${{ matrix.environment }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ secrets.SOPHOS_DEV_DEPLOY_ROLE }}
+          aws-region: us-west-2
+          role-session-name: OIDCSession    
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+         cli_config_credentials_token: ${{ secrets.SOPHOS_TF_API_TOKEN }}
+      - name: Terraform init
+        run: |
+          REPO="${{ github.repository }}"
+          WORKSPACE="${REPO#*/}"
+
+          cat >> remote.tf<<EOF
+          terraform {
+            backend "remote" {}
+          }
+          EOF
+
+          cat >> config.remote.tfbackend<<EOF
+          hostname = "app.terraform.io"
+          organization = "${{ secrets.SOPHOS_TF_ORGANIZATION }}"
+          workspaces { name = "$WORKSPACE" }
+          EOF
+
+          terraform init -backend-config=config.remote.tfbackend
+      - name: Terraform Plan
+        id: plan
+        continue-on-error: true
+        run: |
+          terraform plan -input=false -no-color
+        env:
+          TF_VAR_console_password: ${{ secrets.CONSOLE_PASSWORD }}
+          TF_VAR_config_backup_password: ${{ secrets.CONFIG_BACKUP_PASSWORD }}  
+          TF_VAR_secure_storage_master_key: ${{ secrets.SECURE_STORAGE_MASTER_KEY }}
+          TF_VAR_trusted_ip: '[ "${{ secrets.TRUSTED_IP }}" ]'         
+      - name: Apply Terraform
+        if: steps.plan.outcome == 'success'
+        id: apply
+        continue-on-error: true
+        run: |
+          terraform destroy \
+            -input=false \
+            -no-color \
+            -auto-approve                  
+        env:
+          TF_VAR_console_password: ${{ secrets.CONSOLE_PASSWORD }}
+          TF_VAR_config_backup_password: ${{ secrets.CONFIG_BACKUP_PASSWORD }}  
+          TF_VAR_secure_storage_master_key: ${{ secrets.SECURE_STORAGE_MASTER_KEY }}
+          TF_VAR_trusted_ip: '[ "${{ secrets.TRUSTED_IP }}" ]'              
