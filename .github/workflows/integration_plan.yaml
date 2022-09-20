@@ -5,21 +5,18 @@ on:
     branches:
       - dev
 
-defaults:
-  working-directory:
-    - ./examples
 permissions:
   id-token: write
   contents: read
 
 jobs:
-  plan:
+  integration_plan:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         path:
-          - complete
+          - ./examples/complete
         include:
           - environment: Development
 
@@ -63,9 +60,9 @@ jobs:
         with:
           cli_config_credentials_token: ${{ secrets.SOPHOS_TF_API_TOKEN }}
       - name: Terraform init
+        working-directory: ${{ matrix.path }}
         id: init
         run: |
-          cd ${{ matrix.path }}
           REPO="${{ github.repository }}"
           WORKSPACE="${REPO#*/}"
 
@@ -77,16 +74,16 @@ jobs:
 
           cat >> config.remote.tfbackend<<EOF
           hostname = "app.terraform.io"
-          organization = "terraform-aws-sophos-firewall"
-          workspaces { name = "example-firewall-complete" }
+          organization = "${{ secrets.SOPHOS_TF_ORGANIZATION }}"
+          workspaces { name = "$WORKSPACE" }
           EOF
 
           terraform init -backend-config=config.remote.tfbackend
       - name: Terraform plan
+        working-directory: ${{ matrix.path }}
         id: plan
         continue-on-error: true
         run: | 
-          cd ${{ matrix.path }}
           terraform plan -input=false -no-color -out=tfplan
         env:
           TF_VAR_console_password: ${{ secrets.CONSOLE_PASSWORD }}
