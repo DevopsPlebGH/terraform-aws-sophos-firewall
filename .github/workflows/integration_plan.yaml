@@ -1,15 +1,14 @@
 name: Integration Testing - Plan
 
 on:
-  workflow_run:
-    workflows: [Terraform lint]
-    types:
-      - completed
-      - requested
+  pull_request:
+    branches:
+      - dev
 
 defaults:
-  working-directory:
-    - ./examples
+  run:
+    working-directory:
+      - ./examples
 permissions:
   id-token: write
   contents: read
