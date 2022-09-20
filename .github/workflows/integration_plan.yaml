@@ -6,8 +6,8 @@ on:
       - dev
 
 defaults:
-  env:
-    working-directory: ./examples
+  run:
+    working-directory: examples/
 
 permissions:
   id-token: write
@@ -20,7 +20,7 @@ jobs:
       fail-fast: false
       matrix:
         path:
-          - complete
+          - ./complete
         include:
           - environment: Development
 
