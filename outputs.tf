@@ -1,3 +1,7 @@
+output "ami_id" {
+  value = local.sfos_ami
+}
+
 output "ami_map" {
   description = <<EOT
   The map of AMI's available.
