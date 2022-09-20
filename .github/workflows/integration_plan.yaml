@@ -86,7 +86,7 @@ jobs:
         id: plan
         continue-on-error: true
         run: | 
-          cd ${{ matrix.path }}
+          cd ${{ matrix.path }} 
           terraform plan -input=false -no-color -out=tfplan
         env:
           TF_VAR_console_password: ${{ secrets.CONSOLE_PASSWORD }}
