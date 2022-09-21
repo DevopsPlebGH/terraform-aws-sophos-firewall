@@ -6,10 +6,10 @@ data "aws_ami_ids" "sfos" {
   }
 }
 
-data "aws_ami" "sfos" {
+data "aws_ami" "dynamic_ami" {
   for_each    = toset(data.aws_ami_ids.sfos.ids)
   owners      = ["aws-marketplace"]
-  most_recent = var.latest == true ? var.latest : null
+  most_recent = var.autodetect == true ? var.autodetect : null
   filter {
     name   = "image-id"
     values = [each.key]
@@ -74,5 +74,23 @@ data "aws_iam_policy_document" "trust_relationship" {
       type        = "Service"
       identifiers = ["ec2.amazonaws.com"]
     }
+  }
+}
+
+data "aws_region" "current" {}
+
+data "template_file" "user_data" {
+  template = file("${path.module}/templates/user_data.tpl")
+  vars = {
+    ssmkSecretId    = var.secure_storage_master_key
+    s3bucket        = var.s3bucket
+    centralusername = var.central_username
+    centralpassword = var.central_password
+    hostname        = var.firewall_hostname
+    sendstats       = var.send_stats
+    region          = var.aws_region
+    secretId        = var.console_password
+    configSecretId  = var.config_backup_password
+    serialKey       = var.serial_number
   }
 }

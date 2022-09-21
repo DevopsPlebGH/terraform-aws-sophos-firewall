@@ -1,13 +1,15 @@
-variable "az" {
+variable "aws_region" {
   type        = string
   description = <<EOT
-  (Optional) The availability zone in which to deploy the firewall.
-
-  If not defined, this value will be derived from a randomly selected AZ via the aws_availability_zones data source.
-
-  Default: ""
+  (Required) The region in which to deploy the firewall
   EOT
-  default     = null
+}
+
+variable "availability_zone" {
+  type        = string
+  description = <<EOT
+  (Required) The availability zone in which to deploy the firewall.
+  EOT
 }
 
 variable "central_password" {
@@ -15,9 +17,29 @@ variable "central_password" {
   description = <<EOT
   (Optional) The password for your Sophos Central account if you would like to register the firewall with Sophos Central
 
-  Default: null
+  Default: ""
   EOT
   default     = ""
+}
+
+variable "central_username" {
+  type        = string
+  description = <<EOT
+  (Optional) Sophos Central username if registering the firewall to Central
+
+  Default: ""
+  EOT
+  default     = ""
+}
+
+variable "cicd_ip" {
+  type        = bool
+  description = <<EOT
+  (Optional) Whether to include the IP address of the CI/CD runner in the Trusted Network security group. 
+
+  Default: true
+  EOT
+  default     = true
 }
 
 variable "cidr_block" {
@@ -34,7 +56,6 @@ variable "config_backup_password" {
   type        = string
   description = <<EOT
   (Required) The password to secure the configuration backup.
-
   EOT
 }
 
@@ -42,18 +63,45 @@ variable "console_password" {
   type        = string
   description = <<EOT
   (Required) The password for the firewall management console.
-
   EOT
+}
+
+variable "create_elastic_ip" {
+  type        = bool
+  description = <<EOT
+  (Optional) If set to false, an existing elastic IP allocation ID will need to be provided.
+  EOT
+  default     = true
+}
+
+variable "create_s3_bucket" {
+  type        = bool
+  description = <<EOT
+  (Optional) Whether or not an S3 bucket should be created for the firewall configuration backups.
+
+  Default: false
+  EOT
+  default     = false
 }
 
 variable "create_vpc" {
   type        = bool
   description = <<EOT
-    (Optional) Controls whether or not a new VPC should be created or if an existing VPC should be used.
+    (Optional) If set to false, an existing VPC ID and existing subnet ID's will need to be provided.
 
     Default: true
     EOT
-  default     = "true"
+  default     = true
+}
+
+variable "elastic_ip_tags" {
+  type        = map(string)
+  description = <<EOT
+  (Optional) Additional tags to attach to the Elastic IP Address
+
+  Default: {}
+  EOT
+  default     = {}
 }
 
 variable "enable_dns_hostnames" {
@@ -74,6 +122,31 @@ variable "enable_dns_support" {
   Default: true
   EOT
   default     = true
+}
+
+variable "eula" {
+  type        = string
+  description = <<EOT
+  (Required) Use of this software is subject to the Sophos End User License Agreement (EULA) at https://www.sophos.com/en-us/legal/sophos-end-user-license-agreement.aspx.
+  EOT
+  validation {
+    condition     = contains(["yes", "no"], var.eula)
+    error_message = <<EOT
+    ERROR: To deploy this firewall you must accept the EULA. See https://www.sophos.com/en-us/legal/sophos-end-user-license-agreement.aspx.
+
+    Acceptable values are: [yes : no].
+    EOT
+  }
+}
+
+variable "firewall_hostname" {
+  type        = string
+  description = <<EOT
+  (Optional) The hostname of the firewall
+
+  Default: "sophos-firewall-tf"
+  EOT
+  default     = "sophos-firewall-tf"
 }
 
 variable "iam_role_tags" {
@@ -104,6 +177,65 @@ variable "instance_tags" {
   Default: {}
   EOT
   default     = {}
+}
+
+variable "instance_size" {
+  type        = string
+  description = <<EOT
+  (Required) The size of the instance to deploy. Available instance sizes are:
+
+    t3.small  
+    t3.medium 
+    m3.xlarge 
+    m3.2xlarge
+    m4.large  
+    m4.xlarge 
+    m5.large  
+    m5.xlarge 
+    m5.2xlarge
+    c3.xlarge 
+    c3.2xlarge
+    c3.4xlarge
+    c3.8xlarge
+    c4.large  
+    c4.xlarge 
+    c4.2xlarge
+    c4.4xlarge
+    c4.8xlarge
+    c5.large  
+    c5.xlarge 
+    c5.2xlarge
+
+  Default: "m5.large"
+  EOT
+  validation {
+    condition     = contains(["t3.small", "t3.medium", "m3.xlarge", "m3.2xlarge", "m4.large", "m4.xlarge", "m5.large", "m5.xlarge", "m5.2xlarge", "c3.xlarge", "c3.2xlarge", "c3.4xlarge", "c3.8xlarge", "c4.large", "c4.xlarge", "c4.2xlarge", "c4.4xlarge", "c4.8xlarge", "c5.large", "c5.xlarge", "c5.2xlarge"], var.instance_size)
+    error_message = <<EOT
+    ERROR: Invalid Instance Size! Valid instance sizes are:
+
+      t3.small  
+      t3.medium 
+      m3.xlarge 
+      m3.2xlarge
+      m4.large  
+      m4.xlarge 
+      m5.large  
+      m5.xlarge 
+      m5.2xlarge
+      c3.xlarge 
+      c3.2xlarge
+      c3.4xlarge
+      c3.8xlarge
+      c4.large  
+      c4.xlarge 
+      c4.2xlarge
+      c4.4xlarge
+      c4.8xlarge
+      c5.large  
+      c5.xlarge 
+      c5.2xlarge
+    EOT
+  }
 }
 
 variable "instance_type" {
@@ -146,7 +278,7 @@ variable "internet_gateway_tags" {
   default     = {}
 }
 
-variable "latest" {
+variable "autodetect" {
   type        = bool
   description = <<EOT
   (Optional) Whether or not to use the latest version of the AMI.
@@ -169,13 +301,13 @@ variable "launch_template_tags" {
 variable "namespace" {
   type        = string
   description = <<EOT
-    (Optional) Namespace refers to the application or deployment type.
+    (Internal) Namespace refers to the application or deployment type.
 
-    EG: sophos-xg, sophos-optix, sophos-cwp, etc...
+    EG: SOPHOS_CNF, SOPHOS_CNS, SOPHOS_CWP, etc...
 
-    Default: sophos-xg
+    Default: SOPHOS
     EOT
-  default     = "sophos-xg"
+  default     = "SOPHOS_CNF"
 }
 
 variable "private_eni_tags" {
@@ -261,8 +393,44 @@ variable "security_group_tags" {
 variable "secure_storage_master_key" {
   type        = string
   description = <<EOT
-  (Required) The Secure Storage Master Key password.
+  (Optional) The Secure Storage Master Key password
+
+  Default: ""
   EOT
+  default     = true
+}
+
+variable "send_stats" {
+  type        = string
+  description = <<EOT
+  (Required) Whether to Opt-in to Sophos customer telemetry
+  EOT
+  validation {
+    condition     = contains(["on", "off"], var.send_stats)
+    error_message = <<EOT
+    ERROR: Send stats customer opt-in value must be one of: [on, off].
+    EOT
+  }
+}
+
+variable "s3bucket" {
+  type        = string
+  description = <<EOT
+  (Optional) An S3 bucket in which to store configuration backups. If used in conjunction with "create_s3_bucket", this module will create the S3 bucket.
+
+  Default: ""
+  EOT
+  default     = ""
+}
+
+variable "serial_number" {
+  type        = string
+  description = <<EOT
+  (Optional) The serial number of the firewall. Conflicts with PAYG SKU.
+
+  Default: ""
+  EOT
+  default     = ""
 }
 
 variable "ssh_key_name" {
@@ -273,24 +441,36 @@ variable "ssh_key_name" {
   EOT
 }
 
-variable "size" {
-  type        = string
-  description = <<EOT
-  (Optional) The size of the instance to deploy.
-
-  Default: "m5.large"
-  EOT
-  default     = "m5.large"
-}
-
 variable "sfos_version" {
   type        = string
   description = <<EOT
   (Optional) The firmware version to use for the deployed firewall
 
+  Available versions are:
+   18.0 MR3
+   18.0 MR4
+   18.0 MR5
+   18.5 MR1
+   18.5 MR2
+   18.5 MR3
+   19.0 MR1
+
   Default: "latest"
   EOT
   default     = "latest"
+  validation {
+    condition     = contains(["latest", "18.0 MR3", "18.0 MR4", "18.0 MR5", "18.5 MR1", "18.5 MR2", "18.5 MR3"], var.sfos_version)
+    error_message = <<EOT
+    ERROR: Invalid version provided! Must be one of:
+      latest
+      18.0 MR3
+      18.0 MR4
+      18.0 MR5
+      18.5 MR1
+      18.5 MR2
+      18.5 MR3
+    EOT
+  }
 }
 
 variable "sfos_versions" {
@@ -314,11 +494,16 @@ variable "sfos_versions" {
 variable "sku" {
   type        = string
   description = <<EOT
-  (Optional) The SKU to use for the AMI. Can be either payg or byol
+  (Required) The SKU to use for the AMI. Can be either payg or byol
 
   Default: payg
   EOT
-  default     = "payg"
+  validation {
+    condition     = contains(["payg", "byol"], var.sku)
+    error_message = <<EOT
+    ERROR: Invalid SKU provided! Must be one of: [payg, byol]
+    EOT
+  }
 }
 
 variable "subnet_prefix" {
@@ -342,17 +527,20 @@ variable "tags" {
 }
 
 variable "trusted_ip" {
-  type        = list(string)
+  type        = string
   description = <<EOT
-    (Optional) A trusted IP in CIDR format that will be added to the Trusted Network security group to allow access to the firewall console.
+    (Required) A trusted IP in CIDR format that will be added to the Trusted Network security group to allow access to the firewall console.
 
     The default behavior is to include the public IP address from which the Terraform plan is run.
 
     EG: 192.168.10.24/32
-
-    Default: []
     EOT
-  default     = []
+  validation {
+    condition     = can(cidrnetmask(var.trusted_ip))
+    error_message = <<EOT
+      ERROR: Must be a valid IPv4 CIDR block address.
+      EOT
+  }
 }
 
 variable "vpc_tags" {
