@@ -22,8 +22,8 @@ locals {
   trusted_cidrs    = concat(local.cicd_ip, compact(local.trusted_ip))
   network_prefix   = parseint(regex("/(\\d+)$", "${var.cidr_block}")[0], 10)
   new_bits         = var.subnet_prefix - local.network_prefix
-  public_subnet    = element(cidrsubnets("${var.cidr_block}", "${local.new_bits}", "${local.new_bits}"), 0)
-  private_subnet   = element(cidrsubnets("${var.cidr_block}", "${local.new_bits}", "${local.new_bits}"), 1)
+  public_subnet    = element(cidrsubnets("${var.cidr_block}", "${local.new_bits}", "${local.new_bits}"), 1)
+  private_subnet   = element(cidrsubnets("${var.cidr_block}", "${local.new_bits}", "${local.new_bits}"), 0)
   sfos_version     = lookup(var.sfos_versions, var.sfos_version, "autodetect")
   amis             = { for k, v in data.aws_ami.dynamic_ami : k => v.description }
   sfos_ami         = [for k, v in local.amis : k if v == "XG on AWS ${local.sfos_version}-${var.sku}"]

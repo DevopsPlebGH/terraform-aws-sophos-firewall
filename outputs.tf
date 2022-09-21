@@ -20,7 +20,7 @@ output "trusted_ips" {
   description = <<EOT
   The trusted IP CIDR's in the trusted IP security group.
   EOT
-  value       = local.trusted_ip
+  value       = local.trusted_cidrs
 }
 
 output "firewall_ip_address" {
