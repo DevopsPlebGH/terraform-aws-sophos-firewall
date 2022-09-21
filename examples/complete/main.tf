@@ -16,7 +16,7 @@ module "complete" {
   source                    = "../../"
   create_vpc                = true
   aws_region                = data.aws_region.current.name
-  availability_zone         = null
+  availability_zone         = data.aws_availability_zones.available.names[0]
   console_password          = var.console_password
   firewall_hostname         = "sophos-xg-terraform"
   ssh_key_name              = module.key-pair.key_pair_name
