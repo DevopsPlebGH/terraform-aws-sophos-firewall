@@ -25,5 +25,5 @@ output "availability_zone_map" {
 }
 
 output "trusted_ip" {
-  value = var.trusted_ip
+  value = module.complete.trusted_ips
 }
