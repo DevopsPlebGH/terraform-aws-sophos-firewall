@@ -23,3 +23,7 @@ output "public_dns" {
 output "availability_zone_map" {
   value = local.availability_zone_map
 }
+
+output "trusted_ip" {
+  value = var.trusted_ip
+}
