@@ -78,7 +78,7 @@ data "template_file" "user_data" {
     ssmkSecretId    = aws_secretsmanager_secret.secure_storage_master_key.arn
     s3bucket        = var.s3bucket
     centralusername = var.central_username
-    centralpassword = aws_secretsmanager_secret.central_password[0].arn
+    centralpassword = var.central_password != "" ? aws_secretsmanager_secret.central_password[0].arn : null
     hostname        = var.firewall_hostname
     sendstats       = var.send_stats
     region          = var.aws_region
