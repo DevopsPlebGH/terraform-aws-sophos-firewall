@@ -535,16 +535,15 @@ variable "trusted_ip" {
 
     EG: 192.168.10.24/32
     EOT
-  validation {
-    #condition     = can(cidrnetmask(var.trusted_ip))
-    condition = (
-      can(cidrhost(var.trusted_ip, 0)) &&
-      can(cidrnetmask(var.trusted_ip))
-    )
-    error_message = <<EOT
-      ERROR: Must be a valid IPv4 CIDR block address.
-      EOT
-  }
+  #  validation {
+  #    condition = (
+  #      can(cidrhost(var.trusted_ip, 0)) &&
+  #      can(cidrnetmask(var.trusted_ip))
+  #    )
+  #    error_message = <<EOT
+  #      ERROR: Must be a valid IPv4 CIDR block address.
+  #      EOT
+  #  }
 }
 
 variable "vpc_tags" {
