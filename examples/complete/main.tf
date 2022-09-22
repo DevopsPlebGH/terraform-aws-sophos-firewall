@@ -3,6 +3,7 @@ locals {
     for zone in data.aws_availability_zone.available :
     zone.name => zone.zone_id
   }
+  deploy_date = formatdate("MM-DD-YYYY", timestamp())
 }
 
 module "key-pair" {
@@ -13,8 +14,11 @@ module "key-pair" {
 }
 
 module "complete" {
-  source                    = "../../"
-  create_vpc                = true
+  source     = "../../"
+  create_vpc = true
+  vpc_tags = {
+
+  }
   aws_region                = data.aws_region.current.name
   availability_zone         = data.aws_availability_zones.available.names[0]
   console_password          = var.console_password
@@ -29,5 +33,10 @@ module "complete" {
   sku                       = "payg"
   create_elastic_ip         = true
   create_s3_bucket          = false
+  tags = {
+    managed_by    = "Terraform",
+    contact_email = "ralph.brynard@sophos.com",
+    creation_date = local.deploy_date
+  }
 }
 
