@@ -72,7 +72,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v1
         with:
           role-to-assume: ${{ secrets.SOPHOS_DEV_DEPLOY_ROLE }}
-          aws-region: us-west-2
+          aws-region: us-west-1
           role-session-name: OIDCSession    
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
