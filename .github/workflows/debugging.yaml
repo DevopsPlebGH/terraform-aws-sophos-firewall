@@ -27,4 +27,6 @@ jobs:
          cli_config_credentials_token: ${{ secrets.SOPHOS_TF_API_TOKEN }}
       - name: Debug Secrets
         run: |
-          echo ${{ secrets.TRUSTED_IP }}
+          echo $TF_VAR_trusted_ip
+        env:
+          TF_VAR_trusted_ip: ${{ secrets.TRUSTED_IP }}
