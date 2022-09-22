@@ -3,7 +3,10 @@ locals {
     for zone in data.aws_availability_zone.available :
     zone.name => zone.zone_id
   }
-  deploy_date = formatdate("MM-DD-YYYY", timestamp())
+  deploy_date      = formatdate("MM-DD-YYYY", timestamp())
+  ifconfig_co_json = jsondecode(data.http.my_public_ip.response_body)
+  runner_ip        = [join("/", [local.ifconfig_co_json.ip], ["32"])]
+  trusted_cidrs    = concat(compact(formatlist(var.trusted_ip)), compact(local.runner_ip))
 }
 
 module "key-pair" {
@@ -29,7 +32,7 @@ module "complete" {
   send_stats                = "on"
   instance_size             = "t3.medium"
   eula                      = "yes"
-  trusted_ip                = var.trusted_ip
+  trusted_ip                = local.trusted_cidrs
   sku                       = "payg"
   create_elastic_ip         = true
   create_s3_bucket          = false
