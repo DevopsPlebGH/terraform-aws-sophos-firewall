@@ -75,15 +75,15 @@ data "aws_region" "current" {}
 data "template_file" "user_data" {
   template = file("${path.module}/templates/user_data.tpl")
   vars = {
-    ssmkSecretId    = var.secure_storage_master_key
+    ssmkSecretId    = aws_secretsmanager_secret.secure_storage_master_key.arn
     s3bucket        = var.s3bucket
     centralusername = var.central_username
-    centralpassword = var.central_password
+    centralpassword = aws_secretsmanager_secret.central_password[0].arn
     hostname        = var.firewall_hostname
     sendstats       = var.send_stats
     region          = var.aws_region
-    secretId        = var.console_password
-    configSecretId  = var.config_backup_password
+    secretId        = aws_secretsmanager_secret.console_password.arn
+    configSecretId  = aws_secretsmanager_secret.config_backup_password.arn
     serialKey       = var.serial_number
   }
 }

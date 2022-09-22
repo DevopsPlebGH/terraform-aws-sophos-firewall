@@ -387,6 +387,9 @@ resource "aws_iam_role_policy" "register_in_central" {
 resource "aws_secretsmanager_secret" "console_password" {
   name                    = "sophos-fw-console-password"
   recovery_window_in_days = 0
+  tags = {
+    logical-id = "PasswordSecret"
+  }
 }
 
 # Resource creates the XG Firewall Secret
@@ -399,6 +402,9 @@ resource "aws_secretsmanager_secret_version" "console_password" {
 resource "aws_secretsmanager_secret" "config_backup_password" {
   name                    = "sophos-fw-backup-configuration-password"
   recovery_window_in_days = 0
+  tags = {
+    logical-id = "PasswordSecret"
+  }
 }
 
 # Resource creates the XG Firewall backup configuration secret
@@ -411,6 +417,9 @@ resource "aws_secretsmanager_secret_version" "config_backup_password" {
 resource "aws_secretsmanager_secret" "secure_storage_master_key" {
   name                    = "sophos-fw-secure-storage-master-key"
   recovery_window_in_days = 0
+  tags = {
+    logical-id = "PasswordSecret"
+  }
 }
 
 # Resource creates the Secure Storage Master Key secret
@@ -424,6 +433,9 @@ resource "aws_secretsmanager_secret" "central_password" {
   count                   = var.central_password != "" ? 1 : 0
   name                    = "sophos-central-password"
   recovery_window_in_days = 0
+  tags = {
+    logical-id = "PasswordSecret"
+  }
 }
 
 # Resource creates the Sophos Central secret
