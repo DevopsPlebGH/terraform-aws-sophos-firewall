@@ -27,7 +27,7 @@ module "complete" {
   eula                      = "yes"
   trusted_ip                = var.trusted_ip
   sku                       = "payg"
-  create_elastic_ip         = false
+  create_elastic_ip         = true
   create_s3_bucket          = false
 }
 

@@ -238,7 +238,7 @@ resource "aws_route" "private" {
 # Resource creates a private ENI
 resource "aws_network_interface" "private" {
   subnet_id         = aws_subnet.private[0].id
-  description       = "ENI for private subnet"
+  description       = "ENI for Private Subnet"
   security_groups   = [aws_security_group.lan[0].id]
   source_dest_check = false
   tags = merge(
@@ -266,9 +266,10 @@ resource "aws_network_interface" "public" {
 
 # Resource creates the Elastic IP to attach to the public ENI
 resource "aws_eip" "this" {
-  count             = var.create_elastic_ip ? 1 : 0
-  vpc               = true
-  network_interface = aws_network_interface.public.id
+  count                     = var.create_elastic_ip ? 1 : 0
+  vpc                       = true
+  network_interface         = aws_network_interface.public.id
+  associate_with_private_ip = aws_network_interface.public.private_ip
   tags = merge(
     var.elastic_ip_tags,
     var.tags
