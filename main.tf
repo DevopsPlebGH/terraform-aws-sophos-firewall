@@ -434,7 +434,7 @@ resource "aws_secretsmanager_secret_version" "central_password" {
 ### Supporting resources ###
 # Random ID
 resource "random_id" "this" {
-  prefix      = var.namespace
+  prefix      = "${var.namespace}-"
   byte_length = 1
 }
 
