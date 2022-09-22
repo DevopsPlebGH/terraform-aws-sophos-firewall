@@ -13,6 +13,7 @@
 | Name | Version |
 |------|---------|
 | <a name="provider_aws"></a> [aws](#provider\_aws) | 4.31.0 |
+| <a name="provider_http"></a> [http](#provider\_http) | 3.1.0 |
 | <a name="provider_random"></a> [random](#provider\_random) | 3.4.3 |
 | <a name="provider_template"></a> [template](#provider\_template) | 2.2.0 |
 
@@ -63,6 +64,7 @@ No modules.
 | [aws_iam_policy_document.secure_storage_master_key](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.trust_relationship](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_region.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/region) | data source |
+| [http_http.my_public_ip](https://registry.terraform.io/providers/hashicorp/http/latest/docs/data-sources/http) | data source |
 | [template_file.user_data](https://registry.terraform.io/providers/hashicorp/template/latest/docs/data-sources/file) | data source |
 
 ## Inputs
@@ -113,7 +115,7 @@ No modules.
 | <a name="input_ssh_key_name"></a> [ssh\_key\_name](#input\_ssh\_key\_name) | (Required) The name of the SSH key to use to authenticate to the firewall. | `string` | n/a | yes |
 | <a name="input_subnet_prefix"></a> [subnet\_prefix](#input\_subnet\_prefix) | (Optional) The subnet prefix. Conflicts with public\_subnet/private\_subnet.<br><br>  Default: "24" | `string` | `"24"` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | (Optional) A map of tags to add to all resources<br><br>    Default: {} | `map(string)` | `{}` | no |
-| <a name="input_trusted_ip"></a> [trusted\_ip](#input\_trusted\_ip) | (Required) A trusted IP in CIDR format that will be added to the Trusted Network security group to allow access to the firewall console.<br><br>    The default behavior is to include the public IP address from which the Terraform plan is run.<br><br>    EG: 192.168.10.24/32 | `list(string)` | n/a | yes |
+| <a name="input_trusted_ip"></a> [trusted\_ip](#input\_trusted\_ip) | (Required) A trusted IP in CIDR format that will be added to the Trusted Network security group to allow access to the firewall console.<br><br>    The default behavior is to include the public IP address from which the Terraform plan is run.<br><br>    EG: 192.168.10.24/32 | `string` | n/a | yes |
 | <a name="input_vpc_tags"></a> [vpc\_tags](#input\_vpc\_tags) | (Optional) Additional tags to attach to the VPC<br><br>    Default: {} | `map(string)` | `{}` | no |
 
 ## Outputs
