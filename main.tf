@@ -344,11 +344,11 @@ resource "aws_launch_template" "this" {
   }
   network_interfaces {
     network_interface_id = aws_network_interface.public.id
-    device_index         = 0
+    device_index         = 1
   }
   network_interfaces {
     network_interface_id = aws_network_interface.private.id
-    device_index         = 1
+    device_index         = 0
   }
   user_data = base64encode("${data.template_file.user_data.rendered}")
   tags = merge(
