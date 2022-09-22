@@ -3,6 +3,10 @@ locals {
     for zone in data.aws_availability_zone.available :
     zone.name => zone.zone_id
   }
+  deploy_date      = formatdate("MM-DD-YYYY", timestamp())
+  ifconfig_co_json = jsondecode(data.http.my_public_ip.response_body)
+  runner_ip        = [join("/", [local.ifconfig_co_json.ip], ["32"])]
+  trusted_cidrs    = concat(compact(formatlist(var.trusted_ip)), compact(local.runner_ip))
 }
 
 module "key-pair" {
@@ -13,8 +17,11 @@ module "key-pair" {
 }
 
 module "complete" {
-  source                    = "../../"
-  create_vpc                = true
+  source     = "../../"
+  create_vpc = true
+  vpc_tags = {
+
+  }
   aws_region                = data.aws_region.current.name
   availability_zone         = data.aws_availability_zones.available.names[0]
   console_password          = var.console_password
@@ -25,9 +32,14 @@ module "complete" {
   send_stats                = "on"
   instance_size             = "t3.medium"
   eula                      = "yes"
-  trusted_ip                = var.trusted_ip
+  trusted_ip                = local.trusted_cidrs
   sku                       = "payg"
   create_elastic_ip         = true
   create_s3_bucket          = false
+  tags = {
+    managed_by    = "Terraform",
+    contact_email = "ralph.brynard@sophos.com",
+    creation_date = local.deploy_date
+  }
 }
 

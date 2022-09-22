@@ -6,3 +6,10 @@ data "aws_availability_zone" "available" {
 }
 
 data "aws_region" "current" {}
+
+data "http" "my_public_ip" {
+  url = "https://ifconfig.co/json"
+  request_headers = {
+    Accept = "application/json"
+  }
+}
