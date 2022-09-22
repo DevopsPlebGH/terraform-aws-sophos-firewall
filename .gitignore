@@ -48,3 +48,4 @@ test.pem
 remote.tf
 config.remote.tfbackend
 cloudformation.template
+*.pem
