@@ -22,13 +22,6 @@ data "aws_availability_zones" "available" {
 
 data "aws_caller_identity" "current" {}
 
-data "http" "my_public_ip" {
-  url = "https://ifconfig.co/json"
-  request_headers = {
-    Accept = "application/json"
-  }
-}
-
 data "aws_iam_policy_document" "central" {
   count = var.central_password != "" ? 1 : 0
   statement {
@@ -92,5 +85,12 @@ data "template_file" "user_data" {
     secretId        = var.console_password
     configSecretId  = var.config_backup_password
     serialKey       = var.serial_number
+  }
+}
+
+data "http" "my_public_ip" {
+  url = "https://ifconfig.co/json"
+  request_headers = {
+    Accept = "application/json"
   }
 }

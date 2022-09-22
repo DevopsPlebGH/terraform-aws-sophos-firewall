@@ -16,17 +16,13 @@ locals {
 
 # Standard Locals
 locals {
-  ifconfig_co_json = jsondecode(data.http.my_public_ip.response_body)
-  cicd_ip          = [join("/", ["${local.ifconfig_co_json.ip}"], ["32"])]
-  trusted_ip       = tolist([var.trusted_ip])
-  trusted_cidrs    = concat(local.cicd_ip, compact(local.trusted_ip))
-  network_prefix   = parseint(regex("/(\\d+)$", "${var.cidr_block}")[0], 10)
-  new_bits         = var.subnet_prefix - local.network_prefix
-  public_subnet    = element(cidrsubnets("${var.cidr_block}", "${local.new_bits}", "${local.new_bits}"), 0)
-  private_subnet   = element(cidrsubnets("${var.cidr_block}", "${local.new_bits}", "${local.new_bits}"), 1)
-  sfos_version     = lookup(var.sfos_versions, var.sfos_version, "autodetect")
-  amis             = { for k, v in data.aws_ami.dynamic_ami : k => v.description }
-  sfos_ami         = [for k, v in local.amis : k if v == "XG on AWS ${local.sfos_version}-${var.sku}"]
+  network_prefix = parseint(regex("/(\\d+)$", "${var.cidr_block}")[0], 10)
+  new_bits       = var.subnet_prefix - local.network_prefix
+  public_subnet  = element(cidrsubnets("${var.cidr_block}", "${local.new_bits}", "${local.new_bits}"), 0)
+  private_subnet = element(cidrsubnets("${var.cidr_block}", "${local.new_bits}", "${local.new_bits}"), 1)
+  sfos_version   = lookup(var.sfos_versions, var.sfos_version, "autodetect")
+  amis           = { for k, v in data.aws_ami.dynamic_ami : k => v.description }
+  sfos_ami       = [for k, v in local.amis : k if v == "XG on AWS ${local.sfos_version}-${var.sku}"]
 }
 
 ### VPC ###
@@ -112,6 +108,12 @@ resource "aws_security_group" "public" {
 }
 
 # Resource creates the security group to allow access to the firewall management console
+locals {
+  ifconfig_co_json = jsondecode(data.http.my_public_ip.response_body)
+  runner_ip        = [join("/", [local.ifconfig_co_json.ip], ["32"])]
+  trusted_cidrs    = concat(compact(formatlist(var.trusted_ip)), compact(local.runner_ip))
+}
+
 resource "aws_security_group" "trusted" {
   count       = var.create_vpc ? 1 : 0
   name        = "Trusted Network"

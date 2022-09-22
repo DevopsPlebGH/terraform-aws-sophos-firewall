@@ -43,5 +43,4 @@ No requirements.
 | <a name="output_private_key"></a> [private\_key](#output\_private\_key) | SSH Private Key |
 | <a name="output_public_dns"></a> [public\_dns](#output\_public\_dns) | Firewalls public DNS name |
 | <a name="output_public_ip"></a> [public\_ip](#output\_public\_ip) | Firewalls public IP |
-| <a name="output_trusted_ip"></a> [trusted\_ip](#output\_trusted\_ip) | n/a |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

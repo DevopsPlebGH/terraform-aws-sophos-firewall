@@ -40,6 +40,9 @@ jobs:
           view-status-action-text: View build/deploy status
           review-diffs-action-text: Review commit diffs
           include-files: true
+      - name: Public IP
+        id: ip
+        uses: haythem/public-ip@v1.2          
       - name: Checkout code
         uses: actions/checkout@v2
         with:
@@ -89,7 +92,7 @@ jobs:
           TF_VAR_console_password: ${{ secrets.CONSOLE_PASSWORD }}
           TF_VAR_config_backup_password: ${{ secrets.CONFIG_BACKUP_PASSWORD }}
           TF_VAR_secure_storage_master_key: ${{ secrets.SECURE_STORAGE_MASTER_KEY }}
-          TF_VAR_trusted_ip: ${{ secrets.TRUSTED_IP }}  
+          TF_VAR_trusted_ip: ${{ secrets.TRUSTED_IP }}
       - name: Reformat Plan
         run: |
           echo '${{ steps.plan.outputs.stdout || steps.plan.outputs.stderr }}' \
