@@ -21,7 +21,7 @@ variable "secure_storage_master_key" {
 }
 
 variable "trusted_ip" {
-  type        = string
+  type        = list(string)
   description = <<EOT
   (Required) Trusted IP to allow access to the firewall console.
   EOT

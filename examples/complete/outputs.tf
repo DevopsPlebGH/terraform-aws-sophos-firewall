@@ -23,7 +23,3 @@ output "public_dns" {
 output "availability_zone_map" {
   value = local.availability_zone_map
 }
-
-output "trusted_cidrs" {
-  value = module.complete.trusted_cidrs
-}

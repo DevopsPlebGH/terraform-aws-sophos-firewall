@@ -33,7 +33,3 @@ output "firewall_public_dns_name" {
 output "template_file" {
   value = data.template_file.user_data.rendered
 }
-
-output "trusted_cidrs" {
-  value = var.debug ? local.trusted_cidrs : null
-}

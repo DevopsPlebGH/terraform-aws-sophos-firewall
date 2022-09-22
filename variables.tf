@@ -535,7 +535,7 @@ variable "tags" {
 }
 
 variable "trusted_ip" {
-  type        = string
+  type        = list(string)
   description = <<EOT
     (Required) A trusted IP in CIDR format that will be added to the Trusted Network security group to allow access to the firewall console.
 

@@ -108,12 +108,6 @@ resource "aws_security_group" "public" {
 }
 
 # Resource creates the security group to allow access to the firewall management console
-locals {
-  ifconfig_co_json = jsondecode(data.http.my_public_ip.response_body)
-  runner_ip        = [join("/", [local.ifconfig_co_json.ip], ["32"])]
-  trusted_cidrs    = concat(compact(formatlist(var.trusted_ip)), compact(local.runner_ip))
-}
-
 resource "aws_security_group" "trusted" {
   count       = var.create_vpc ? 1 : 0
   name        = "Trusted Network"
@@ -124,7 +118,7 @@ resource "aws_security_group" "trusted" {
     from_port   = 0
     to_port     = 65535
     protocol    = "tcp"
-    cidr_blocks = local.trusted_cidrs
+    cidr_blocks = var.trusted_ip
   }
   egress {
     description = "Allow all traffic outbound"
