@@ -40,10 +40,6 @@ jobs:
           view-status-action-text: View build/deploy status
           review-diffs-action-text: Review commit diffs
           include-files: true
-      - name: Public IP
-        id: ip
-        uses: haythem/public-ip@v1.2
-        
       - name: Checkout code
         uses: actions/checkout@v2
         with:
