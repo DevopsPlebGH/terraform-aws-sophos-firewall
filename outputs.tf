@@ -16,13 +16,6 @@ output "availability_zones" {
   value       = var.availability_zone != null ? var.availability_zone : data.aws_availability_zones.available.names[0]
 }
 
-output "trusted_ips" {
-  description = <<EOT
-  The trusted IP CIDR's in the trusted IP security group.
-  EOT
-  value       = local.trusted_cidrs
-}
-
 output "firewall_ip_address" {
   description = <<EOT
   The public IP for the firewall
@@ -41,6 +34,6 @@ output "template_file" {
   value = data.template_file.user_data.rendered
 }
 
-output "cicd_ip" {
-  value = local.cicd_ip
+output "trusted_cidrs" {
+  value = var.debug ? local.trusted_cidrs : null
 }

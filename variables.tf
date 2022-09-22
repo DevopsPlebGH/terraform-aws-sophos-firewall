@@ -94,6 +94,14 @@ variable "create_vpc" {
   default     = true
 }
 
+variable "debug" {
+  type        = bool
+  description = <<EOT
+  (Optional) Enable debugging in the module
+  EOT
+  default     = true
+}
+
 variable "elastic_ip_tags" {
   type        = map(string)
   description = <<EOT

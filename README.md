@@ -83,6 +83,7 @@ No modules.
 | <a name="input_create_elastic_ip"></a> [create\_elastic\_ip](#input\_create\_elastic\_ip) | (Optional) If set to false, an existing elastic IP allocation ID will need to be provided. | `bool` | `true` | no |
 | <a name="input_create_s3_bucket"></a> [create\_s3\_bucket](#input\_create\_s3\_bucket) | (Optional) Whether or not an S3 bucket should be created for the firewall configuration backups.<br><br>  Default: false | `bool` | `false` | no |
 | <a name="input_create_vpc"></a> [create\_vpc](#input\_create\_vpc) | (Optional) If set to false, an existing VPC ID and existing subnet ID's will need to be provided.<br><br>    Default: true | `bool` | `true` | no |
+| <a name="input_debug"></a> [debug](#input\_debug) | (Optional) Enable debugging in the module | `bool` | `true` | no |
 | <a name="input_elastic_ip_tags"></a> [elastic\_ip\_tags](#input\_elastic\_ip\_tags) | (Optional) Additional tags to attach to the Elastic IP Address<br><br>  Default: {} | `map(string)` | `{}` | no |
 | <a name="input_enable_dns_hostnames"></a> [enable\_dns\_hostnames](#input\_enable\_dns\_hostnames) | (Optional) Controls whether or not DNS hostname support should be enabled in the VPC<br><br>    Default: true | `bool` | `true` | no |
 | <a name="input_enable_dns_support"></a> [enable\_dns\_support](#input\_enable\_dns\_support) | (Optional) Controls whether DNS support should be enabled in the VPC<br><br>  Default: true | `bool` | `true` | no |
@@ -124,9 +125,8 @@ No modules.
 | <a name="output_ami_id"></a> [ami\_id](#output\_ami\_id) | n/a |
 | <a name="output_ami_map"></a> [ami\_map](#output\_ami\_map) | The map of AMI's available. |
 | <a name="output_availability_zones"></a> [availability\_zones](#output\_availability\_zones) | The availability zone that the resources were deployed in if no availability zone was specified. |
-| <a name="output_cicd_ip"></a> [cicd\_ip](#output\_cicd\_ip) | n/a |
 | <a name="output_firewall_ip_address"></a> [firewall\_ip\_address](#output\_firewall\_ip\_address) | The public IP for the firewall |
 | <a name="output_firewall_public_dns_name"></a> [firewall\_public\_dns\_name](#output\_firewall\_public\_dns\_name) | The public DNS name for the firewall. |
 | <a name="output_template_file"></a> [template\_file](#output\_template\_file) | n/a |
-| <a name="output_trusted_ips"></a> [trusted\_ips](#output\_trusted\_ips) | The trusted IP CIDR's in the trusted IP security group. |
+| <a name="output_trusted_cidrs"></a> [trusted\_cidrs](#output\_trusted\_cidrs) | n/a |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
