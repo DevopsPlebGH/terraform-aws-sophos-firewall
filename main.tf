@@ -281,6 +281,10 @@ resource "aws_iam_instance_profile" "this" {
     var.tags
   )
 }
+# Enable serial console access
+resource "aws_ec2_serial_console_access" "this" {
+  enabled = true
+}
 
 # Resource will create the EC2 instance
 resource "aws_instance" "this" {
