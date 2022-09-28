@@ -1,3 +1,6 @@
+# Ignored directories
+scratch
+*venv
 # ACT ignored files
 **.secrets
 # Hashicorp Packer

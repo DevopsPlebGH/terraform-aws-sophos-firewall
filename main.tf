@@ -271,6 +271,35 @@ resource "aws_eip" "this" {
   )
 }
 
+### Lambda Resources ###
+# Resource will create the Lambda function execution role
+#resource "aws_iam_role" "lambda_execution_role" {
+#  name = "LambdaExecutionRole-${random_id.this.hex}"
+#  assume_role_policy = <<EOT
+#  EOT
+#}
+# Resource will create the initial configuration Lambda function
+resource "aws_lambda_function" "this" {
+  role          = "lambda-role"
+  function_name = "XG-Initial-Config-${random_id.this.hex}"
+
+  vpc_config {
+    subnet_ids         = [aws_subnet.private[0].id]
+    security_group_ids = [aws_security_group.lan[0].id]
+  }
+
+  runtime = "python3.7"
+  handler = "config.main"
+  environment {
+    variables = {
+      IP                  = aws_network_interface.private.private_ip,
+      USERNAME            = "admin",
+      PASSWORD            = "admin",
+      CONSOLE_SECRET_NAME = aws_secretsmanager_secret.console_password.id,
+      REGION_NAME         = data.aws_region.current.name
+    }
+  }
+}
 ### EC2 Resources ###
 # Resource will create the IAM instance profile
 resource "aws_iam_instance_profile" "this" {

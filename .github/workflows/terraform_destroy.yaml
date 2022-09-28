@@ -2,6 +2,8 @@ name: Terraform Destroy
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: "59 23 * * *"
 
 permissions:
   id-token: write
@@ -16,10 +18,10 @@ jobs:
       matrix:
         include:
           - environment: Development
-    
+
     environment:
       name: ${{ matrix.environment }}
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -28,7 +30,7 @@ jobs:
         with:
           role-to-assume: ${{ secrets.SOPHOS_DEV_DEPLOY_ROLE }}
           aws-region: us-west-2
-          role-session-name: OIDCSession    
+          role-session-name: OIDCSession
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
         with:
@@ -58,9 +60,9 @@ jobs:
           terraform plan -input=false -no-color
         env:
           TF_VAR_console_password: ${{ secrets.CONSOLE_PASSWORD }}
-          TF_VAR_config_backup_password: ${{ secrets.CONFIG_BACKUP_PASSWORD }}  
+          TF_VAR_config_backup_password: ${{ secrets.CONFIG_BACKUP_PASSWORD }}
           TF_VAR_secure_storage_master_key: ${{ secrets.SECURE_STORAGE_MASTER_KEY }}
-          TF_VAR_trusted_ip: '[ "${{ secrets.TRUSTED_IP }}" ]'         
+          TF_VAR_trusted_ip: '[ "${{ secrets.TRUSTED_IP }}" ]'
       - name: Apply Terraform
         if: steps.plan.outcome == 'success'
         id: apply
@@ -69,9 +71,9 @@ jobs:
           terraform destroy \
             -input=false \
             -no-color \
-            -auto-approve                  
+            -auto-approve
         env:
           TF_VAR_console_password: ${{ secrets.CONSOLE_PASSWORD }}
-          TF_VAR_config_backup_password: ${{ secrets.CONFIG_BACKUP_PASSWORD }}  
+          TF_VAR_config_backup_password: ${{ secrets.CONFIG_BACKUP_PASSWORD }}
           TF_VAR_secure_storage_master_key: ${{ secrets.SECURE_STORAGE_MASTER_KEY }}
-          TF_VAR_trusted_ip: '[ "${{ secrets.TRUSTED_IP }}" ]'              
+          TF_VAR_trusted_ip: '[ "${{ secrets.TRUSTED_IP }}" ]'
