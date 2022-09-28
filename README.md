@@ -12,7 +12,7 @@
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 4.31.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 4.32.0 |
 | <a name="provider_http"></a> [http](#provider\_http) | 3.1.0 |
 | <a name="provider_random"></a> [random](#provider\_random) | 3.4.3 |
 | <a name="provider_template"></a> [template](#provider\_template) | 2.2.0 |
