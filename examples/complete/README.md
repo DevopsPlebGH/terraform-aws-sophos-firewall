@@ -43,6 +43,7 @@ No requirements.
 
 | Name | Description |
 |------|-------------|
+| <a name="output_archive_name"></a> [archive\_name](#output\_archive\_name) | n/a |
 | <a name="output_availability_zone_map"></a> [availability\_zone\_map](#output\_availability\_zone\_map) | n/a |
 | <a name="output_private_key"></a> [private\_key](#output\_private\_key) | SSH Private Key |
 | <a name="output_public_dns"></a> [public\_dns](#output\_public\_dns) | Firewalls public DNS name |
