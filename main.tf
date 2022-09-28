@@ -282,7 +282,7 @@ resource "aws_iam_role" "lambda_execution_role" {
       {
         "Action": "sts:AssumeRole",
         "Principal": {
-          "Service": "lamda.amazonaws.com"
+          "Service": "lambda.amazonaws.com"
         },
         "Effect": "Allow",
         "Sid": ""
