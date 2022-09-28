@@ -1,0 +1,32 @@
+name: Debugging
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  debugging:
+    name: Debug
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ secrets.SOPHOS_DEV_DEPLOY_ROLE }}
+          aws-region: us-west-2
+          role-session-name: OIDCSession 
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+         cli_config_credentials_token: ${{ secrets.SOPHOS_TF_API_TOKEN }}
+      - name: Debug Secrets
+        run: |
+          echo $TF_VAR_trusted_ip
+        env:
+          TF_VAR_trusted_ip: ${{ secrets.TRUSTED_IP }}
