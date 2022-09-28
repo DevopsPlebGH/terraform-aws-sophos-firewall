@@ -294,7 +294,7 @@ resource "aws_lambda_function" "this" {
       USERNAME            = "admin",
       PASSWORD            = "admin",
       CONSOLE_SECRET_NAME = aws_secretsmanager_secret.console_password.id,
-      REGION_NAME         = data.aws_region.current
+      REGION_NAME         = data.aws_region.current.name
     }
   }
 }
