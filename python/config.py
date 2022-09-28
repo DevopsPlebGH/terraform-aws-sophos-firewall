@@ -7,7 +7,8 @@ from paramiko_expect import SSHClientInteraction
 
 IP=os.getenv(IP)
 USERNAME=os.getenv(USERNAME)
-PASSWORD=os.getenv(PASSWORD)
+DEFAULT_PASSWORD=os.getenv(DEFAULT_PASSWORD)
+CONSOLE_PASSWORD=os.getenv(CONSOLE_PASSWORD)
 
 
 def ssh_connect(self):
@@ -31,7 +32,7 @@ def change_password(client):
   client = paramiko.SSHClient()
   client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
   try:
-    client.connect(IP,username=USERNAME,password=PASSWORD)
+    client.connect(IP,username=USERNAME,password=DEFAULT_PASSWORD)
     with SSHClientInteraction(client, timeout=10, display=True) as interact:
       interact.expect('Select Menu Number')
       interact.send('2')
@@ -40,11 +41,11 @@ def change_password(client):
       interact.expect('continue?')
       interact.send('Y')
       interact.expect('Enter current password:')
-      interact.send(xg_default_password)
+      interact.send(DEFAULT_PASSWORD)
       interact.expect('Enter new password')
-      interact.send('BrynaR!60122')
+      interact.send(consolepassword)
       interact.expect('Re-Enter new Password')
-      interact.send('BrynaR!60122')
+      interact.send(consolepassword
       interact.expect('Password Changed')
       interact.send()
   except Exception:
