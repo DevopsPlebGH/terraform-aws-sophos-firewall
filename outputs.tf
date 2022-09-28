@@ -33,3 +33,7 @@ output "firewall_public_dns_name" {
 output "template_file" {
   value = data.template_file.user_data.rendered
 }
+
+output "lambda_archive" {
+  value = data.archive_file.lambda_zip.id
+}

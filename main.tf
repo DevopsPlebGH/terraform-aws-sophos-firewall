@@ -237,7 +237,7 @@ resource "aws_network_interface" "private" {
   security_groups   = [aws_security_group.lan[0].id]
   source_dest_check = false
   tags = merge(
-    { Name = "priv-eni-${random_id.this.hex}-${data.aws_caller_identity.current.account_id}" },
+    { Name = "private-eni-${data.aws_caller_identity.current.account_id}" },
     var.private_eni_tags,
     var.tags
   )
@@ -253,7 +253,7 @@ resource "aws_network_interface" "public" {
   ]
   source_dest_check = false
   tags = merge(
-    { Name = "pub-eni-${random_id.this.hex}-${data.aws_caller_identity.current.account_id}" },
+    { Name = "public-eni-${data.aws_caller_identity.current.account_id}" },
     var.public_eni_tags,
     var.tags
   )
@@ -273,17 +273,30 @@ resource "aws_eip" "this" {
 
 ### Lambda Resources ###
 # Resource will create the Lambda function execution role
-#resource "aws_iam_role" "lambda_execution_role" {
-#  name = "LambdaExecutionRole-${random_id.this.hex}"
-#  assume_role_policy = <<EOT
-#  EOT
-#}
+resource "aws_iam_role" "lambda_execution_role" {
+  name               = "LambdaExecutionRole-${random_id.this.hex}"
+  assume_role_policy = <<-EOT
+  {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Action": "sts.AssumeRole",
+        "Principal": {
+          "Service": "lamda.amazonaws.com"
+        },
+        "Effect": "Allow",
+        "Sid": ""
+      }
+    ]
+  }
+  EOT
+}
 # Resource will create the initial configuration Lambda function
 resource "aws_lambda_function" "this" {
-  role          = "lambda-role"
+  role          = aws_iam_role.lambda_execution_role.arn
   function_name = "XG-Initial-Config-${random_id.this.hex}"
 
-  filename = data.archive_file.lambda_zip.id
+  filename = "${path.module}/initial_config.zip"
 
   vpc_config {
     subnet_ids         = [aws_subnet.private[0].id]
