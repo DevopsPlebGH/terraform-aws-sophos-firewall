@@ -1,3 +1,8 @@
+data "archive_file" "lambda_zip" {
+  type        = "zip"
+  source_dir  = "${path.module}/xg-config-lambda"
+  output_path = "${path.module}/initial_config.zip"
+}
 data "aws_ami_ids" "sfos" {
   owners = ["aws-marketplace"]
   filter {
