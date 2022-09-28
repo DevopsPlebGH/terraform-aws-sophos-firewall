@@ -283,6 +283,8 @@ resource "aws_lambda_function" "this" {
   role          = "lambda-role"
   function_name = "XG-Initial-Config-${random_id.this.hex}"
 
+  filename = data.archive_file.lambda_zip.id
+
   vpc_config {
     subnet_ids         = [aws_subnet.private[0].id]
     security_group_ids = [aws_security_group.lan[0].id]
