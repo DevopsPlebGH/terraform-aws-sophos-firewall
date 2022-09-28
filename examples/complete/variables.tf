@@ -19,3 +19,10 @@ variable "secure_storage_master_key" {
   (Required) The Secure Storage Master Key password.
   EOT
 }
+
+variable "trusted_ip" {
+  type        = string
+  description = <<EOT
+  (Required) Trusted IP to allow access to the firewall console.
+  EOT
+}

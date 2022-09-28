@@ -5,7 +5,7 @@ on:
   push:
     branches:
       - dev
-  
+
 permissions:
   id-token: write
   contents: read
@@ -20,47 +20,66 @@ jobs:
         uses: tibdex/github-app-token@v1
         with:
           app_id: ${{ secrets.APP_ID }}
-          private_key: ${{ secrets.APP_PRIVATE_KEY }}    
+          private_key: ${{ secrets.APP_PRIVATE_KEY }}
       - name: Inform on Pull Request that Apply is running
         uses: mshick/add-pr-comment@v1
         with:
           repo-token: ${{ steps.generate-token.outputs.token }}
           message: |
             ***Running terraform apply***
-            Results will display here momentarily...  
+            Results will display here momentarily...
   plan_and_apply:
     name: Plan and Apply
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
+        path:
+          - ./examples/complete
         include:
           - environment: Development
-            url: https://app.terraform.io/app/esg_se_xdr_demo_dev/workspaces/terraform-aws-sophos-firewall/runs
 
-    environment: 
+    environment:
       name: ${{ matrix.environment }}
       url: ${{ matrix.url }}
 
     steps:
+      - name: Microsoft Teams Notifications
+        uses: toko-bifrost/ms-teams-deploy-card@master
+        if: always()
+        with:
+          environment: ${{ matrix.environment }}
+          github-token: ${{ steps.generate-token.outputs.token }}
+          webhook-uri: ${{ secrets.MSTEAMS_WEBHOOK }}
+          card-layout-start: complete
+          card-layout-exit: complete
+          show-on-start: true
+          show-on-exist: true
+          show-on-failure: true
+          enable-view-status-action: true
+          enable-review-diffs-actions: true
+          view-status-action-text: View build/deploy status
+          review-diffs-action-text: Review commit diffs
+          include-files: true
       - name: Check out code
         uses: actions/checkout@v2
       - id: generate-token
         uses: tibdex/github-app-token@v1
         with:
           app_id: ${{ secrets.APP_ID }}
-          private_key: ${{ secrets.APP_PRIVATE_KEY }}        
+          private_key: ${{ secrets.APP_PRIVATE_KEY }}
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           role-to-assume: ${{ secrets.SOPHOS_DEV_DEPLOY_ROLE }}
-          aws-region: us-west-2
-          role-session-name: OIDCSession    
+          aws-region: us-west-1
+          role-session-name: OIDCSession
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
         with:
          cli_config_credentials_token: ${{ secrets.SOPHOS_TF_API_TOKEN }}
       - name: Terraform init
+        working-directory: ${{ matrix.path }}
         run: |
           REPO="${{ github.repository }}"
           WORKSPACE="${REPO#*/}"
@@ -79,28 +98,30 @@ jobs:
 
           terraform init -backend-config=config.remote.tfbackend
       - name: Terraform Plan
+        working-directory: ${{ matrix.path }}
         id: plan
         continue-on-error: true
         run: |
           terraform plan -input=false -no-color
         env:
           TF_VAR_console_password: ${{ secrets.CONSOLE_PASSWORD }}
-          TF_VAR_config_backup_password: ${{ secrets.CONFIG_BACKUP_PASSWORD }}  
+          TF_VAR_config_backup_password: ${{ secrets.CONFIG_BACKUP_PASSWORD }}
           TF_VAR_secure_storage_master_key: ${{ secrets.SECURE_STORAGE_MASTER_KEY }}
-          TF_VAR_trusted_ip: ${{ secrets.TRUSTED_IP }}              
+          TF_VAR_trusted_ip: ${{ secrets.TRUSTED_IP }}
       - name: Reformat Plan
         if: steps.plan.outcome == 'success'
         run: |
           echo '${{ steps.plan.outputs.stdout || steps.plan.outputs.stderr }}' \
-          | sed -E 's/^([[:space:]]+)([-+])/\2\1/g' > plan.txt  
+          | sed -E 's/^([[:space:]]+)([-+])/\2\1/g' > plan.txt
       - name: Put Plan in Github Env Var
         if: steps.plan.outcome == 'success'
         run: |
           PLAN=$(cat plan.txt)
           echo "PLAN<<EOF" >> $GITHUB_ENV
           echo "$PLAN" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV         
+          echo "EOF" >> $GITHUB_ENV
       - name: Apply Terraform
+        working-directory: ${{ matrix.path }}
         if: steps.plan.outcome == 'success'
         id: apply
         continue-on-error: true
@@ -111,9 +132,19 @@ jobs:
             -auto-approve
         env:
           TF_VAR_console_password: ${{ secrets.CONSOLE_PASSWORD }}
-          TF_VAR_config_backup_password: ${{ secrets.CONFIG_BACKUP_PASSWORD }}  
+          TF_VAR_config_backup_password: ${{ secrets.CONFIG_BACKUP_PASSWORD }}
           TF_VAR_secure_storage_master_key: ${{ secrets.SECURE_STORAGE_MASTER_KEY }}
-          TF_VAR_trusted_ip: '[ "${{ secrets.TRUSTED_IP }}" ]'                             
+          TF_VAR_trusted_ip: ${{ secrets.TRUSTED_IP }}
+      - name: Upload Lambda Artifact
+        run: |
+          cd ../../ \
+          ZIP="./intial_config.zip" \
+          ls -lah && pwd
+
+          if [ -f $ZIP ]; then
+            echo "artifactPath=$(pwd)/initial_config.zip" >> $GITHUB_ENV
+          fi
+          echo $GITHUB_ENV
       - name: Post Plan and Apply to GitHub PR
         if: steps.plan.outcome == 'success' && steps.apply.outcome == 'success'
         uses: mshick/add-pr-comment@v1
@@ -128,7 +159,7 @@ jobs:
 
             ```
             ${{ steps.apply.outputs.stdout }}
-            ```              
+            ```
       - name: Post Plan Failure
         if: steps.plan.outcome == 'failure'
         uses: mshick/add-pr-comment@v1
@@ -139,7 +170,7 @@ jobs:
 
             ```
             ${{ steps.plan.outputs.stderr }}
-            ```            
+            ```
       - name: Post Apply Failure
         if: steps.apply.outcome == 'failure'
         uses: mshick/add-pr-comment@v1
@@ -150,5 +181,3 @@ jobs:
 
             ```
             ${{ steps.apply.outputs.stderr }}
-            ```               
-      

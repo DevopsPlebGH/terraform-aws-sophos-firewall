@@ -1,16 +1,28 @@
+# Validation for BYOL SKU
 locals {
-  ifconfig_co_json = jsondecode(data.http.my_public_ip.response_body)
-  my_ip            = [join("/", ["${local.ifconfig_co_json.ip}"], ["32"])]
-  #  trusted_ip       = var.trusted_ip == null ? var.trusted_ip : local.my_ip
-  trusted_ip     = concat(local.my_ip, compact(var.trusted_ip))
+  validate_sku_byol_condition = var.sku == "payg" && var.serial_number != ""
+  validate_sku_byol_message   = <<EOT
+  ERROR: Incorrect SKU type for provided serial number!
+
+  If providing a serial number, SKU type must be "byol"
+  EOT
+  validate_sku_byol_check = regex(
+    "^${local.validate_sku_byol_message}$",
+    (!local.validate_sku_byol_condition
+      ? local.validate_sku_byol_message
+    : "")
+  )
+}
+
+# Standard Locals
+locals {
   network_prefix = parseint(regex("/(\\d+)$", "${var.cidr_block}")[0], 10)
   new_bits       = var.subnet_prefix - local.network_prefix
   public_subnet  = element(cidrsubnets("${var.cidr_block}", "${local.new_bits}", "${local.new_bits}"), 0)
   private_subnet = element(cidrsubnets("${var.cidr_block}", "${local.new_bits}", "${local.new_bits}"), 1)
-  #amis           = { for k, v in data.aws_ami.sfos : k => v.description }
-  sfos_version = lookup(var.sfos_versions, var.sfos_version, "latest")
-  amis         = { for k, v in data.aws_ami.sfos : k => v.description }
-  sfos_ami     = [for k, v in local.amis : k if v == "XG on AWS ${local.sfos_version}-${var.sku}"]
+  sfos_version   = lookup(var.sfos_versions, var.sfos_version, "autodetect")
+  amis           = { for k, v in data.aws_ami.dynamic_ami : k => v.description }
+  sfos_ami       = [for k, v in local.amis : k if v == "XG on AWS ${local.sfos_version}-${var.sku}"]
 }
 
 ### VPC ###
@@ -33,7 +45,7 @@ resource "aws_subnet" "public" {
   count                   = var.create_vpc ? 1 : 0
   vpc_id                  = aws_vpc.this[0].id
   cidr_block              = var.public_subnet != null ? var.public_subnet : local.public_subnet
-  availability_zone       = var.az == null ? var.az : element("${random_shuffle.az.result}", 0)
+  availability_zone       = var.availability_zone
   map_public_ip_on_launch = true
   tags = merge(
     { Name = "public-${random_id.this.hex}-${data.aws_caller_identity.current.account_id}" },
@@ -47,7 +59,7 @@ resource "aws_subnet" "private" {
   count             = var.create_vpc ? 1 : 0
   vpc_id            = aws_vpc.this[0].id
   cidr_block        = var.private_subnet != null ? var.private_subnet : local.private_subnet
-  availability_zone = var.az == null ? var.az : element("${random_shuffle.az.result}", 0)
+  availability_zone = var.availability_zone
   tags = merge(
     { Name = "private-${random_id.this.hex}-${data.aws_caller_identity.current.account_id}" }
   )
@@ -96,6 +108,7 @@ resource "aws_security_group" "public" {
 }
 
 # Resource creates the security group to allow access to the firewall management console
+
 resource "aws_security_group" "trusted" {
   count       = var.create_vpc ? 1 : 0
   name        = "Trusted Network"
@@ -106,7 +119,7 @@ resource "aws_security_group" "trusted" {
     from_port   = 0
     to_port     = 65535
     protocol    = "tcp"
-    cidr_blocks = local.trusted_ip
+    cidr_blocks = var.trusted_ip
   }
   egress {
     description = "Allow all traffic outbound"
@@ -219,11 +232,12 @@ resource "aws_route" "private" {
 ### Elastic Network Interfaces ###
 # Resource creates a private ENI
 resource "aws_network_interface" "private" {
-  subnet_id       = aws_subnet.private[0].id
-  description     = "ENI for private subnet"
-  security_groups = [aws_security_group.lan[0].id]
+  subnet_id         = aws_subnet.private[0].id
+  description       = "ENI for Private Subnet"
+  security_groups   = [aws_security_group.lan[0].id]
+  source_dest_check = false
   tags = merge(
-    { Name = "priv-eni-${random_id.this.hex}-${data.aws_caller_identity.current.account_id}" },
+    { Name = "private-eni-${data.aws_caller_identity.current.account_id}" },
     var.private_eni_tags,
     var.tags
   )
@@ -237,13 +251,70 @@ resource "aws_network_interface" "public" {
     aws_security_group.trusted[0].id,
     aws_security_group.public[0].id
   ]
+  source_dest_check = false
   tags = merge(
-    { Name = "pub-eni-${random_id.this.hex}-${data.aws_caller_identity.current.account_id}" },
+    { Name = "public-eni-${data.aws_caller_identity.current.account_id}" },
     var.public_eni_tags,
     var.tags
   )
 }
 
+# Resource creates the Elastic IP to attach to the public ENI
+resource "aws_eip" "this" {
+  count                     = var.create_elastic_ip ? 1 : 0
+  vpc                       = true
+  network_interface         = aws_network_interface.public.id
+  associate_with_private_ip = aws_network_interface.public.private_ip
+  tags = merge(
+    var.elastic_ip_tags,
+    var.tags
+  )
+}
+
+### Lambda Resources ###
+# Resource will create the Lambda function execution role
+resource "aws_iam_role" "lambda_execution_role" {
+  name               = "LambdaExecutionRole-${random_id.this.hex}"
+  assume_role_policy = <<-EOT
+  {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Action": "sts:AssumeRole",
+        "Principal": {
+          "Service": "lambda.amazonaws.com"
+        },
+        "Effect": "Allow",
+        "Sid": ""
+      }
+    ]
+  }
+  EOT
+}
+# Resource will create the initial configuration Lambda function
+resource "aws_lambda_function" "this" {
+  role          = aws_iam_role.lambda_execution_role.arn
+  function_name = "XG-Initial-Config-${random_id.this.hex}"
+
+  filename = "${path.module}/initial_config.zip"
+
+  vpc_config {
+    subnet_ids         = [aws_subnet.private[0].id]
+    security_group_ids = [aws_security_group.lan[0].id]
+  }
+
+  runtime = "python3.7"
+  handler = "config.main"
+  environment {
+    variables = {
+      IP                  = aws_network_interface.private.private_ip,
+      USERNAME            = "admin",
+      PASSWORD            = "admin",
+      CONSOLE_SECRET_NAME = aws_secretsmanager_secret.console_password.id,
+      REGION_NAME         = data.aws_region.current.name
+    }
+  }
+}
 ### EC2 Resources ###
 # Resource will create the IAM instance profile
 resource "aws_iam_instance_profile" "this" {
@@ -269,17 +340,18 @@ resource "aws_instance" "this" {
   }
   iam_instance_profile = aws_iam_instance_profile.this.name
   monitoring           = true
+  ebs_optimized        = false
   tags = merge(
+    { Name = var.firewall_hostname },
     var.instance_tags,
     var.tags
   )
-  ebs_optimized = false
 }
 
 # Resource creates the EC2 launch template
 resource "aws_launch_template" "this" {
   name          = "launch-template-${random_id.this.hex}-${data.aws_caller_identity.current.account_id}"
-  instance_type = lookup(var.instance_type, var.size, "m5.large")
+  instance_type = lookup(var.instance_type, var.instance_size, "m5.large")
   image_id      = element(local.sfos_ami, 0)
   key_name      = var.ssh_key_name
   block_device_mappings {
@@ -311,12 +383,13 @@ resource "aws_launch_template" "this" {
   }
   network_interfaces {
     network_interface_id = aws_network_interface.public.id
-    device_index         = 0
+    device_index         = 1
   }
   network_interfaces {
     network_interface_id = aws_network_interface.private.id
-    device_index         = 1
+    device_index         = 0
   }
+  user_data = base64encode("${data.template_file.user_data.rendered}")
   tags = merge(
     var.launch_template_tags,
     var.tags
@@ -352,8 +425,11 @@ resource "aws_iam_role_policy" "register_in_central" {
 ### AWS Secrets Manager Resources ###
 # Resource creates the XG Firewall Password secret
 resource "aws_secretsmanager_secret" "console_password" {
-  name                    = "sophos-fw-console-password"
+  name                    = "sophos-fw-console-password-${random_id.this.hex}"
   recovery_window_in_days = 0
+  tags = {
+    logical-id = "PasswordSecret"
+  }
 }
 
 # Resource creates the XG Firewall Secret
@@ -364,8 +440,11 @@ resource "aws_secretsmanager_secret_version" "console_password" {
 
 # Resource creates the XG Firewall backup configuration password secret
 resource "aws_secretsmanager_secret" "config_backup_password" {
-  name                    = "sophos-fw-backup-configuration-password"
+  name                    = "sophos-fw-backup-configuration-password-${random_id.this.hex}"
   recovery_window_in_days = 0
+  tags = {
+    logical-id = "PasswordSecret"
+  }
 }
 
 # Resource creates the XG Firewall backup configuration secret
@@ -376,8 +455,11 @@ resource "aws_secretsmanager_secret_version" "config_backup_password" {
 
 # Resource creates the Secure Storage Master Key password secret
 resource "aws_secretsmanager_secret" "secure_storage_master_key" {
-  name                    = "sophos-fw-secure-storage-master-key"
+  name                    = "sophos-fw-secure-storage-master-key-${random_id.this.hex}"
   recovery_window_in_days = 0
+  tags = {
+    logical-id = "PasswordSecret"
+  }
 }
 
 # Resource creates the Secure Storage Master Key secret
@@ -389,8 +471,11 @@ resource "aws_secretsmanager_secret_version" "secure_storage_master_key" {
 # Resource creates the Sophos Central password secret
 resource "aws_secretsmanager_secret" "central_password" {
   count                   = var.central_password != "" ? 1 : 0
-  name                    = "sophos-central-password"
+  name                    = "sophos-central-password-${random_id.this.hex}"
   recovery_window_in_days = 0
+  tags = {
+    logical-id = "PasswordSecret"
+  }
 }
 
 # Resource creates the Sophos Central secret
@@ -403,13 +488,7 @@ resource "aws_secretsmanager_secret_version" "central_password" {
 ### Supporting resources ###
 # Random ID
 resource "random_id" "this" {
-  prefix      = var.namespace
+  prefix      = "${var.namespace}-"
   byte_length = 1
-}
-
-# Random Shuffle
-resource "random_shuffle" "az" {
-  input        = data.aws_availability_zones.available.names
-  result_count = 1
 }
 

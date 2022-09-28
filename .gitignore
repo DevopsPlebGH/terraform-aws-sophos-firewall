@@ -1,3 +1,6 @@
+# Ignored directories
+scratch
+*venv
 # ACT ignored files
 **.secrets
 # Hashicorp Packer
@@ -48,3 +51,4 @@ test.pem
 remote.tf
 config.remote.tfbackend
 cloudformation.template
+*.pem

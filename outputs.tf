@@ -9,16 +9,31 @@ output "ami_map" {
   value       = local.amis
 }
 
-output "azs" {
+output "availability_zones" {
   description = <<EOT
   The availability zone that the resources were deployed in if no availability zone was specified.
   EOT
-  value       = var.az == null ? var.az : element("${random_shuffle.az.result}", 0)
+  value       = var.availability_zone != null ? var.availability_zone : data.aws_availability_zones.available.names[0]
 }
 
-output "trusted_ips" {
+output "firewall_ip_address" {
   description = <<EOT
-  The trusted IP CIDR's in the trusted IP security group.
+  The public IP for the firewall
   EOT
-  value       = local.trusted_ip
+  value       = aws_instance.this.public_ip
+}
+
+output "firewall_public_dns_name" {
+  description = <<EOT
+  The public DNS name for the firewall.
+  EOT
+  value       = aws_instance.this.public_dns
+}
+
+output "template_file" {
+  value = data.template_file.user_data.rendered
+}
+
+output "lambda_archive" {
+  value = data.archive_file.lambda_zip.id
 }

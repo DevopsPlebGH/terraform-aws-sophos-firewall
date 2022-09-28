@@ -9,18 +9,19 @@ defaults:
   run:
     working-directory:
       - ./examples
+
 permissions:
   id-token: write
   contents: read
 
 jobs:
-  plan:
+  integration_plan:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         path:
-          - complete
+          - ./examples/complete
         include:
           - environment: Development
 
@@ -43,7 +44,7 @@ jobs:
           enable-review-diffs-actions: true
           view-status-action-text: View build/deploy status
           review-diffs-action-text: Review commit diffs
-          include-files: true
+          include-files: true       
       - name: Checkout code
         uses: actions/checkout@v2
         with:
@@ -57,16 +58,16 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v1
         with: 
           role-to-assume: ${{ secrets.SOPHOS_DEV_DEPLOY_ROLE }}
-          aws-region: us-west-2
+          aws-region: us-west-1
           role-session-name: OIDCSession
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
         with:
           cli_config_credentials_token: ${{ secrets.SOPHOS_TF_API_TOKEN }}
       - name: Terraform init
+        working-directory: ${{ matrix.path }}
         id: init
         run: |
-          cd ${{ matrix.path }}
           REPO="${{ github.repository }}"
           WORKSPACE="${REPO#*/}"
 
@@ -78,12 +79,13 @@ jobs:
 
           cat >> config.remote.tfbackend<<EOF
           hostname = "app.terraform.io"
-          organization = "terraform-aws-sophos-firewall"
-          workspaces { name = "example-firewall-complete" }
+          organization = "${{ secrets.SOPHOS_TF_ORGANIZATION }}"
+          workspaces { name = "$WORKSPACE" }
           EOF
 
           terraform init -backend-config=config.remote.tfbackend
       - name: Terraform plan
+        working-directory: ${{ matrix.path }}
         id: plan
         continue-on-error: true
         run: | 
@@ -93,7 +95,7 @@ jobs:
           TF_VAR_console_password: ${{ secrets.CONSOLE_PASSWORD }}
           TF_VAR_config_backup_password: ${{ secrets.CONFIG_BACKUP_PASSWORD }}
           TF_VAR_secure_storage_master_key: ${{ secrets.SECURE_STORAGE_MASTER_KEY }}
-          TF_VAR_trusted_ip: '[ "${{ secrets.TRUSTED_IP }}" ]'  
+          TF_VAR_trusted_ip: ${{ secrets.TRUSTED_IP }}
       - name: Reformat Plan
         run: |
           echo '${{ steps.plan.outputs.stdout || steps.plan.outputs.stderr }}' \
