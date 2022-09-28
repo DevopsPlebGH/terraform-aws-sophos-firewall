@@ -1,34 +1,52 @@
 #!/usr/bin/env python
 import paramiko
 import traceback
+import os
 from paramiko.ssh_exception import BadHostKeyException, AuthenticationException, SSHException
 from paramiko_expect import SSHClientInteraction
 
-ip="52.52.203.132"
-xg_user="admin"
-xg_default_password="admin"
+IP=os.getenv(IP)
+USERNAME=os.getenv(USERNAME)
+PASSWORD=os.getenv(PASSWORD)
+
+
+def ssh_connect(self):
+  client = paramiko.SSHClient()
+  client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+  try:
+    client.connect(ip=IP,
+                  username=USERNAME,
+                  password=PASSWORD)
+  except AuthenticationException as error:
+    print('Authentication Failed: Please check your network/ssh key')
+  finally:
+    return client
 
 def logging(enable,event):
   if enable:
     print("DEBUG: " + event)
   return
-def ssh_client():
-  client = paramiko.SSHClient()
-  client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-  try:
-    client.connect(ip,username=xg_user,password=xg_default_password)
-def main():
 
+def change_password(client):
   client = paramiko.SSHClient()
   client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
   try:
-    client.connect(ip,username=xg_user,password=xg_default_password)
+    client.connect(IP,username=USERNAME,password=PASSWORD)
     with SSHClientInteraction(client, timeout=10, display=True) as interact:
       interact.expect('Select Menu Number')
       interact.send('2')
       interact.expect('Select Menu Number')
       interact.send('1')
-      interact.expect('SFOS')
+      interact.expect('continue?')
+      interact.send('Y')
+      interact.expect('Enter current password:')
+      interact.send(xg_default_password)
+      interact.expect('Enter new password')
+      interact.send('BrynaR!60122')
+      interact.expect('Re-Enter new Password')
+      interact.send('BrynaR!60122')
+      interact.expect('Password Changed')
+      interact.send()
   except Exception:
     traceback.print_exc()
   finally:
@@ -36,6 +54,10 @@ def main():
       client.close()
     except Exception:
       pass
+
+def main():
+  client = ssh_connect(IP)
+  change_password(client="client")
 
 if __name__ == "__main__":
     main()

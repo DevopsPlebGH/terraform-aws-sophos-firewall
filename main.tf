@@ -271,6 +271,21 @@ resource "aws_eip" "this" {
   )
 }
 
+### Lambda Resources ###
+# Resource will create the initial configuration Lambda function
+resource "aws_lambda_function" "this" {
+  role          = "lambda-role"
+  function_name = "function"
+  environment {
+    variables = {
+      IP                  = aws_network_interface.private.private_ip,
+      USERNAME            = "admin",
+      PASSWORD            = "admin",
+      CONSOLE_SECRET_NAME = aws_secretsmanager_secret.console_password.id
+      REGION_NAME         = data.aws_region.current
+    }
+  }
+}
 ### EC2 Resources ###
 # Resource will create the IAM instance profile
 resource "aws_iam_instance_profile" "this" {
@@ -280,10 +295,6 @@ resource "aws_iam_instance_profile" "this" {
     var.instance_profile_tags,
     var.tags
   )
-}
-# Enable serial console access
-resource "aws_ec2_serial_console_access" "this" {
-  enabled = true
 }
 
 # Resource will create the EC2 instance
