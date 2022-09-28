@@ -288,6 +288,8 @@ resource "aws_lambda_function" "this" {
     security_group_ids = [aws_security_group.lan[0].id]
   }
 
+  runtime = "python3.7"
+  handler = "config.main"
   environment {
     variables = {
       IP                  = aws_network_interface.private.private_ip,
