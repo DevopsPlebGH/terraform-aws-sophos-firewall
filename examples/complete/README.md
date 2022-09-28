@@ -11,6 +11,7 @@ No requirements.
 |------|---------|
 | <a name="provider_aws"></a> [aws](#provider\_aws) | 4.31.0 |
 | <a name="provider_http"></a> [http](#provider\_http) | 3.1.0 |
+| <a name="provider_random"></a> [random](#provider\_random) | 3.4.3 |
 
 ## Modules
 
@@ -23,6 +24,7 @@ No requirements.
 
 | Name | Type |
 |------|------|
+| [random_id.this](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
 | [aws_availability_zone.available](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/availability_zone) | data source |
 | [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/availability_zones) | data source |
 | [aws_region.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/region) | data source |

@@ -9,10 +9,15 @@ locals {
   trusted_cidrs    = concat(compact(formatlist(var.trusted_ip)), compact(local.runner_ip))
 }
 
+resource "random_id" "this" {
+  prefix      = "example-complete"
+  byte_length = 1
+}
+
 module "key-pair" {
   source             = "terraform-aws-modules/key-pair/aws"
   version            = "2.0.0"
-  key_name           = "sophos"
+  key_name           = "sophos-${random_id.this.hex}"
   create_private_key = true
 }
 
