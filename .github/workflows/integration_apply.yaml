@@ -137,8 +137,8 @@ jobs:
           TF_VAR_trusted_ip: ${{ secrets.TRUSTED_IP }}
       - name: Upload Lambda Artifact
         run: |
-          cd ../../
-          ZIP=./intial_config.zip
+          cd ../../ \
+          ZIP="./intial_config.zip" \
           ls -lah && pwd
 
           if [ -f $ZIP ]; then
