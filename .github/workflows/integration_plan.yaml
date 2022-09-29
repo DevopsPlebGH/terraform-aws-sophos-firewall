@@ -1,4 +1,4 @@
-name: Integration Testing - Plan on PR
+name: Plan on Pull Request (Integration Test)
 
 on:
   pull_request:
@@ -13,7 +13,6 @@ defaults:
 permissions:
   id-token: write
   contents: read
-
 jobs:
   integration_plan:
     runs-on: ubuntu-latest
