@@ -5,14 +5,10 @@ on:
     branches:
       - dev
 
-defaults:
-  run:
-    working-directory:
-      - ./examples
-
 permissions:
   id-token: write
   contents: read
+  
 jobs:
   integration_plan:
     runs-on: ubuntu-latest
@@ -87,8 +83,8 @@ jobs:
         working-directory: ${{ matrix.path }}
         id: plan
         continue-on-error: true
-        run: | 
-          cd ${{ matrix.path }} 
+        run: |
+          cd ${{ matrix.path }}
           terraform plan -input=false -no-color -out=tfplan
         env:
           TF_VAR_console_password: ${{ secrets.CONSOLE_PASSWORD }}
