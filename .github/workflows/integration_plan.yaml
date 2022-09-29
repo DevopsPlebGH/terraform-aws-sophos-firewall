@@ -8,7 +8,7 @@ on:
 permissions:
   id-token: write
   contents: read
-  
+
 jobs:
   integration_plan:
     runs-on: ubuntu-latest
@@ -84,7 +84,6 @@ jobs:
         id: plan
         continue-on-error: true
         run: |
-          cd ${{ matrix.path }}
           terraform plan -input=false -no-color -out=tfplan
         env:
           TF_VAR_console_password: ${{ secrets.CONSOLE_PASSWORD }}
