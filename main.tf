@@ -275,21 +275,15 @@ resource "aws_eip" "this" {
 # Resource will create the Lambda function execution role
 resource "aws_iam_role" "lambda_execution_role" {
   name               = "LambdaExecutionRole-${random_id.this.hex}"
-  assume_role_policy = <<-EOT
-  {
-    "Version": "2012-10-17",
-    "Statement": [
-      {
-        "Action": "sts:AssumeRole",
-        "Principal": {
-          "Service": "lambda.amazonaws.com"
-        },
-        "Effect": "Allow",
-        "Sid": ""
-      }
-    ]
+  assume_role_policy = data.aws_iam_policy_document.lambda_execution_trust_policy.json
+  inline_policy {
+    name   = "lambda-config-policy-${random_id.this.hex}"
+    policy = data.aws_iam_policy_document.lambda_execution_inline_policy.json
   }
-  EOT
+  tags = merge(
+    var.iam_role_tags,
+    var.tags
+  )
 }
 # Resource will create the initial configuration Lambda function
 resource "aws_lambda_function" "this" {
