@@ -1,14 +1,9 @@
-name: Integration Testing - Plan
+name: Plan on Pull Request (Integration Test)
 
 on:
   pull_request:
     branches:
       - dev
-
-defaults:
-  run:
-    working-directory:
-      - ./examples
 
 permissions:
   id-token: write
@@ -44,7 +39,7 @@ jobs:
           enable-review-diffs-actions: true
           view-status-action-text: View build/deploy status
           review-diffs-action-text: Review commit diffs
-          include-files: true       
+          include-files: true
       - name: Checkout code
         uses: actions/checkout@v2
         with:
@@ -53,10 +48,10 @@ jobs:
         uses: tibdex/github-app-token@v1
         with:
           app_id: ${{ secrets.APP_ID }}
-          private_key: ${{ secrets.APP_PRIVATE_KEY }}        
+          private_key: ${{ secrets.APP_PRIVATE_KEY }}
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
-        with: 
+        with:
           role-to-assume: ${{ secrets.SOPHOS_DEV_DEPLOY_ROLE }}
           aws-region: us-west-1
           role-session-name: OIDCSession
@@ -88,8 +83,7 @@ jobs:
         working-directory: ${{ matrix.path }}
         id: plan
         continue-on-error: true
-        run: | 
-          cd ${{ matrix.path }} 
+        run: |
           terraform plan -input=false -no-color -out=tfplan
         env:
           TF_VAR_console_password: ${{ secrets.CONSOLE_PASSWORD }}
@@ -99,7 +93,7 @@ jobs:
       - name: Reformat Plan
         run: |
           echo '${{ steps.plan.outputs.stdout || steps.plan.outputs.stderr }}' \
-          | sed -E 's/^([[:space:]]+)([-+])/\2\1/g' > plan.txt           
+          | sed -E 's/^([[:space:]]+)([-+])/\2\1/g' > plan.txt
       - name: Put plan in github environment variable
         run: |
           PLAN=$(cat plan.txt)
@@ -119,14 +113,13 @@ jobs:
             ! Orange
             @@ Pink @@
             #Gray
-            ${{ env.PLAN }}     
+            ${{ env.PLAN }}
             ```
 
 
 
-          
 
 
 
-        
-  
+
+
