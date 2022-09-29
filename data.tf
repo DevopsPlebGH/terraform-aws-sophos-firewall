@@ -75,6 +75,31 @@ data "aws_iam_policy_document" "trust_relationship" {
   }
 }
 
+data "aws_iam_policy_document" "lambda_execution_inline_policy" {
+  statement {
+    actions = [
+      "ec2:DescribeNetworkInterfaces",
+      "ec2:CreateNetworkInterface",
+      "ec2:DeleteNetworkInterface",
+      "ec2:DescribeInstances",
+      "ec2:AttachNetworkInterface"
+    ]
+    resources = [
+      aws_network_interface.private.arn
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "lambda_execution_trust_policy" {
+  statement {
+    actions = ["sts:AssumeRole"]
+    principals {
+      type        = "Service"
+      identifiers = ["lambda.amazonaws.com"]
+    }
+  }
+}
+
 data "aws_region" "current" {}
 
 data "template_file" "user_data" {
