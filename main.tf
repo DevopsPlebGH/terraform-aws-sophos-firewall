@@ -309,6 +309,7 @@ resource "aws_lambda_function" "this" {
     }
   }
 }
+
 ### EC2 Resources ###
 # Resource will create the IAM instance profile
 resource "aws_iam_instance_profile" "this" {
