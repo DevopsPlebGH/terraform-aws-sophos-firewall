@@ -84,9 +84,7 @@ data "aws_iam_policy_document" "lambda_execution_inline_policy" {
       "ec2:DescribeInstances",
       "ec2:AttachNetworkInterface"
     ]
-    resources = [
-      aws_network_interface.private.arn
-    ]
+    resources = ["*"]
   }
 }
 
