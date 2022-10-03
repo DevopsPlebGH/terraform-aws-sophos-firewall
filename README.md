@@ -131,6 +131,7 @@ No modules.
 | <a name="output_ami_id"></a> [ami\_id](#output\_ami\_id) | n/a |
 | <a name="output_ami_map"></a> [ami\_map](#output\_ami\_map) | The map of AMI's available. |
 | <a name="output_availability_zones"></a> [availability\_zones](#output\_availability\_zones) | The availability zone that the resources were deployed in if no availability zone was specified. |
+| <a name="output_console_secret_arn"></a> [console\_secret\_arn](#output\_console\_secret\_arn) | The ARN for the Console Secret. |
 | <a name="output_firewall_ip_address"></a> [firewall\_ip\_address](#output\_firewall\_ip\_address) | The public IP for the firewall |
 | <a name="output_firewall_public_dns_name"></a> [firewall\_public\_dns\_name](#output\_firewall\_public\_dns\_name) | The public DNS name for the firewall. |
 | <a name="output_lambda_archive"></a> [lambda\_archive](#output\_lambda\_archive) | n/a |

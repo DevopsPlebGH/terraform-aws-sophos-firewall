@@ -27,3 +27,7 @@ output "availability_zone_map" {
 output "archive_name" {
   value = module.complete.lambda_archive
 }
+
+output "console_secret_arn" {
+  value = module.complete.console_secret_arn
+}

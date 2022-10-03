@@ -16,6 +16,12 @@ output "availability_zones" {
   value       = var.availability_zone != null ? var.availability_zone : data.aws_availability_zones.available.names[0]
 }
 
+output "console_secret_arn" {
+  description = <<EOT
+  The ARN for the Console Secret.
+  EOT
+  value       = aws_secretsmanager_secret.console_password.arn
+}
 output "firewall_ip_address" {
   description = <<EOT
   The public IP for the firewall

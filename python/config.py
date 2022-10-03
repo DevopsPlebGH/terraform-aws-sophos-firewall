@@ -79,6 +79,16 @@ def get_secret():
 
     # Your code goes here.
 
+def eula(client):
+  client = paramiko.SSHClient()
+  client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+  try:
+    client.connect(HOST_IP,username=DEFAULT_USER,password=DEFAULT_PASSWORD)
+    with SSHClientInteraction(client, timeout=10, display=True) as interact:
+      interact.expect('Accept' )
+      interact.send(chr(0x1b)+'[D')
+      interact.expect('Accept')
+      interact.send(chr(0x1b)+'[015')
 
 def change_password(client):
   client = paramiko.SSHClient()
@@ -86,10 +96,6 @@ def change_password(client):
   try:
     client.connect(HOST_IP,username=DEFAULT_USER,password=DEFAULT_PASSWORD)
     with SSHClientInteraction(client, timeout=10, display=True) as interact:
-      interact.expect('End User Terms of Use')
-      interact.sendall('\x1b[011')
-      interact.expect('Accept')
-      interact.send('\x1b[015')
       interact.expect('Select Menu Number')
       interact.send('2')
       interact.expect('Select Menu Number')
@@ -116,6 +122,7 @@ def main():
   logger = logging.getLogger()
   logger.setLevel(logging.DEBUG)
   client = ssh_connect(HOST_IP)
+  eula(client="client")
   change_password(client="client")
 
 if __name__ == "__main__":
