@@ -301,11 +301,11 @@ resource "aws_lambda_function" "this" {
   handler = "config.main"
   environment {
     variables = {
-      IP                  = aws_network_interface.private.private_ip,
-      USERNAME            = "admin",
-      PASSWORD            = "admin",
-      CONSOLE_SECRET_NAME = aws_secretsmanager_secret.console_password.id,
-      REGION_NAME         = data.aws_region.current.name
+      HOST_IP            = aws_network_interface.private.private_ip,
+      DEFAULT_USER       = "admin",
+      DEFAULT_PASSWORD   = "admin",
+      CONSOLE_SECRET_ARN = aws_secretsmanager_secret.console_password.id,
+      REGION_NAME        = data.aws_region.current.name
     }
   }
 }
