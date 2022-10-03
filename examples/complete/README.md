@@ -9,7 +9,7 @@ No requirements.
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 4.31.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 4.32.0 |
 | <a name="provider_http"></a> [http](#provider\_http) | 3.1.0 |
 | <a name="provider_random"></a> [random](#provider\_random) | 3.4.3 |
 
@@ -45,6 +45,7 @@ No requirements.
 |------|-------------|
 | <a name="output_archive_name"></a> [archive\_name](#output\_archive\_name) | n/a |
 | <a name="output_availability_zone_map"></a> [availability\_zone\_map](#output\_availability\_zone\_map) | n/a |
+| <a name="output_console_secret_arn"></a> [console\_secret\_arn](#output\_console\_secret\_arn) | n/a |
 | <a name="output_private_key"></a> [private\_key](#output\_private\_key) | SSH Private Key |
 | <a name="output_public_dns"></a> [public\_dns](#output\_public\_dns) | Firewalls public DNS name |
 | <a name="output_public_ip"></a> [public\_ip](#output\_public\_ip) | Firewalls public IP |
