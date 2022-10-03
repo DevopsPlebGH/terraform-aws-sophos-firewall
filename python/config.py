@@ -4,15 +4,16 @@ import traceback
 import os
 import boto3
 import base64
+import logging
 from botocore.exceptions import ClientError
 from paramiko.ssh_exception import BadHostKeyException, AuthenticationException, SSHException
 from paramiko_expect import SSHClientInteraction
 
-HOST_IP=os.getenv(HOST_IP)
-DEFAULT_USER=os.getenv(DEFAULT_USER)
-DEFAULT_PASSWORD=os.getenv(DEFAULT_PASSWORD)
-CONSOLE_SECRET_ARN=os.getenv(CONSOLE_SECRET_ARN)
-REGION_NAME=os.getenv(REGION_NAME)
+HOST_IP=os.getenv("HOST_IP",None)
+DEFAULT_USER=os.getenv("DEFAULT_USER",None)
+DEFAULT_PASSWORD=os.getenv("DEFAULT_PASSWORD",None)
+CONSOLE_SECRET_ARN=os.getenv("CONSOLE_SECRET_ARN",None)
+REGION_NAME=os.getenv("REGION_NAME",None)
 
 
 def ssh_connect(self):
@@ -26,20 +27,6 @@ def ssh_connect(self):
     print('Authentication Failed: Please check your network/ssh key')
   finally:
     return client
-
-def logging(enable,event):
-  if enable:
-    print("DEBUG: " + event)
-  return
-
-# Use this code snippet in your app.
-# If you need more information about configurations or implementing the sample code, visit the AWS docs:
-# https://aws.amazon.com/developers/getting-started/python/
-
-import boto3
-import base64
-from botocore.exceptions import ClientError
-
 
 def get_secret():
 
@@ -97,8 +84,12 @@ def change_password(client):
   client = paramiko.SSHClient()
   client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
   try:
-    client.connect(IP,username=USERNAME,password=DEFAULT_PASSWORD)
+    client.connect(HOST_IP,username=DEFAULT_USER,password=DEFAULT_PASSWORD)
     with SSHClientInteraction(client, timeout=10, display=True) as interact:
+      interact.expect('End User Terms of Use')
+      interact.sendall('\x1b[011')
+      interact.expect('Accept')
+      interact.send('\x1b[015')
       interact.expect('Select Menu Number')
       interact.send('2')
       interact.expect('Select Menu Number')
@@ -122,7 +113,9 @@ def change_password(client):
       pass
 
 def main():
-  client = ssh_connect(IP)
+  logger = logging.getLogger()
+  logger.setLevel(logging.DEBUG)
+  client = ssh_connect(HOST_IP)
   change_password(client="client")
 
 if __name__ == "__main__":
