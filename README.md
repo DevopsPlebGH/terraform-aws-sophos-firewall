@@ -28,9 +28,16 @@ No modules.
 |------|------|
 | [aws_eip.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eip) | resource |
 | [aws_iam_instance_profile.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_instance_profile) | resource |
+| [aws_iam_policy_attachment.central_password_secret](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy_attachment) | resource |
+| [aws_iam_policy_attachment.firewall_console_password](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy_attachment) | resource |
+| [aws_iam_policy_attachment.secure_storage_master_key](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy_attachment) | resource |
+| [aws_iam_policy_attachment.sophos_central_password](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy_attachment) | resource |
+| [aws_iam_role.ec2_iam_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 | [aws_iam_role.lambda_execution_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
-| [aws_iam_role.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
-| [aws_iam_role_policy.register_in_central](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy) | resource |
+| [aws_iam_role_policy.central_password_secret](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy) | resource |
+| [aws_iam_role_policy.firewall_console_password](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy) | resource |
+| [aws_iam_role_policy.secret_central_password](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy) | resource |
+| [aws_iam_role_policy.secure_storage_master_key](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy) | resource |
 | [aws_instance.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/instance) | resource |
 | [aws_internet_gateway.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/internet_gateway) | resource |
 | [aws_lambda_function.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lambda_function) | resource |
@@ -43,10 +50,19 @@ No modules.
 | [aws_route_table.public](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table) | resource |
 | [aws_route_table_association.private](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table_association) | resource |
 | [aws_route_table_association.public](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table_association) | resource |
+| [aws_secretsmanager_secret.BasicAdminPassword](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret) | resource |
+| [aws_secretsmanager_secret.CentralPassword](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret) | resource |
+| [aws_secretsmanager_secret.CentralUsername](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret) | resource |
+| [aws_secretsmanager_secret.ConfigBackupPassword](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret) | resource |
+| [aws_secretsmanager_secret.SSMKPassword](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret) | resource |
 | [aws_secretsmanager_secret.central_password](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret) | resource |
 | [aws_secretsmanager_secret.config_backup_password](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret) | resource |
 | [aws_secretsmanager_secret.console_password](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret) | resource |
 | [aws_secretsmanager_secret.secure_storage_master_key](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret) | resource |
+| [aws_secretsmanager_secret_version.BasicAdminPassword](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret_version) | resource |
+| [aws_secretsmanager_secret_version.CentralPassword](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret_version) | resource |
+| [aws_secretsmanager_secret_version.ConfigBackupPassword](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret_version) | resource |
+| [aws_secretsmanager_secret_version.SSMKPassword](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret_version) | resource |
 | [aws_secretsmanager_secret_version.central_password](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret_version) | resource |
 | [aws_secretsmanager_secret_version.config_backup_password](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret_version) | resource |
 | [aws_secretsmanager_secret_version.console_password](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret_version) | resource |
@@ -63,11 +79,12 @@ No modules.
 | [aws_ami_ids.sfos](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ami_ids) | data source |
 | [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/availability_zones) | data source |
 | [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
-| [aws_iam_policy_document.central](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
-| [aws_iam_policy_document.ec2_iam_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
+| [aws_iam_policy_document.central_password](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
+| [aws_iam_policy_document.firewall_console_password](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.lambda_execution_inline_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.lambda_execution_trust_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.secure_storage_master_key](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
+| [aws_iam_policy_document.sophos_central_password](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.trust_relationship](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_region.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/region) | data source |
 | [http_http.my_public_ip](https://registry.terraform.io/providers/hashicorp/http/latest/docs/data-sources/http) | data source |
@@ -77,12 +94,13 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_app"></a> [app](#input\_app) | (Optional) The name of the app the firewall is being deployed to.<br><br>  Default: "sophos cloud native firewall" | `string` | `"sophos cloud native firewall"` | no |
 | <a name="input_autodetect"></a> [autodetect](#input\_autodetect) | (Optional) Whether or not to use the latest version of the AMI.<br><br>  Default: true | `bool` | `true` | no |
 | <a name="input_availability_zone"></a> [availability\_zone](#input\_availability\_zone) | (Required) The availability zone in which to deploy the firewall. | `string` | n/a | yes |
 | <a name="input_aws_region"></a> [aws\_region](#input\_aws\_region) | (Required) The region in which to deploy the firewall | `string` | n/a | yes |
 | <a name="input_central_password"></a> [central\_password](#input\_central\_password) | (Optional) The password for your Sophos Central account if you would like to register the firewall with Sophos Central<br><br>  Default: "" | `string` | `""` | no |
 | <a name="input_central_username"></a> [central\_username](#input\_central\_username) | (Optional) Sophos Central username if registering the firewall to Central<br><br>  Default: "" | `string` | `""` | no |
-| <a name="input_cicd_ip"></a> [cicd\_ip](#input\_cicd\_ip) | (Optional) Whether to include the IP address of the CI/CD runner in the Trusted Network security group. <br><br>  Default: true | `bool` | `true` | no |
+| <a name="input_cicd_ip"></a> [cicd\_ip](#input\_cicd\_ip) | (Optional) Whether to include the IP address of the CI/CD runner in the Trusted Network security group.<br><br>  Default: true | `bool` | `true` | no |
 | <a name="input_cidr_block"></a> [cidr\_block](#input\_cidr\_block) | (Optional) The CIDR range for the VPC CIDR block.<br><br>    Default: "10.0.0.0/16" | `string` | `"10.0.0.0/16"` | no |
 | <a name="input_config_backup_password"></a> [config\_backup\_password](#input\_config\_backup\_password) | (Required) The password to secure the configuration backup. | `string` | n/a | yes |
 | <a name="input_console_password"></a> [console\_password](#input\_console\_password) | (Required) The password for the firewall management console. | `string` | n/a | yes |
@@ -93,11 +111,12 @@ No modules.
 | <a name="input_elastic_ip_tags"></a> [elastic\_ip\_tags](#input\_elastic\_ip\_tags) | (Optional) Additional tags to attach to the Elastic IP Address<br><br>  Default: {} | `map(string)` | `{}` | no |
 | <a name="input_enable_dns_hostnames"></a> [enable\_dns\_hostnames](#input\_enable\_dns\_hostnames) | (Optional) Controls whether or not DNS hostname support should be enabled in the VPC<br><br>    Default: true | `bool` | `true` | no |
 | <a name="input_enable_dns_support"></a> [enable\_dns\_support](#input\_enable\_dns\_support) | (Optional) Controls whether DNS support should be enabled in the VPC<br><br>  Default: true | `bool` | `true` | no |
+| <a name="input_environment"></a> [environment](#input\_environment) | (Optional) The environment in which the firewall is being deployed in.<br><br>  Default: "" | `string` | `""` | no |
 | <a name="input_eula"></a> [eula](#input\_eula) | (Required) Use of this software is subject to the Sophos End User License Agreement (EULA) at https://www.sophos.com/en-us/legal/sophos-end-user-license-agreement.aspx. | `string` | n/a | yes |
 | <a name="input_firewall_hostname"></a> [firewall\_hostname](#input\_firewall\_hostname) | (Optional) The hostname of the firewall<br><br>  Default: "sophos-firewall-tf" | `string` | `"sophos-firewall-tf"` | no |
 | <a name="input_iam_role_tags"></a> [iam\_role\_tags](#input\_iam\_role\_tags) | (Optional) Additional tags to attach to created IAM roles<br><br>  Default: {} | `map(string)` | `{}` | no |
 | <a name="input_instance_profile_tags"></a> [instance\_profile\_tags](#input\_instance\_profile\_tags) | (Optional) Additional tags to attach to instance profile<br><br>  Default: {} | `map(string)` | `{}` | no |
-| <a name="input_instance_size"></a> [instance\_size](#input\_instance\_size) | (Required) The size of the instance to deploy. Available instance sizes are:<br><br>    t3.small<br>    t3.medium <br>    m3.xlarge <br>    m3.2xlarge<br>    m4.large<br>    m4.xlarge <br>    m5.large<br>    m5.xlarge <br>    m5.2xlarge<br>    c3.xlarge <br>    c3.2xlarge<br>    c3.4xlarge<br>    c3.8xlarge<br>    c4.large<br>    c4.xlarge <br>    c4.2xlarge<br>    c4.4xlarge<br>    c4.8xlarge<br>    c5.large<br>    c5.xlarge <br>    c5.2xlarge<br><br>  Default: "m5.large" | `string` | n/a | yes |
+| <a name="input_instance_size"></a> [instance\_size](#input\_instance\_size) | (Required) The size of the instance to deploy. Available instance sizes are:<br><br>    t3.small<br>    t3.medium<br>    m3.xlarge<br>    m3.2xlarge<br>    m4.large<br>    m4.xlarge<br>    m5.large<br>    m5.xlarge<br>    m5.2xlarge<br>    c3.xlarge<br>    c3.2xlarge<br>    c3.4xlarge<br>    c3.8xlarge<br>    c4.large<br>    c4.xlarge<br>    c4.2xlarge<br>    c4.4xlarge<br>    c4.8xlarge<br>    c5.large<br>    c5.xlarge<br>    c5.2xlarge<br><br>  Default: "m5.large" | `string` | n/a | yes |
 | <a name="input_instance_tags"></a> [instance\_tags](#input\_instance\_tags) | (Optional) Additional tags to attach to the EC2 instance<br><br>  Default: {} | `map(string)` | `{}` | no |
 | <a name="input_instance_type"></a> [instance\_type](#input\_instance\_type) | (Optional) The EC2 instance type to use for the firewall | `map(any)` | <pre>{<br>  "c3.2xlarge": "c3.2xlarge",<br>  "c3.4xlarge": "c3.4xlarge",<br>  "c3.8xlarge": "c3.8xlarge",<br>  "c3.xlarge": "c3.xlarge",<br>  "c4.2xlarge": "c4.2xlarge",<br>  "c4.4xlarge": "c4.4xlarge",<br>  "c4.8xlarge": "c4.8xlarge",<br>  "c4.large": "c4.large",<br>  "c4.xlarge": "c4.xlarge",<br>  "c5.2xlarge": "c5.2xlarge",<br>  "c5.large": "c5.large",<br>  "c5.xlarge": "c5.xlarge",<br>  "m3.2xlarge": "m3.2xlarge",<br>  "m3.xlarge": "m3.xlarge",<br>  "m4.large": "m4.large",<br>  "m4.xlarge": "m4.xlarge",<br>  "m5.2xlarge": "m5.2xlarge",<br>  "m5.large": "m5.large",<br>  "m5.xlarge": "m5.xlarge",<br>  "t3.medium": "t3.medium",<br>  "t3.small": "t3.small"<br>}</pre> | no |
 | <a name="input_internet_gateway_tags"></a> [internet\_gateway\_tags](#input\_internet\_gateway\_tags) | (Optional) Additional tags to attach to created internet gateways<br><br>  Default: {} | `map(string)` | `{}` | no |
@@ -131,7 +150,7 @@ No modules.
 | <a name="output_ami_id"></a> [ami\_id](#output\_ami\_id) | n/a |
 | <a name="output_ami_map"></a> [ami\_map](#output\_ami\_map) | The map of AMI's available. |
 | <a name="output_availability_zones"></a> [availability\_zones](#output\_availability\_zones) | The availability zone that the resources were deployed in if no availability zone was specified. |
-| <a name="output_console_secret_arn"></a> [console\_secret\_arn](#output\_console\_secret\_arn) | The ARN for the Console Secret. |
+| <a name="output_console_secret_name"></a> [console\_secret\_name](#output\_console\_secret\_name) | The ARN for the Console Secret. |
 | <a name="output_firewall_ip_address"></a> [firewall\_ip\_address](#output\_firewall\_ip\_address) | The public IP for the firewall |
 | <a name="output_firewall_public_dns_name"></a> [firewall\_public\_dns\_name](#output\_firewall\_public\_dns\_name) | The public DNS name for the firewall. |
 | <a name="output_lambda_archive"></a> [lambda\_archive](#output\_lambda\_archive) | n/a |

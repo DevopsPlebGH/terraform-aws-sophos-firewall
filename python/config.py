@@ -28,10 +28,13 @@ def ssh_connect(self):
   finally:
     return client
 
-def get_secret():
+def write_to_file(msg):
+      with open('output.log', 'a') as f:
+            f.write(msg)
 
-    secret_name = CONSOLE_SECRET_ARN
-    region_name = REGION_NAME
+def get_secret():
+    secret_name = os.getenv("CONSOLE_SECRET_ARN")
+    region_name = os.getenv("REGION_NAME")
 
     # Create a Secrets Manager client
     session = boto3.session.Session()
@@ -78,6 +81,7 @@ def get_secret():
             decoded_binary_secret = base64.b64decode(get_secret_value_response['SecretBinary'])
 
     # Your code goes here.
+    return secret
 
 def eula(client):
   client = paramiko.SSHClient()
@@ -85,15 +89,22 @@ def eula(client):
   try:
     client.connect(HOST_IP,username=DEFAULT_USER,password=DEFAULT_PASSWORD)
     with SSHClientInteraction(client, timeout=10, display=True) as interact:
-      interact.expect('Accept' )
-      interact.send(chr(0x1b)+'[D')
-      interact.expect('Accept')
-      interact.send(chr(0x1b)+'[015')
+      interact.expect('End User License Agreement')
+      interact.send('A')
+  except Exception:
+    traceback.print_exc()
+  finally:
+    try:
+      client.close()
+    except Exception:
+      pass
 
 def change_password(client):
+  consolepassword=get_secret()
   client = paramiko.SSHClient()
   client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
   try:
+    print (consolepassword)
     client.connect(HOST_IP,username=DEFAULT_USER,password=DEFAULT_PASSWORD)
     with SSHClientInteraction(client, timeout=10, display=True) as interact:
       interact.expect('Select Menu Number')

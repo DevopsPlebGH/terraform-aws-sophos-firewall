@@ -27,7 +27,8 @@ data "aws_availability_zones" "available" {
 
 data "aws_caller_identity" "current" {}
 
-data "aws_iam_policy_document" "central" {
+### Policy Documents ###
+data "aws_iam_policy_document" "central_password" {
   count = var.central_password != "" ? 1 : 0
   statement {
     actions = [
@@ -40,7 +41,7 @@ data "aws_iam_policy_document" "central" {
   }
 }
 
-data "aws_iam_policy_document" "ec2_iam_policy" {
+data "aws_iam_policy_document" "firewall_console_password" {
   statement {
     actions = [
       "secretsmanager:GetSecretValue",

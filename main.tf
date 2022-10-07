@@ -304,7 +304,7 @@ resource "aws_lambda_function" "this" {
       HOST_IP            = aws_network_interface.private.private_ip,
       DEFAULT_USER       = "admin",
       DEFAULT_PASSWORD   = "admin",
-      CONSOLE_SECRET_ARN = aws_secretsmanager_secret.console_password.id,
+      CONSOLE_SECRET_ARN = aws_secretsmanager_secret.console_password.name,
       REGION_NAME        = data.aws_region.current.name
     }
   }
@@ -314,7 +314,7 @@ resource "aws_lambda_function" "this" {
 # Resource will create the IAM instance profile
 resource "aws_iam_instance_profile" "this" {
   name = "ec2-instance-profile-${random_id.this.hex}"
-  role = aws_iam_role.this.name
+  role = aws_iam_role.ec2_iam_role.name
   tags = merge(
     var.instance_profile_tags,
     var.tags
@@ -374,7 +374,7 @@ resource "aws_launch_template" "this" {
     instance_metadata_tags      = "enabled"
   }
   iam_instance_profile {
-    name = aws_iam_role.this.name
+    name = aws_iam_role.ec2_iam_role.name
   }
   network_interfaces {
     network_interface_id = aws_network_interface.public.id
@@ -392,39 +392,29 @@ resource "aws_launch_template" "this" {
 }
 ### IAM Role ###
 # Resource will create the EC2 IAM role
-resource "aws_iam_role" "this" {
-  name               = "ec2-iam-role-${random_id.this.hex}-${data.aws_caller_identity.current.account_id}"
-  assume_role_policy = data.aws_iam_policy_document.trust_relationship.json
-  inline_policy {
-    name   = "ec2-policy-${random_id.this.hex}"
-    policy = data.aws_iam_policy_document.ec2_iam_policy.json
-  }
-  inline_policy {
-    name   = "ssm-policy-${random_id.this.hex}"
-    policy = data.aws_iam_policy_document.secure_storage_master_key.json
-  }
-  tags = merge(
-    var.iam_role_tags,
-    var.tags
-  )
+# Resource will create the policy attachment to the EC2 IAM role to allow access to the Central Password secret.
+resource "aws_iam_policy_attachment" "central_password_secret" {
+  name       = "central_password-${random_id.this.hex}"
+  roles      = aws_iam_role.ec2_iam_role.name
+  policy_arn = aws_iam_role_policy.register_in_central.arn
 }
-
 # Resource will create the IAM role policy for the EC2 role
-resource "aws_iam_role_policy" "register_in_central" {
+resource "aws_iam_role_policy" "central_password_secret" {
   count  = var.central_password != "" ? 1 : 0
-  name   = "ec2-central-policy-${random_id.this.hex}"
+  name   = "ssm-central-password-secret-${random_id.this.hex}"
   role   = aws_iam_role.this.id
-  policy = data.aws_iam_policy_document.central[0].json
+  policy = data.aws_iam_policy_document.central_password[0].json
 }
 
+resource "aws_iam_role_policy" "firewall_console_password" {
+  name = "ssm-firewall-console-password-${random_id.this.hex}"
+
+}
 ### AWS Secrets Manager Resources ###
 # Resource creates the XG Firewall Password secret
 resource "aws_secretsmanager_secret" "console_password" {
   name                    = "sophos-fw-console-password-${random_id.this.hex}"
   recovery_window_in_days = 0
-  tags = {
-    logical-id = "PasswordSecret"
-  }
 }
 
 # Resource creates the XG Firewall Secret
@@ -437,9 +427,6 @@ resource "aws_secretsmanager_secret_version" "console_password" {
 resource "aws_secretsmanager_secret" "config_backup_password" {
   name                    = "sophos-fw-backup-configuration-password-${random_id.this.hex}"
   recovery_window_in_days = 0
-  tags = {
-    logical-id = "PasswordSecret"
-  }
 }
 
 # Resource creates the XG Firewall backup configuration secret
@@ -452,9 +439,6 @@ resource "aws_secretsmanager_secret_version" "config_backup_password" {
 resource "aws_secretsmanager_secret" "secure_storage_master_key" {
   name                    = "sophos-fw-secure-storage-master-key-${random_id.this.hex}"
   recovery_window_in_days = 0
-  tags = {
-    logical-id = "PasswordSecret"
-  }
 }
 
 # Resource creates the Secure Storage Master Key secret
@@ -468,9 +452,6 @@ resource "aws_secretsmanager_secret" "central_password" {
   count                   = var.central_password != "" ? 1 : 0
   name                    = "sophos-central-password-${random_id.this.hex}"
   recovery_window_in_days = 0
-  tags = {
-    logical-id = "PasswordSecret"
-  }
 }
 
 # Resource creates the Sophos Central secret
@@ -484,6 +465,6 @@ resource "aws_secretsmanager_secret_version" "central_password" {
 # Random ID
 resource "random_id" "this" {
   prefix      = "${var.namespace}-"
-  byte_length = 1
+  byte_length = 2
 }
 

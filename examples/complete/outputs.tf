@@ -12,22 +12,6 @@ output "public_ip" {
     EOT
   value       = module.complete.firewall_ip_address
 }
-
-output "public_dns" {
-  description = <<EOT
-    Firewalls public DNS name
-    EOT
-  value       = module.complete.firewall_public_dns_name
-}
-
-output "availability_zone_map" {
-  value = local.availability_zone_map
-}
-
-output "archive_name" {
-  value = module.complete.lambda_archive
-}
-
-output "console_secret_arn" {
-  value = module.complete.console_secret_arn
+output "console_secret_name" {
+  value = module.complete.console_secret_name
 }

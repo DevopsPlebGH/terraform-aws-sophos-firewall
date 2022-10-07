@@ -45,3 +45,37 @@ module "complete" {
   }
 }
 
+module "cloudformation-stack" {
+  source  = "cloudposse/cloudformation-stack/aws"
+  version = "0.7.1"
+  # insert the 13 required variables here
+  enabled      = true
+  namespace    = "cft"
+  stage        = "dev"
+  name         = "sophos-xg-fw"
+  template_url = "https://s3.amazonaws.com/awsmp-fulfillment-cf-templates-prod/336ce6d8-8e8b-4f15-a35c-f524e4fdcce2.97b34878-cd88-4c6d-a955-4a06f6e36f10.template"
+  parameters = {
+    AMI                      = "autodetect"
+    AvailabilityZone         = "us-west-1b"
+    PublicNetworkPrefix      = "10.15"
+    OptExistingVPC           = ""
+    OptExistingSubnetPublic  = ""
+    OptExistingSubnetPrivate = ""
+    TrustedNetworkCIDR       = "47.184.79.94/32"
+    PublicNetworkCIDR        = "0.0.0.0/0"
+    OptUsingEIPonFirewall    = "yes"
+    OptExistingElasticIpId   = ""
+    InstanceSize             = "t3.medium"
+    KeyName                  = "${module.key-pair.key_pair_name}"
+    ExistingS3Bucket         = ""
+    SophosFirewallName       = "sophos-cft-firewall"
+    BasicAdminPassword       = "${var.console_password}"
+    ConfigBackupPassword     = "${var.config_backup_password}"
+    SSMKPassword             = "${var.secure_storage_master_key}"
+    AgreeUserTerms           = "yes"
+    SendLearningStats        = "on"
+    CentralUsername          = ""
+    CentralPassword          = ""
+  }
+  capabilities = ["CAPABILITY_IAM", "CAPABILITY_NAMED_IAM", "CAPABILITY_AUTO_EXPAND"]
+}

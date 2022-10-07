@@ -17,6 +17,7 @@ No requirements.
 
 | Name | Source | Version |
 |------|--------|---------|
+| <a name="module_cloudformation-stack"></a> [cloudformation-stack](#module\_cloudformation-stack) | cloudposse/cloudformation-stack/aws | 0.7.1 |
 | <a name="module_complete"></a> [complete](#module\_complete) | ../../ | n/a |
 | <a name="module_key-pair"></a> [key-pair](#module\_key-pair) | terraform-aws-modules/key-pair/aws | 2.0.0 |
 
@@ -43,10 +44,7 @@ No requirements.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_archive_name"></a> [archive\_name](#output\_archive\_name) | n/a |
-| <a name="output_availability_zone_map"></a> [availability\_zone\_map](#output\_availability\_zone\_map) | n/a |
-| <a name="output_console_secret_arn"></a> [console\_secret\_arn](#output\_console\_secret\_arn) | n/a |
+| <a name="output_console_secret_name"></a> [console\_secret\_name](#output\_console\_secret\_name) | n/a |
 | <a name="output_private_key"></a> [private\_key](#output\_private\_key) | SSH Private Key |
-| <a name="output_public_dns"></a> [public\_dns](#output\_public\_dns) | Firewalls public DNS name |
 | <a name="output_public_ip"></a> [public\_ip](#output\_public\_ip) | Firewalls public IP |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

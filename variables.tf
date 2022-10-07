@@ -1,3 +1,12 @@
+variable "app" {
+  type        = string
+  description = <<EOT
+  (Optional) The name of the app the firewall is being deployed to.
+
+  Default: "sophos cloud native firewall"
+  EOT
+  default     = "sophos cloud native firewall"
+}
 variable "aws_region" {
   type        = string
   description = <<EOT
@@ -35,7 +44,7 @@ variable "central_username" {
 variable "cicd_ip" {
   type        = bool
   description = <<EOT
-  (Optional) Whether to include the IP address of the CI/CD runner in the Trusted Network security group. 
+  (Optional) Whether to include the IP address of the CI/CD runner in the Trusted Network security group.
 
   Default: true
   EOT
@@ -64,6 +73,21 @@ variable "console_password" {
   description = <<EOT
   (Required) The password for the firewall management console.
   EOT
+  #validation {
+  #  condition = length(var.console_password) >= 10
+  #  error_message = <<EOT
+  #  ERROR: Must be at least 10 characters.
+  #  EOT
+  #}
+  validation {
+    condition     = can(regex("^(.*[0-9])(.*[^A-Za-z0-9])(.*[a-z])(.*[A-Z])((.*)).{10,60}$", var.console_password))
+    error_message = <<EOT
+    ERROR: Password validation error.
+
+    Password does not meet the password complexity requirements. Password must be;
+    At least 10 characters long, have at least one upper case and one lower case letter, at least one number, and at least one special character.
+    EOT
+  }
 }
 
 variable "create_elastic_ip" {
@@ -132,6 +156,15 @@ variable "enable_dns_support" {
   default     = true
 }
 
+variable "environment" {
+  type        = string
+  description = <<EOT
+  (Optional) The environment in which the firewall is being deployed in.
+
+  Default: ""
+  EOT
+  default     = ""
+}
 variable "eula" {
   type        = string
   description = <<EOT
@@ -192,26 +225,26 @@ variable "instance_size" {
   description = <<EOT
   (Required) The size of the instance to deploy. Available instance sizes are:
 
-    t3.small  
-    t3.medium 
-    m3.xlarge 
+    t3.small
+    t3.medium
+    m3.xlarge
     m3.2xlarge
-    m4.large  
-    m4.xlarge 
-    m5.large  
-    m5.xlarge 
+    m4.large
+    m4.xlarge
+    m5.large
+    m5.xlarge
     m5.2xlarge
-    c3.xlarge 
+    c3.xlarge
     c3.2xlarge
     c3.4xlarge
     c3.8xlarge
-    c4.large  
-    c4.xlarge 
+    c4.large
+    c4.xlarge
     c4.2xlarge
     c4.4xlarge
     c4.8xlarge
-    c5.large  
-    c5.xlarge 
+    c5.large
+    c5.xlarge
     c5.2xlarge
 
   Default: "m5.large"
@@ -221,26 +254,26 @@ variable "instance_size" {
     error_message = <<EOT
     ERROR: Invalid Instance Size! Valid instance sizes are:
 
-      t3.small  
-      t3.medium 
-      m3.xlarge 
+      t3.small
+      t3.medium
+      m3.xlarge
       m3.2xlarge
-      m4.large  
-      m4.xlarge 
-      m5.large  
-      m5.xlarge 
+      m4.large
+      m4.xlarge
+      m5.large
+      m5.xlarge
       m5.2xlarge
-      c3.xlarge 
+      c3.xlarge
       c3.2xlarge
       c3.4xlarge
       c3.8xlarge
-      c4.large  
-      c4.xlarge 
+      c4.large
+      c4.xlarge
       c4.2xlarge
       c4.4xlarge
       c4.8xlarge
-      c5.large  
-      c5.xlarge 
+      c5.large
+      c5.xlarge
       c5.2xlarge
     EOT
   }
