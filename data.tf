@@ -1,8 +1,3 @@
-data "archive_file" "lambda_zip" {
-  type        = "zip"
-  source_dir  = "${path.module}/xg-config-lambda"
-  output_path = "${path.module}/initial_config.zip"
-}
 data "aws_ami_ids" "sfos" {
   owners = ["aws-marketplace"]
   filter {
@@ -21,104 +16,58 @@ data "aws_ami" "dynamic_ami" {
   }
 }
 
-data "aws_availability_zones" "available" {
-  state = "available"
-}
-
-data "aws_caller_identity" "current" {}
-
-data "aws_iam_policy_document" "central" {
-  count = var.central_password != "" ? 1 : 0
-  statement {
-    actions = [
-      "secretsmanager:GetSecretValue",
-      "secretsmanager:DescribeSecret"
-    ]
-    resources = [
-      element(aws_secretsmanager_secret.central_password[*].arn, count.index)
-    ]
+data "aws_eip" "by_filter" {
+  depends_on = [aws_eip.this]
+  filter {
+    name   = "tag:Name"
+    values = ["${local.name_prefix}"]
   }
 }
 
-data "aws_iam_policy_document" "ec2_iam_policy" {
-  statement {
-    actions = [
-      "secretsmanager:GetSecretValue",
-      "secretsmanager:DescribeSecret"
-    ]
-    resources = [
-      aws_secretsmanager_secret.console_password.arn,
-      aws_secretsmanager_secret.config_backup_password.arn
-    ]
-  }
-}
-
-data "aws_iam_policy_document" "secure_storage_master_key" {
-  statement {
-    actions = [
-      "secretsmanager:GetSecretValue",
-      "secretsmanager:DescribeSecret"
-    ]
-    resources = [
-      aws_secretsmanager_secret.secure_storage_master_key.arn
-    ]
-  }
-}
-
-data "aws_iam_policy_document" "trust_relationship" {
-  statement {
-    actions = ["sts:AssumeRole"]
-    principals {
-      type        = "Service"
-      identifiers = ["ec2.amazonaws.com"]
+// EC2 IAM role
+data "aws_iam_policy_document" "policy" {
+  dynamic "statement" {
+    for_each = var.central_password == null ? [] : [1]
+    content {
+      sid = "CentralPass"
+      actions = [
+        "secretsmanager:GetSecretValue",
+        "secretsmanager:DescribeSecret"
+      ]
+      resources = [aws_secretsmanager_secret.central_password.arn]
     }
   }
-}
-
-data "aws_iam_policy_document" "lambda_execution_inline_policy" {
-  statement {
-    actions = [
-      "ec2:DescribeNetworkInterfaces",
-      "ec2:CreateNetworkInterface",
-      "ec2:DeleteNetworkInterface",
-      "ec2:DescribeInstances",
-      "ec2:AttachNetworkInterface"
-    ]
-    resources = ["*"]
-  }
-}
-
-data "aws_iam_policy_document" "lambda_execution_trust_policy" {
-  statement {
-    actions = ["sts:AssumeRole"]
-    principals {
-      type        = "Service"
-      identifiers = ["lambda.amazonaws.com"]
+  dynamic "statement" {
+    for_each = var.console_password == null ? [] : [1]
+    content {
+      sid = "ConsolePass"
+      actions = [
+        "secretsmanager:GetSecretValue",
+        "secretsmanager:DescribeSecret"
+      ]
+      resources = [aws_secretsmanager_secret.console_password.arn]
     }
   }
-}
-
-data "aws_region" "current" {}
-
-data "template_file" "user_data" {
-  template = file("${path.module}/templates/user_data.tpl")
-  vars = {
-    ssmkSecretId    = aws_secretsmanager_secret.secure_storage_master_key.arn
-    s3bucket        = var.s3bucket
-    centralusername = var.central_username
-    centralpassword = var.central_password != "" ? aws_secretsmanager_secret.central_password[0].arn : null
-    hostname        = var.firewall_hostname
-    sendstats       = var.send_stats
-    region          = var.aws_region
-    secretId        = aws_secretsmanager_secret.console_password.arn
-    configSecretId  = aws_secretsmanager_secret.config_backup_password.arn
-    serialKey       = var.serial_number
+  dynamic "statement" {
+    for_each = var.config_backup_password == null ? [] : [1]
+    content {
+      sid = "ConfigBackupPass"
+      actions = [
+        "secretsmanager:GetSecretValue",
+        "secretsmanager:DescribeSecret"
+      ]
+      resources = [aws_secretsmanager_secret.config_backup_password.arn]
+    }
   }
-}
-
-data "http" "my_public_ip" {
-  url = "https://ifconfig.co/json"
-  request_headers = {
-    Accept = "application/json"
+  dynamic "statement" {
+    for_each = var.secure_storage_master_key == null ? [] : [1]
+    content {
+      sid = "SecureStorageMasterKey"
+      actions = [
+        "secretsmanager:GetSecretValue",
+        "secretsmanager:DescribeSecret"
+      ]
+      resources = [aws_secretsmanager_secret.secure_storage_master_key.arn]
+    }
   }
 }
